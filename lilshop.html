@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Administrador - Anxie Store</title>
+  <!-- CDN de Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Archivo de Estilos Externo -->
+  <link rel="stylesheet" href="lilshop.css">
+</head>
+<body>
+
+  <!-- ==========================================
+       PANTALLA DE LOGIN
+       ========================================== -->
+  <div id="lock-screen">
+    <div class="login-header">
+      <img src="assets/anxie2.jpg" alt="Anxie Store Logo" class="login-logo-img">
+      <h2>Sign in to Anxie Panel</h2>
+    </div>
+
+    <div class="login-box">
+      <form id="nip-form">
+        <label for="nip-input">Master PIN</label>
+        <div class="input-wrapper">
+          <input 
+            type="password" 
+            id="nip-input" 
+            placeholder="Enter your PIN" 
+            required 
+          >
+        </div>
+        <button type="submit" id="btn-login" class="login-btn">Sign in</button>
+        <div id="nip-msg" class="error"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       APP PRINCIPAL
+       ========================================== -->
+  <div id="app-container">
+    
+    <!-- BARRA LATERAL -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <img src="assets/anxie2.jpg" alt="Anxie Store Logo" class="sidebar-logo-img">
+        <div class="sidebar-brand-text">
+          <h2>ANXIE STORE</h2>
+          <p>PANEL</p>
+        </div>
+      </div>
+
+      <ul class="nav-menu">
+        <li class="nav-item active" onclick="cambiarVista('inicio', event)">
+          🏠 Inicio
+        </li>
+        <li class="nav-item" onclick="cambiarVista('agregar', event)">
+          ✨ Agregar Cuentas
+        </li>
+        <li class="nav-item" onclick="cambiarVista('editar', event)">
+          📁 Editar / Eliminar
+        </li>
+        <li class="nav-item" onclick="cerrarSesion()" style="margin-top: auto;">
+          ⚙️ Cerrar Sesión
+        </li>
+      </ul>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+      
+      <!-- VISTA 1: INICIO (DASHBOARD) -->
+      <section id="vista-inicio" class="view-section active">
+        <div class="header-date" id="fecha-actual">Cargando fecha...</div>
+        <h1 class="header-title">Buenos días, <span>Miguel</span></h1>
+
+        <div class="dashboard-grid">
+          <div class="dash-card">
+            <h3>¿Qué hacemos hoy?</h3>
+            <p class="subtitle">Atajos a las tareas que mas usas.</p>
+            <div class="shortcuts-grid">
+              <button class="shortcut-btn" onclick="cambiarVista('agregar', event)">
+                🖼️ Agregar Cuenta
+              </button>
+              <button class="shortcut-btn" onclick="cambiarVista('editar', event)">
+                🧾 Editar/Eliminar
+              </button>
+            </div>
+          </div>
+
+          <div class="dash-card">
+            <h3>CONTENIDO GENERADO</h3>
+            <p class="subtitle-white">Estadísticas de tus cuentas actuales.</p>
+            <ul class="stats-list">
+              <li class="stats-item">
+                🖼️ <span id="contador-cuentas">Cargando...</span>&nbsp;cuentas en stock
+              </li>
+              <li class="stats-item" style="color: var(--text-muted); font-weight: normal;">
+                (Más estadísticas próximamente)
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- VISTA 2: AGREGAR CUENTAS -->
+      <section id="vista-agregar" class="view-section">
+        <h1 style="margin-bottom: 20px; font-weight: 600;">Subir Nueva Cuenta</h1>
+        
+        <div class="form-container">
+          <form id="cuenta-form">
+            <div class="form-group">
+              <label for="titulo">Título de la Cuenta</label>
+              <input type="text" id="titulo" placeholder="Ej: Cuenta Fortnite OG Travis Scott" required>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label for="preciomxn">Precio MXN ($)</label>
+                <input type="number" step="0.01" id="preciomxn" placeholder="700" required>
+              </div>
+              <div class="form-group">
+                <label for="preciousd">Precio USD ($)</label>
+                <input type="number" step="0.01" id="preciousd" placeholder="41" required>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label for="vbucks">V-Bucks / Pavos</label>
+                <input type="text" id="vbucks" placeholder="Ej: 1,500 V-Bucks" required>
+              </div>
+              <div class="form-group">
+                <label for="disponibilidad">Disponibilidad (Plataformas)</label>
+                <input type="text" id="disponibilidad" placeholder="Ej: PC, Xbox, Play, Nintendo" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="descripcion">Descripción / Skins / Detalles</label>
+              <textarea id="descripcion" rows="3" placeholder="Incluye Pases de batalla 2, 3, 4, Skin de Travis Scott, etc." required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="imagen">Imagen de la Cuenta</label>
+              <input type="file" id="imagen" accept="image/*" required style="padding: 9px; background: var(--bg-panel);">
+            </div>
+
+            <button type="submit" id="btn-guardar" class="login-btn" style="margin-top: 10px;">Subir Cuenta al Catálogo</button>
+            <div id="status-msg"></div>
+          </form>
+        </div>
+      </section>
+
+      <!-- VISTA 3: EDITAR / ELIMINAR CUENTAS -->
+      <section id="vista-editar" class="view-section">
+        <h1 style="margin-bottom: 20px; font-weight: 600;">Gestionar Inventario</h1>
+        <div id="lista-cuentas-editar" class="cuentas-grid-admin">
+          <!-- Tarjetas cargadas dinámicamente -->
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL DE EDICIÓN (Ubicado correctamente antes de los scripts) -->
+  <div id="modal-editar" class="modal-overlay" style="display: none;">
+    <div class="modal-content form-container">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="font-weight: 600;">Editar Cuenta</h2>
+        <button onclick="cerrarModalEditar()" style="background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;">&times;</button>
+      </div>
+
+      <form id="form-editar-cuenta">
+        <input type="hidden" id="edit-id">
+        <input type="hidden" id="edit-imagen-actual">
+
+        <div class="form-group">
+          <label for="edit-titulo">Título de la Cuenta</label>
+          <input type="text" id="edit-titulo" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="edit-preciomxn">Precio MXN ($)</label>
+            <input type="number" step="0.01" id="edit-preciomxn" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-preciousd">Precio USD ($)</label>
+            <input type="number" step="0.01" id="edit-preciousd" required>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="edit-vbucks">V-Bucks / Pavos</label>
+            <input type="text" id="edit-vbucks" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-disponibilidad">Disponibilidad (Plataformas)</label>
+            <input type="text" id="edit-disponibilidad" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-descripcion">Descripción / Skins / Detalles</label>
+          <textarea id="edit-descripcion" rows="3" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-imagen">Cambiar Imagen (Opcional)</label>
+          <input type="file" id="edit-imagen" accept="image/*" style="padding: 9px; background: var(--bg-panel);">
+        </div>
+
+        <div class="grid-2" style="margin-top: 15px;">
+          <button type="button" onclick="cerrarModalEditar()" class="login-btn" style="background-color: #475569;">Cancelar</button>
+          <button type="submit" id="btn-guardar-edit" class="login-btn">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div> 
+
+  <!-- LÓGICA DE JAVASCRIPT -->
+  <script>
+    // ==========================================
+    // 1. CONFIGURACIÓN DE SUPABASE
+    // ==========================================
+    const SUPABASE_URL = 'https://jayxntvpiduxvgvluaky.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpheXhudHZwaWR1eHZndmx1YWt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2NDgxNjMsImV4cCI6MjEwMjIyNDE2M30.U7Hrie3HIBAcp_2fYU0YHgP8McGnpYYYjdBiW-9AMjw'; // 👈 Pon tu anon key aquí
+
+    const ADMIN_EMAIL = 'matthewsantreys13@gmail.com';
+
+    const { createClient } = supabase;
+    const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ==========================================
+    // 2. SISTEMA DE SEGURIDAD Y LOGIN
+    // ==========================================
+    const nipForm = document.getElementById('nip-form');
+    const nipInput = document.getElementById('nip-input');
+    const nipMsg = document.getElementById('nip-msg');
+    const btnLogin = document.getElementById('btn-login');
+
+    window.addEventListener('load', async () => {
+      establecerFecha();
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (session) {
+        mostrarAppPrincipal();
+      }
+    });
+
+    nipForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nipIngresado = nipInput.value;
+
+      btnLogin.disabled = true;
+      btnLogin.innerText = "Verificando...";
+      nipMsg.style.display = 'none';
+
+      const { data, error } = await _supabase.auth.signInWithPassword({
+        email: ADMIN_EMAIL,
+        password: nipIngresado
+      });
+
+      if (error) {
+        nipMsg.innerText = "PIN incorrecto. Intenta de nuevo.";
+        nipMsg.style.display = 'block';
+        btnLogin.disabled = false;
+        btnLogin.innerText = "Sign in";
+      } else {
+        mostrarAppPrincipal();
+      }
+    });
+
+    function mostrarAppPrincipal() {
+      document.getElementById('lock-screen').style.display = 'none';
+      document.getElementById('app-container').style.display = 'flex';
+      cargarEstadisticas();
+    }
+
+    async function cerrarSesion() {
+      await _supabase.auth.signOut();
+      location.reload();
+    }
+
+    // ==========================================
+    // 3. UI Y NAVEGACIÓN
+    // ==========================================
+    function establecerFecha() {
+      const opciones = { weekday: 'long', day: 'numeric', month: 'long' };
+      let fechaStr = new Date().toLocaleDateString('es-ES', opciones);
+      document.getElementById('fecha-actual').innerText = fechaStr.toUpperCase();
+    }
+
+    function cambiarVista(vistaId, e) {
+      document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(`vista-${vistaId}`).classList.add('active');
+
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      if(e && e.currentTarget) e.currentTarget.classList.add('active');
+
+      if(vistaId === 'inicio') cargarEstadisticas();
+      if(vistaId === 'editar') cargarCuentasParaEditar();
+    }
+
+    async function cargarEstadisticas() {
+      try {
+        const { count, error } = await _supabase
+          .from('Cuentas')
+          .select('*', { count: 'exact', head: true });
+        
+        if (!error) {
+          document.getElementById('contador-cuentas').innerText = count;
+        }
+      } catch (err) {
+        console.error("Error al cargar stats:", err);
+      }
+    }
+
+    // ==========================================
+    // 4. SUBIR NUEVA CUENTA
+    // ==========================================
+    const form = document.getElementById('cuenta-form');
+    const statusMsg = document.getElementById('status-msg');
+    const btnGuardar = document.getElementById('btn-guardar');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      btnGuardar.disabled = true;
+      btnGuardar.innerText = "Subiendo imagen y guardando...";
+      mostrarMensaje("", "");
+
+      try {
+        const fileInput = document.getElementById('imagen');
+        const file = fileInput.files[0];
+
+        if (!file) throw new Error("Por favor selecciona una imagen.");
+
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+
+        const { data: uploadData, error: uploadError } = await _supabase.storage
+          .from('cuentas-fotos')
+          .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = _supabase.storage
+          .from('cuentas-fotos')
+          .getPublicUrl(fileName);
+
+        const imagenUrl = urlData.publicUrl;
+
+        const titulo = document.getElementById('titulo').value;
+        const preciomxn = parseFloat(document.getElementById('preciomxn').value);
+        const preciousd = parseFloat(document.getElementById('preciousd').value);
+        const vbucks = document.getElementById('vbucks').value;
+        const disponibilidad = document.getElementById('disponibilidad').value;
+        const descripcion = document.getElementById('descripcion').value;
+
+        const { error: insertError } = await _supabase
+          .from('Cuentas')
+          .insert([{
+            titulo: titulo,
+            preciomxn: preciomxn,
+            preciousd: preciousd,
+            vbucks: vbucks,
+            disponibilidad: disponibilidad,
+            descripcion: descripcion,
+            image_url: imagenUrl
+          }]);
+
+        if (insertError) throw insertError;
+
+        mostrarMensaje("¡Cuenta guardada exitosamente!", "success");
+        form.reset();
+
+      } catch (err) {
+        console.error(err);
+        mostrarMensaje("Error: " + (err.message || "Ocurrió un problema"), "error");
+      } finally {
+        btnGuardar.disabled = false;
+        btnGuardar.innerText = "Subir Cuenta al Catálogo";
+      }
+    });
+
+    function mostrarMensaje(texto, tipo) {
+      if (!texto) {
+        statusMsg.style.display = 'none';
+        return;
+      }
+      statusMsg.innerText = texto;
+      statusMsg.className = tipo;
+      statusMsg.style.display = 'block';
+      setTimeout(() => statusMsg.style.display = 'none', 5000);
+    }
+
+    // ==========================================
+    // 5. GESTIÓN DE INVENTARIO (EDITAR Y ELIMINAR)
+    // ==========================================
+    async function cargarCuentasParaEditar() {
+      const contenedor = document.getElementById('lista-cuentas-editar');
+      contenedor.innerHTML = '<p style="color: var(--text-muted);">Cargando inventario...</p>';
+
+      try {
+        const { data: cuentas, error } = await _supabase
+          .from('Cuentas')
+          .select('*')
+          .order('id', { ascending: false });
+
+        if (error) throw error;
+
+        if (!cuentas || cuentas.length === 0) {
+          contenedor.innerHTML = '<p style="color: var(--text-muted);">No hay cuentas publicadas.</p>';
+          return;
+        }
+
+        contenedor.innerHTML = '';
+        cuentas.forEach(c => {
+          const card = document.createElement('div');
+          card.className = 'card-admin';
+          card.innerHTML = `
+            <img src="${c.image_url}" alt="${c.titulo}" class="card-admin-img">
+            <div class="card-admin-body">
+              <div class="card-admin-title">${c.titulo}</div>
+              <div class="card-admin-price">$${c.preciomxn} MXN / $${c.preciousd} USD</div>
+              <div class="card-admin-details">
+                <strong>Pavos:</strong> ${c.vbucks}<br>
+                <strong>Plataformas:</strong> ${c.disponibilidad}
+              </div>
+              <div class="card-actions-grid">
+                <button class="btn-card-edit" onclick='abrirModalEditar(${JSON.stringify(c)})'>✏️ Editar</button>
+                <button class="btn-card-delete" onclick="eliminarCuenta(${c.id})">🗑️ Eliminar</button>
+              </div>
+            </div>
+          `;
+          contenedor.appendChild(card);
+        });
+
+      } catch (err) {
+        console.error(err);
+        contenedor.innerHTML = '<p style="color: var(--accent-red);">Error al cargar las cuentas.</p>';
+      }
+    }
+
+    async function eliminarCuenta(id) {
+      const confirmacion = confirm("¿Estás seguro de borrar esta cuenta? Se eliminará del catálogo.");
+      if (!confirmacion) return;
+
+      try {
+        const { error } = await _supabase
+          .from('Cuentas')
+          .delete()
+          .eq('id', id);
+
+        if (error) throw error;
+
+        alert("¡Cuenta eliminada con éxito!");
+        cargarCuentasParaEditar();
+        cargarEstadisticas();
+      } catch (err) {
+        console.error(err);
+        alert("Error al eliminar: " + err.message);
+      }
+    }
+
+    function abrirModalEditar(cuenta) {
+      document.getElementById('edit-id').value = cuenta.id;
+      document.getElementById('edit-titulo').value = cuenta.titulo;
+      document.getElementById('edit-preciomxn').value = cuenta.preciomxn;
+      document.getElementById('edit-preciousd').value = cuenta.preciousd;
+      document.getElementById('edit-vbucks').value = cuenta.vbucks;
+      document.getElementById('edit-disponibilidad').value = cuenta.disponibilidad;
+      document.getElementById('edit-descripcion').value = cuenta.descripcion;
+      document.getElementById('edit-imagen-actual').value = cuenta.image_url;
+
+      document.getElementById('modal-editar').style.display = 'flex';
+    }
+
+    function cerrarModalEditar() {
+      document.getElementById('modal-editar').style.display = 'none';
+      document.getElementById('form-editar-cuenta').reset();
+    }
+
+    // FORMULARIO DE EDICIÓN
+    document.getElementById('form-editar-cuenta').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-guardar-edit');
+      btn.disabled = true;
+      btn.innerText = "Guardando...";
+
+      try {
+        const id = document.getElementById('edit-id').value;
+        let imagenUrl = document.getElementById('edit-imagen-actual').value;
+
+        const fileInput = document.getElementById('edit-imagen');
+        if (fileInput.files.length > 0) {
+          const file = fileInput.files[0];
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${Date.now()}.${fileExt}`;
+
+          const { error: uploadError } = await _supabase.storage
+            .from('cuentas-fotos')
+            .upload(fileName, file);
+
+          if (uploadError) throw uploadError;
+
+          const { data: urlData } = _supabase.storage
+            .from('cuentas-fotos')
+            .getPublicUrl(fileName);
+
+          imagenUrl = urlData.publicUrl;
+        }
+
+        const { error: updateError } = await _supabase
+          .from('Cuentas')
+          .update({
+            titulo: document.getElementById('edit-titulo').value,
+            preciomxn: parseFloat(document.getElementById('edit-preciomxn').value),
+            preciousd: parseFloat(document.getElementById('edit-preciousd').value),
+            vbucks: document.getElementById('edit-vbucks').value,
+            disponibilidad: document.getElementById('edit-disponibilidad').value,
+            descripcion: document.getElementById('edit-descripcion').value,
+            image_url: imagenUrl
+          })
+          .eq('id', id);
+
+        if (updateError) throw updateError;
+
+        alert("¡Cuenta actualizada con éxito!");
+        cerrarModalEditar();
+        cargarCuentasParaEditar();
+
+      } catch (err) {
+        console.error(err);
+        alert("Error al actualizar: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Guardar Cambios";
+      }
+    });
+  </script>
+</body>
+</html>

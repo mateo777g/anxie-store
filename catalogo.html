@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Catálogo | ANXIE STORE</title>
+
+    <!-- Google Fonts: Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+    <!-- CSS Base y CSS del Catálogo -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="catalogo.css">
+    
+    <!-- Visor de Spline -->
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
+    <!-- CDN de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <!-- 🌟 HEADER COMPLETO STICKY (LUPA + LOGO + FILTRO + NAV) 🌟 -->
+    <header class="catalog-header">
+        <div class="header-top-row">
+
+            <!-- 🍔 LADO IZQUIERDO: MENÚ HAMBURGUESA + BÚSQUEDA -->
+            <div class="header-left-group">
+                <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Abrir Menú">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+                <button class="header-icon-btn" id="open-search-btn" title="Buscar productos">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- 🔴 LOGO CIRCULAR (CENTRO) -->
+            <img src="assets/logo.jpg" alt="ANXIE STORE" class="header-logo">
+
+            <!-- ⚙️ ÍCONO DE FILTRO (DERECHA) -->
+            <div class="filter-dropdown-container">
+                <button class="header-icon-btn" id="filter-toggle-btn" title="Filtrar catálogo">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="4" y1="6" x2="20" y2="6"></line>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                        <line x1="10" y1="18" x2="14" y2="18"></line>
+                    </svg>
+                </button>
+
+                <!-- Menú flotante de filtro -->
+                <div class="filter-menu" id="filter-menu">
+                    <span class="filter-menu-title">Ordenar Por</span>
+                    <button class="filter-opt active" data-sort="high-low">Precio: Mayor a Menor</button>
+                    <button class="filter-opt" data-sort="low-high">Precio: Menor a Mayor</button>
+                    <button class="filter-opt" data-sort="newest">Más Recientes</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- BARRA GRIS NAVEGACIÓN -->
+        <div class="catalog-nav-container">
+            <nav class="catalog-nav">
+                <a href="index.html#home">INICIO</a>
+                <a href="catalogo.html">CATÁLOGO</a>
+                <a href="index.html#features">CONTACTO</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 🚪 BARRA LATERAL (SIDEBAR) & OVERLAY PARA MÓVIL (BLANCA) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar-catalog" id="sidebar">
+        <button class="sidebar-close-btn" id="sidebarClose">&times;</button>
+        
+        <div class="sidebar-header">
+            <img src="assets/logo.jpg" alt="Logo ANXIE STORE" class="sidebar-logo">
+            <span class="sidebar-title">ANXIE STORE</span>
+        </div>
+
+        <ul class="sidebar-links">
+            <li><a href="index.html#home">Inicio</a></li>
+            <li><a href="catalogo.html">Catálogo</a></li>
+            <li><a href="index.html#features">Contacto</a></li>
+        </ul>
+    </aside>
+
+    <!-- 🛒 ÁREA PRINCIPAL DEL CATÁLOGO 🛒 -->
+    <main class="catalog-main">
+        <h1 class="shop-all-title">CATÁLOGO COMPLETO</h1>
+        
+        <div class="product-grid" id="product-grid">
+            <div id="loading-msg">Cargando cuentas...</div>
+        </div>
+    </main>
+
+    <!-- 🔍 VENTANA EMERGENTE (MODAL) DE BÚSQUEDA 🔍 -->
+    <div class="search-modal-overlay" id="search-modal">
+        <div class="search-modal-card">
+            <div class="search-bar-header">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="search-input" class="search-input-field" placeholder="Search..." autocomplete="off">
+                <button class="close-search-btn" id="close-search-btn">&times;</button>
+            </div>
+
+            <div class="search-results-section">
+                <div class="search-section-title">Cuentas</div>
+                <div class="search-results-grid" id="search-results">
+                    <!-- Los resultados de la búsqueda se renderizan aquí dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 🛒 VENTANA EMERGENTE (MODAL) OPCIONES DE COMPRA 🛒 -->
+    <div class="buy-modal-overlay" id="buy-modal">
+        <div class="buy-modal-card">
+            <button class="close-buy-btn" id="close-buy-btn">&times;</button>
+            
+            <!-- 📱 TÍTULO EXCLUSIVO PARA CELULARES (Corregido) -->
+            <p class="buy-modal-mobile-title">Puedes contactarme por Instagram o crear un ticket en Discord para adquirir tu cuenta.</p>
+
+            <div class="buy-modal-body">
+                
+                <!-- LADO IZQUIERDO: INSTAGRAM -->
+                <div class="buy-col">
+                    <p class="buy-col-title">Puedes contactarme directamente en Instagram y adquirir tu cuenta.</p>
+                    <div class="buy-spline-box">
+                        <spline-viewer url="https://prod.spline.design/oe-RDmLSVmAWNKtd/scene.splinecode"></spline-viewer>
+                    </div>
+                    <a href="https://www.instagram.com/anxieofficial/" target="_blank" rel="noopener noreferrer" class="btn-buy-option btn-ig">
+                        <span class="text-pc">Enviar mensaje a Instagram</span>
+                        <span class="text-mobile">Instagram</span>
+                    </a>
+                </div>
+
+                <!-- LÍNEA DIVISORA -->
+                <div class="buy-modal-divider"></div>
+
+                <!-- LADO DERECHO: DISCORD -->
+                <div class="buy-col">
+                    <p class="buy-col-title">Puedes crear un ticket en mi servidor de Discord y adquirir tu cuenta.</p>
+                    <div class="buy-spline-box">
+                        <spline-viewer url="https://prod.spline.design/XKsR2uz1pm2A4ada/scene.splinecode"></spline-viewer>
+                    </div>
+                    <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener noreferrer" class="btn-buy-option btn-discord">
+                        <span class="text-pc">Unirse al Discord</span>
+                        <span class="text-mobile">Discord</span>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔍 VENTANA EMERGENTE PARA VER IMAGEN GRANDE Y ZOOM 🔍 -->
+    <div class="image-zoom-overlay" id="image-zoom-overlay">
+        <div class="image-zoom-container">
+            <button class="close-zoom-btn" id="close-zoom-btn">&times;</button>
+            <img src="" alt="Vista Previa de Cuenta" class="image-zoom-img" id="large-zoom-image">
+        </div>
+    </div>
+
+    <!-- 🌐 FOOTER OSCURO 🌐 -->
+    <footer class="footer-social" style="background-color: #000; border-top:none;">
+        <div class="footer-container">
+            <div class="social-spline-wrapper">
+                <spline-viewer url="https://prod.spline.design/4uAm5uYQsL5uXqW6/scene.splinecode"></spline-viewer>
+            </div>
+            <p class="footer-copy" style="color: #666; font-family: 'Montserrat', sans-serif; font-size: 0.8rem;">&copy; 2026 ANXIE STORE. By Matthew.</p>
+        </div>
+    </footer>
+
+    <!-- LÓGICA DE SUPABASE + BÚSQUEDA EN TIEMPO REAL + FILTROS -->
+    <script>
+        // 🛑 ELIMINACIÓN AGRESIVA DE MARCA DE AGUA DE SPLINE EN EL FOOTER
+        function limpiarSplineViewer(viewer) {
+            const aplicarOcultamiento = () => {
+                if (!viewer.shadowRoot) return;
+
+                if (!viewer.shadowRoot.querySelector('#estilo-sin-logo')) {
+                    const style = document.createElement('style');
+                    style.id = 'estilo-sin-logo';
+                    style.textContent = `
+                        #logo, #spline-logo, a[href*="spline"], .spline-watermark, #watermark, [class*="watermark"] {
+                            display: none !important;
+                            opacity: 0 !important;
+                            pointer-events: none !important;
+                            visibility: hidden !important;
+                            transform: scale(0) !important;
+                            width: 0 !important;
+                            height: 0 !important;
+                        }
+                    `;
+                    viewer.shadowRoot.appendChild(style);
+                }
+
+                const logo = viewer.shadowRoot.querySelector('#logo, #spline-logo, a[href*="spline"], .spline-watermark, #watermark');
+                if (logo) {
+                    logo.remove();
+                }
+            };
+
+            const arrancarObservador = () => {
+                if (viewer.shadowRoot && !viewer.dataset.observed) {
+                    viewer.dataset.observed = 'true';
+                    aplicarOcultamiento();
+
+                    const observer = new MutationObserver(() => aplicarOcultamiento());
+                    observer.observe(viewer.shadowRoot, { childList: true, subtree: true });
+                }
+            };
+
+            const intervaloRapido = setInterval(() => {
+                aplicarOcultamiento();
+                arrancarObservador();
+                if (viewer.shadowRoot && viewer.shadowRoot.querySelector('#estilo-sin-logo')) {
+                    clearInterval(intervaloRapido);
+                }
+            }, 20);
+
+            viewer.addEventListener('load', () => {
+                aplicarOcultamiento();
+                arrancarObservador();
+            });
+        }
+
+        function ocultarLogosSpline() {
+            document.querySelectorAll('spline-viewer').forEach(limpiarSplineViewer);
+
+            const docObserver = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.tagName && node.tagName.toLowerCase() === 'spline-viewer') {
+                            limpiarSplineViewer(node);
+                        }
+                    });
+                });
+            });
+
+            const target = document.body || document.documentElement;
+            if (target) {
+                docObserver.observe(target, { childList: true, subtree: true });
+            }
+        }
+
+        ocultarLogosSpline();
+
+        // 🟢 CONFIGURACIÓN SUPABASE Y CATÁLOGO
+        const SUPABASE_URL = 'https://jayxntvpiduxvgvluaky.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpheXhudHZwaWR1eHZndmx1YWt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2NDgxNjMsImV4cCI6MjEwMjIyNDE2M30.U7Hrie3HIBAcp_2fYU0YHgP8McGnpYYYjdBiW-9AMjw';
+        
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let globalCuentas = [];
+
+        function renderPlataformasHTML(texto) {
+            if (!texto) return 'DISPONIBLE';
+
+            const platforms = [
+                {
+                    regex: /\b(PC|COMPU|DESKTOP)\b/i,
+                    name: 'PC',
+                    svg: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="margin-right: 5px; vertical-align: -2px;"><path fill-rule="evenodd" clip-rule="evenodd" d="M4 4C2.89543 4 2 4.89543 2 6V16C2 17.1046 2.89543 18 4 18H10V20H7C6.44772 20 6 20.4477 6 21C6 21.5523 6.44772 22 7 22H17C17.5523 22 18 21.5523 18 21C18 20.4477 17.5523 20 17 20H14V18H20C21.1046 18 22 17.1046 22 16V6C22 4.89543 21.1046 4 20 4H4ZM4 6H20V16H4V6Z" fill="#00D2FF"/></svg>`
+                },
+                {
+                    regex: /\b(XBOX|XBX|XONE)\b/i,
+                    name: 'XBOX',
+                    svg: `<svg width="15" height="15" viewBox="0 0 100 100" fill="none" style="margin-right: 5px; vertical-align: -2px;"><circle cx="50" cy="50" r="50" fill="#107C10"/><path fill="#FFFFFF" d="M33.7 26.1C38.2 28.5 44.5 33 50 39.4c5.5-6.4 11.8-10.9 16.3-13.3 2.8 3 5 6.6 6.5 10.4-3.5 3.3-9.5 8.8-15.1 16 7 10.6 14.8 20.3 18.2 24.3-2.2 2.7-4.9 5-7.9 6.8-4.5-5.3-11.8-14.8-18-23.8-6.2 9-13.5 18.5-18 23.8-3-1.8-5.7-4.1-7.9-6.8 3.4-4 11.2-13.7 18.2-24.3-5.6-7.2-11.6-12.7-15.1-16 1.5-3.8 3.7-7.4 6.5-10.4z"/></svg>`
+                },
+                {
+                    regex: /\b(PLAY|PS|PS4|PS5|PLAYSTATION)\b/i,
+                    name: 'PLAY',
+                    svg: `<svg width="15" height="15" viewBox="0 0 100 100" fill="none" style="margin-right: 5px; vertical-align: -2px;"><circle cx="50" cy="50" r="50" fill="#003791"/><path fill="#FFFFFF" d="M56.8 30.6v27.2c3.5-.8 6.2-2.3 6.2-4.4 0-2.8-4.2-3.8-9.4-4.6v-8.8c8.3.8 16.8 2.8 16.8 9.5 0 6.1-7.1 9.4-13.6 10.7v9.4l-6.9 2.3V25l6.9 5.6zm-13.7 13c-4.8 0-9 1.1-11.8 2.6l2.3 5.4c2.5-1.1 5.8-1.9 9.5-1.9 3.2 0 4.6.8 4.6 2.1 0 1.2-1.1 1.8-4.6 2.4-7.4 1.2-12.7 3.2-12.7 8.3 0 5.1 5.3 7.6 12.3 7.6 5.5 0 10.3-1.3 13.5-3l-2.3-5.5c-2.7 1.3-6.5 2.2-10.8 2.2-3.8 0-5.8-.8-5.8-2.2 0-1.4 1.5-2 5.1-2.6 7.6-1.2 12.4-3.4 12.4-8.1 0-5.8-5.5-7.3-11.7-7.3z"/></svg>`
+                },
+                {
+                    regex: /\b(NINTENDO|SWITCH|SWUICH|NSW)\b/i,
+                    name: 'NINTENDO',
+                    svg: `<svg width="15" height="15" viewBox="0 0 100 100" fill="none" style="margin-right: 5px; vertical-align: -2px;"><rect width="100" height="100" rx="20" fill="#E60012"/><path fill="#FFFFFF" d="M28 20h18v60H28a12 12 0 0 1-12-12V32a12 12 0 0 1 12-12zm6 12a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 24a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm20-36h18a12 12 0 0 1 12 12v36a12 12 0 0 1-12 12H54V20zm14 20a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg>`
+                }
+            ];
+
+            let found = [];
+            platforms.forEach(p => {
+                if (p.regex.test(texto)) {
+                    found.push(`<span class="platform-item" style="display:inline-flex; align-items:center; margin-right:10px;">${p.svg}<span>${p.name}</span></span>`);
+                }
+            });
+
+            if (found.length === 0) {
+                let limpio = texto.replace(/:\w+:/g, '').trim();
+                return limpio || texto;
+            }
+
+            return found.join('');
+        }
+
+        async function cargarCatalogo() {
+            const grid = document.getElementById('product-grid');
+
+            try {
+                const { data: cuentas, error } = await _supabase
+                    .from('Cuentas')
+                    .select('*');
+
+                if (error) throw error;
+
+                globalCuentas = cuentas || [];
+
+                if (globalCuentas.length === 0) {
+                    grid.innerHTML = '<div id="loading-msg">Aún no hay cuentas en el catálogo.</div>';
+                    return;
+                }
+
+                ordenarYRenderizarGrid('high-low');
+
+            } catch (err) {
+                console.error("Error al cargar el catálogo:", err);
+                grid.innerHTML = '<div id="loading-msg" style="color:red;">Hubo un error al cargar el catálogo.</div>';
+            }
+        }
+
+        // 1. Modificar la generación del botón en renderGrid
+        function renderGrid(lista) {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+
+            lista.forEach(cuenta => {
+                const badgeHTML = renderPlataformasHTML(cuenta.disponibilidad);
+                const safeId = 'cuenta-' + normalizarTexto(cuenta.titulo).replace(/[^a-z0-9]/g, '-');
+
+                const cardHTML = `
+                    <div class="product-card" id="${safeId}">
+                        <span class="platform-badge">${badgeHTML}</span>
+                        <div class="image-container">
+                            <img src="${cuenta.image_url}" alt="${cuenta.titulo}">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">${cuenta.titulo}</h3>
+                            <div class="product-price">
+                                $${cuenta.preciomxn} MXN 
+                                <span class="price-usd">$${cuenta.preciousd} USD</span>
+                            </div>
+                            <button type="button" class="btn-buy open-buy-modal-btn">¡Contáctanos!</button>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += cardHTML;
+            });
+        }
+
+        function ordenarYRenderizarGrid(criterio) {
+            let lista = [...globalCuentas];
+
+            if (criterio === 'high-low') {
+                lista.sort((a, b) => Number(b.preciomxn) - Number(a.preciomxn));
+            } else if (criterio === 'low-high') {
+                lista.sort((a, b) => Number(a.preciomxn) - Number(b.preciomxn));
+            } else if (criterio === 'newest') {
+                lista.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+            }
+
+            renderGrid(lista);
+        }
+
+        function normalizarTexto(str) {
+            return (str || '')
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
+        }
+
+        function ejecutarBusqueda(query) {
+            const term = normalizarTexto(query.trim());
+
+            if (!term) {
+                renderResultadosModal(globalCuentas);
+                return;
+            }
+
+            const filtrados = globalCuentas.filter(cuenta => {
+                const tituloNorm = normalizarTexto(cuenta.titulo);
+                const dispNorm = normalizarTexto(cuenta.disponibilidad);
+                return tituloNorm.includes(term) || dispNorm.includes(term);
+            });
+
+            renderResultadosModal(filtrados);
+        }
+
+        function renderResultadosModal(lista) {
+            const resultsContainer = document.getElementById('search-results');
+            resultsContainer.innerHTML = '';
+
+            if (lista.length === 0) {
+                resultsContainer.innerHTML = '<div style="font-size:0.8rem; color:#888; grid-column: 1 / -1; font-weight:600;">No se encontraron productos.</div>';
+                return;
+            }
+
+            lista.forEach(cuenta => {
+                const safeId = 'cuenta-' + normalizarTexto(cuenta.titulo).replace(/[^a-z0-9]/g, '-');
+
+                const itemHTML = `
+                    <a href="javascript:void(0)" class="search-result-item scroll-to-account" data-id="${safeId}">
+                        <img src="${cuenta.image_url}" alt="${cuenta.titulo}" class="search-result-img">
+                        <span class="search-result-title">${cuenta.titulo}</span>
+                        <span class="search-result-price">$${cuenta.preciomxn} MXN</span>
+                    </a>
+                `;
+                resultsContainer.innerHTML += itemHTML;
+            });
+        }
+
+        // 2. Agregar los eventos del Modal de Compra dentro del DOMContentLoaded
+        window.addEventListener('DOMContentLoaded', () => {
+            const splineViewers = document.querySelectorAll('spline-viewer');
+            splineViewers.forEach(viewer => {
+                viewer.addEventListener('wheel', (e) => e.stopPropagation(), { capture: true });
+            });
+
+            cargarCatalogo();
+
+            // --- LÓGICA DEL MODAL DE BÚSQUEDA (SE MANTIENE INTACTO) ---
+            const openSearchBtn = document.getElementById('open-search-btn');
+            const closeSearchBtn = document.getElementById('close-search-btn');
+            const searchModal = document.getElementById('search-modal');
+            const searchInput = document.getElementById('search-input');
+
+            const abrirModalBusqueda = () => {
+                searchModal.classList.add('active');
+                document.body.classList.add('no-scroll');
+                searchInput.value = '';
+                renderResultadosModal(globalCuentas);
+                setTimeout(() => searchInput.focus(), 100);
+            };
+
+            const cerrarModalBusqueda = () => {
+                searchModal.classList.remove('active');
+                document.body.classList.remove('no-scroll');
+            };
+
+            openSearchBtn.addEventListener('click', abrirModalBusqueda);
+            closeSearchBtn.addEventListener('click', cerrarModalBusqueda);
+            searchModal.addEventListener('click', (e) => {
+                if (e.target === searchModal) cerrarModalBusqueda();
+            });
+            searchInput.addEventListener('input', (e) => {
+                ejecutarBusqueda(e.target.value);
+            });
+
+            const searchResultsContainer = document.getElementById('search-results');
+
+            searchResultsContainer.addEventListener('click', (e) => {
+                const item = e.target.closest('.scroll-to-account');
+                
+                if (item) {
+                    e.preventDefault();
+                    const targetId = item.getAttribute('data-id');
+                    const targetElement = document.getElementById(targetId);
+
+                    if (targetElement) {
+                        cerrarModalBusqueda();
+
+                        setTimeout(() => {
+                            targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 150);
+                    }
+                }
+            });
+
+            // --- LÓGICA DEL NUEVO MODAL DE COMPRA (INSTAGRAM / DISCORD) ---
+            const buyModal = document.getElementById('buy-modal');
+            const closeBuyBtn = document.getElementById('close-buy-btn');
+            const productGrid = document.getElementById('product-grid');
+
+            const abrirBuyModal = () => {
+                buyModal.classList.add('active');
+                document.body.classList.add('no-scroll');
+            };
+
+            const cerrarBuyModal = () => {
+                buyModal.classList.remove('active');
+                document.body.classList.remove('no-scroll');
+            };
+
+            // Al hacer clic en cualquier botón "Comprar / Info" del catálogo
+            productGrid.addEventListener('click', (e) => {
+                if (e.target.classList.contains('open-buy-modal-btn')) {
+                    abrirBuyModal();
+                }
+            });
+
+            closeBuyBtn.addEventListener('click', cerrarBuyModal);
+            buyModal.addEventListener('click', (e) => {
+                if (e.target === buyModal) cerrarBuyModal();
+            });
+            
+            // --- LÓGICA DEL MENÚ LATERAL MÓVIL ---
+            const toggleBtn = document.getElementById('sidebarToggle');
+            const closeBtn = document.getElementById('sidebarClose');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const sidebarLinks = document.querySelectorAll('.sidebar-links a');
+
+            const abrirSidebar = () => {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+                document.body.classList.add('no-scroll');
+            };
+
+            const cerrarSidebar = () => {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.classList.remove('no-scroll');
+            };
+
+            if (toggleBtn) toggleBtn.addEventListener('click', abrirSidebar);
+            if (closeBtn) closeBtn.addEventListener('click', cerrarSidebar);
+            if (overlay) overlay.addEventListener('click', cerrarSidebar);
+
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', cerrarSidebar);
+            });
+
+            // --- FILTROS DE CATÁLOGO ---
+            const filterToggleBtn = document.getElementById('filter-toggle-btn');
+            const filterMenu = document.getElementById('filter-menu');
+            const filterOpts = document.querySelectorAll('.filter-opt');
+
+            filterToggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                filterMenu.classList.toggle('active');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!filterMenu.contains(e.target) && e.target !== filterToggleBtn) {
+                    filterMenu.classList.remove('active');
+                }
+            });
+
+            filterOpts.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterOpts.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const criterio = btn.getAttribute('data-sort');
+                    ordenarYRenderizarGrid(criterio);
+                    filterMenu.classList.remove('active');
+                });
+            });
+
+            // --- LÓGICA DE LA VENTANA DE IMAGEN Y ZOOM ---
+            const imageZoomOverlay = document.getElementById('image-zoom-overlay');
+            const largeZoomImage = document.getElementById('large-zoom-image');
+            const closeZoomBtn = document.getElementById('close-zoom-btn');
+            let isImageZoomed = false;
+
+            document.getElementById('product-grid').addEventListener('click', (e) => {
+                if (e.target.tagName === 'IMG' && e.target.closest('.image-container')) {
+                    const imgSrc = e.target.getAttribute('src');
+                    largeZoomImage.src = imgSrc;
+                    imageZoomOverlay.classList.add('active');
+                    document.body.classList.add('no-scroll');
+                    
+                    isImageZoomed = false;
+                    largeZoomImage.classList.remove('zoomed');
+                    largeZoomImage.style.transform = 'scale(1)';
+                    largeZoomImage.style.transformOrigin = 'center center';
+                }
+            });
+
+            const cerrarModalImagen = () => {
+                imageZoomOverlay.classList.remove('active');
+                document.body.classList.remove('no-scroll');
+            };
+
+            closeZoomBtn.addEventListener('click', cerrarModalImagen);
+            
+            imageZoomOverlay.addEventListener('click', (e) => {
+                if (e.target === imageZoomOverlay || e.target.classList.contains('image-zoom-container')) {
+                    cerrarModalImagen();
+                }
+            });
+
+            largeZoomImage.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768) return; 
+
+                isImageZoomed = !isImageZoomed;
+
+                if (isImageZoomed) {
+                    largeZoomImage.classList.add('zoomed');
+                    largeZoomImage.style.transform = 'scale(2.5)';
+                    
+                    const rect = e.target.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    largeZoomImage.style.transformOrigin = `${x}% ${y}%`;
+                } else {
+                    largeZoomImage.classList.remove('zoomed');
+                    largeZoomImage.style.transform = 'scale(1)';
+                    largeZoomImage.style.transformOrigin = 'center center';
+                }
+            });
+
+            largeZoomImage.addEventListener('mousemove', (e) => {
+                if (isImageZoomed && window.innerWidth > 768) {
+                    const rect = e.target.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    largeZoomImage.style.transformOrigin = `${x}% ${y}%`;
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>

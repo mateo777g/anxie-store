@@ -1,0 +1,437 @@
+:root {
+  --bg-dark: #0f0f0f;
+  --bg-panel: #1a1a1a;
+  --bg-card: #242424;
+  --text-main: #ffffff;
+  --text-muted: #a3a3a3;
+  --accent-red: #c93b40;
+  --accent-red-hover: #a32d31;
+  --border-color: #333333;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ==========================================
+   PANTALLA DE LOGIN
+   ========================================== */
+#lock-screen {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-dark);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.login-logo-img {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0 auto 20px auto;
+  display: block;
+  background-color: #fff;
+}
+
+.login-box {
+  background-color: var(--bg-panel);
+  padding: 30px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid var(--border-color);
+}
+
+.login-box label {
+  font-weight: bold;
+  color: var(--text-main);
+  margin-bottom: 8px;
+  display: block;
+  font-size: 0.9rem;
+}
+
+.input-wrapper {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.login-box input {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-dark);
+  color: white;
+  font-size: 1rem;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--accent-red);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.login-btn:hover {
+  background-color: var(--accent-red-hover);
+}
+
+/* ==========================================
+   LAYOUT PRINCIPAL (SIDEBAR + CONTENT)
+   ========================================== */
+#app-container {
+  display: none;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 260px;
+  background-color: var(--bg-panel);
+  border-right: 1px solid var(--border-color);
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  margin-bottom: 30px;
+}
+
+.sidebar-logo-img {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
+  background-color: #fff;
+}
+
+.sidebar-brand-text h2 { font-size: 1.1rem; font-style: italic; }
+.sidebar-brand-text p { font-size: 0.7rem; color: var(--accent-red); font-weight: bold; }
+
+.nav-menu {
+  list-style: none;
+}
+
+.nav-item {
+  padding: 12px 20px;
+  margin: 5px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.nav-item:hover {
+  color: var(--text-main);
+  background-color: var(--bg-card);
+}
+
+.nav-item.active {
+  background-color: var(--accent-red);
+  color: white;
+}
+
+.nav-item i {
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+.main-content {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+/* ==========================================
+   VISTA DE INICIO (DASHBOARD)
+   ========================================== */
+.header-date {
+  color: var(--accent-red);
+  font-size: 0.8rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+}
+
+.header-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 40px;
+}
+
+.header-title span {
+  color: var(--accent-red);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.dash-card {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  padding: 25px;
+  border: 1px solid var(--border-color);
+}
+
+.dash-card h3 {
+  font-size: 1.3rem;
+  font-style: italic;
+  margin-bottom: 5px;
+}
+
+.dash-card p.subtitle {
+  color: var(--accent-red);
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+}
+
+.dash-card p.subtitle-white {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+}
+
+.shortcuts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.shortcut-btn {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+}
+
+.shortcut-btn:hover {
+  background-color: #333;
+}
+
+.shortcut-btn i {
+  margin-right: 8px;
+  color: #b97af5;
+}
+
+.stats-list {
+  list-style: none;
+}
+
+.stats-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+  font-weight: bold;
+}
+
+.stats-item:last-child {
+  border-bottom: none;
+}
+
+.stats-item i {
+  margin-right: 15px;
+  color: var(--text-muted);
+}
+
+/* ==========================================
+   FORMULARIO Y VISTAS GENÉRICAS
+   ========================================== */
+.view-section {
+  display: none;
+}
+
+.view-section.active {
+  display: block;
+}
+
+.form-container {
+  background-color: var(--bg-card);
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 700px;
+  border: 1px solid var(--border-color);
+}
+
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: var(--text-muted); }
+
+.form-group input, .form-group textarea, .form-group select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-dark);
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.form-group input:focus, .form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent-red);
+}
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+#status-msg, #nip-msg {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 0.9rem;
+  display: none;
+}
+.success { background-color: #065f46; color: #34d399; }
+.error { background-color: #881337; color: #f87171; }
+
+/* GRID DE TARJETAS EN ADMIN */
+.cuentas-grid-admin {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.card-admin {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-admin-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  background-color: var(--bg-panel);
+}
+
+.card-admin-body {
+  padding: 15px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-admin-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.card-admin-price {
+  color: #34d399;
+  font-weight: bold;
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+}
+
+.card-admin-details {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 15px;
+  flex: 1;
+}
+
+/* BOTONES EN LAS TARJETAS */
+.card-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.btn-card-edit {
+  background-color: #0284c7;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-card-edit:hover { background-color: #0369a1; }
+
+.btn-card-delete {
+  background-color: var(--accent-red);
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-card-delete:hover { background-color: var(--accent-red-hover); }
+
+/* VENTANA MODAL EMERGENTE */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 650px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
