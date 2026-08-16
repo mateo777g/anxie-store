@@ -1,0 +1,1335 @@
+/* ==========================================
+   RESET BÁSICO Y ESTILOS GENERALES
+   ========================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', -apple-system, sans-serif;
+    background-color: #000000; 
+    color: #ffffff; 
+    overflow-x: hidden;
+}
+
+/* ==========================================
+   SECCIÓN 1: HERO (SCROLL EFECTO TENZ)
+   ========================================== */
+
+/* Contenedor extra alto para el efecto de scroll */
+.hero-scroll-wrapper {
+    position: relative;
+    width: 100vw;
+    height: 200vh; /* Te engancha por una pantalla extra */
+    background-color: #000000;
+    z-index: 10;
+}
+
+/* El hero ahora se "pega" a la pantalla mientras scrolleas el wrapper */
+.hero {
+    position: sticky;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #ffffff;
+}
+
+/* Sombra inferior sutil para transición suave */
+.hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 3; 
+    pointer-events: none;
+    background: linear-gradient(
+        to bottom, 
+        transparent 0%, 
+        transparent 84%, 
+        rgba(0, 0, 0, 0.35) 100%
+    );
+}
+
+/* 🌟 BARRA DE NAVEGACIÓN SUPERIOR (AHORA GLOBAL) 🌟 */
+.navbar {
+    position: fixed; /* 👈 ¡AQUÍ ESTÁ LA MAGIA! Cambiamos absolute por fixed */
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 3.5rem 4.5rem 3.5rem;
+    z-index: 9000; /* Z-index altísimo para que nada la tape */
+    pointer-events: none;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.2) 55%, rgba(0, 0, 0, 0) 100%);
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    pointer-events: auto;
+}
+
+.logo-img {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.logo-texto {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #ffffff;
+    letter-spacing: 1px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+    pointer-events: auto;
+}
+
+.nav-links li {
+    position: relative;
+    padding-bottom: 4px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400; 
+    font-size: 1rem;
+    opacity: 0.75; 
+    transition: opacity 0.3s ease;
+}
+
+.nav-links a:hover { opacity: 1; }
+
+.nav-links li::after {
+    content: '';
+    width: 0%;
+    height: 2px;
+    background: #FF0000;
+    display: block;
+    margin: 4px auto 0 auto;
+    transition: width 0.4s ease-in-out;
+    border-radius: 2px;
+}
+
+.nav-links li:hover::after { width: 100%; }
+
+/* ==========================================
+   🚪 BARRA LATERAL (SIDEBAR MÓVIL) Y BOTÓN HAMBURGUESA
+   ========================================== */
+
+/* Botón Hamburguesa: Oculto en PC por defecto */
+.sidebar-toggle-btn {
+    display: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    z-index: 9001;
+    pointer-events: auto;
+}
+
+.sidebar-toggle-btn .bar {
+    width: 28px;
+    height: 3px;
+    background-color: #ffffff;
+    border-radius: 2px;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.sidebar-toggle-btn:hover .bar {
+    background-color: #FF0000;
+}
+
+/* Fondo Oscuro del Menú */
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(5px);
+    z-index: 9990;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Menú Lateral */
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: -320px;
+    width: 300px;
+    height: 100vh;
+    background: rgba(10, 10, 10, 0.98);
+    /* 👇 Borramos el border-left que estaba aquí 👇 */
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    padding: 3rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    transition: right 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.sidebar.active {
+    right: 0;
+}
+
+.sidebar-close-btn {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.3s ease;
+}
+
+.sidebar-close-btn:hover {
+    color: #FF0000;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 1rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+}
+
+.sidebar-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #ffffff;
+    letter-spacing: 1px;
+}
+
+.sidebar-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+}
+
+.sidebar-links a {
+    text-decoration: none;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #dddddd;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.3s ease, padding-left 0.3s ease;
+    display: inline-block;
+}
+
+.sidebar-links a:hover {
+    color: #FF0000;
+    padding-left: 8px;
+}
+
+/* Contenedor 3D al fondo */
+.contenedor-3d {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* Capa inferior */
+    pointer-events: none;
+}
+
+spline-viewer { width: 100%; height: 100%; }
+
+/* 🎯 MARCA EN EL MERO CENTRO 🎯 */
+.hero-center-brand {
+    position: absolute;
+    top: 42%;
+    left: 50%;
+    transform: translate(-50%, -35%); /* Cambio: un poco más abajo para el efecto */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    text-align: center;
+    z-index: 5;
+
+    /* Nuevas propiedades para la animación */
+    opacity: 0; 
+    transition: opacity 1.2s ease 0.3s, transform 1.2s ease 0.3s;
+}
+
+/* Agrega esta clase nueva para que el JS active la marca central */
+.hero-center-brand.visible {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+}
+
+.brand-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 5.2rem;
+    text-transform: uppercase;
+    letter-spacing: 6px;
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-red { color: #FF0000; text-shadow: 0 0 20px rgba(255, 26, 54, 0.2); }
+.brand-black { color: #000000; }
+
+.brand-sub-red {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #FF0000;
+    text-transform: uppercase;
+    letter-spacing: 6px;
+    margin-top: 1rem;
+}
+
+/* Contenido inferior (Botones y Textos) */
+.hero-bottom-content {
+    position: absolute;
+    bottom: 3.5rem;
+    left: 0;
+    width: 100%;
+    padding: 0 3.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 2rem;
+    z-index: 10; /* Capa superior para no ser tapado por el 3D */
+    pointer-events: none; /* Permite que el scroll pase a través */
+}
+
+.hero-left { max-width: 45%; }
+
+.hero-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    color: #000000;
+    font-size: 3.8rem;
+    line-height: 1.05;
+    letter-spacing: -1.5px;
+    text-transform: uppercase;
+}
+
+.hero-right {
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.hero-description {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    font-size: 1.1rem;
+    color: #000000;
+    line-height: 1.5;
+    letter-spacing: -0.2px;
+}
+
+/* Activa los clics exclusivamente en los botones */
+.hero-buttons {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+    pointer-events: auto; 
+}
+
+/* 🔴 BOTONES CON BORDE ROJO ANIMADO 🔴 */
+.btn-animated {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5px;
+    border-radius: 50px;
+    overflow: hidden;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(255, 26, 54, 0.25);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    pointer-events: auto; 
+}
+
+.btn-animated::before {
+    content: '';
+    position: absolute;
+    width: 250%;
+    height: 250%;
+    background: conic-gradient(from 0deg, #FF0000, #D60027, #FF334B, #B3001E, #FF0000);
+    animation: rotateBorder 3s linear infinite;
+    z-index: 0;
+}
+
+.btn-animated:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(255, 26, 54, 0.45); }
+
+.btn-animated-inner {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 0.85rem 1.8rem;
+    border-radius: 50px;
+    background-color: #ffffff;
+    color: #000000;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-animated:hover .btn-animated-inner { background-color: #f4f4f4; }
+
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    background-color: #000000;
+    color: #ffffff;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 1.1rem;
+    line-height: 1;
+    margin-left: 2px;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.btn-animated:hover .btn-icon { transform: rotate(90deg); background-color: #222222; }
+
+/* ==========================================
+   BOTÓN EXCLUSIVO DE CELULAR (CENTRAL)
+   ========================================== */
+.hero-mobile-btn {
+    display: none; /* Lo ocultamos en PC */
+    margin-top: 4.5rem; /* 👈 CÁMBIALO AQUÍ: Súbelo de 2.8rem a 4.5rem (o 5rem si lo quieres más abajo) */
+    pointer-events: auto; /* Para que funcione el clic sin problemas */
+}
+
+/* Centrado perfecto para el botón sin el ícono de "+" */
+.btn-animated-inner.btn-centered {
+    padding: 0.85rem 3rem; /* Le damos más espacio a los lados para que no se vea apretado */
+    justify-content: center;
+    text-align: center;
+}
+
+@keyframes rotateBorder {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 📱 RESPONSIVE - SECCIÓN 1 📱 */
+@media (max-width: 900px) {
+    /* 🔴 Ocultar links de PC y activar botón hamburguesa */
+    .nav-links { display: none !important; }
+    .sidebar-toggle-btn { display: flex !important; }
+
+    /* 🎯 OCULTAR TEXTO Y CENTRAR LOGO EN CELULAR */
+    .logo-texto { 
+        display: none; 
+    }
+
+    .logo-container {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .navbar { 
+        padding: 1.5rem 2rem; 
+        justify-content: flex-end; 
+    }
+
+    .brand-title { font-size: 2.5rem; letter-spacing: 4px; gap: 0.4rem; }
+    .brand-sub-red { font-size: 0.75rem; letter-spacing: 4px; }
+
+    /* 📱 MOSTRAR EL BOTÓN CENTRAL EN CELULARES */
+    .hero-mobile-btn {
+        display: block;
+    }
+
+    .hero-bottom-content {
+        position: absolute;
+        bottom: 2rem;
+        left: 0;
+        width: 100%;
+        padding: 0 1.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    /* 🔴 OCULTAR DESCRIPCIÓN Y BOTONES EN CELULAR */
+    .hero-right { 
+        display: none !important; 
+    }
+
+    .hero-left { 
+        max-width: 100%; 
+        width: 100%;
+    }
+
+    .hero-title {
+        font-size: 2.1rem;
+        text-align: center;
+        line-height: 1.1;
+        width: 100%;
+    }
+}
+
+/* ==========================================
+   SECCIÓN 2: SCROLL-JACKING AVANZADO
+   ========================================== */
+.cases-scroll-wrapper {
+    position: relative;
+    width: 100vw;
+    height: 400vh; /* 👈 Tiempo de scroll para toda la animación */
+    background-color: #000000;
+    z-index: 20;
+}
+
+.cases-sticky {
+    position: sticky;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* TEXTO DE FONDO GIGANTE */
+.cases-bg-text {
+    position: absolute;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 6rem;
+    white-space: nowrap;
+    z-index: 5;
+    transform: translateX(100vw);
+    will-change: transform, opacity;
+}
+
+.cases-bg-text .text-red { 
+    color: #FF0000; 
+}
+.cases-bg-text .text-gray { 
+    color: #d8d8d8; 
+}
+
+/* MODELO 3D EN EL CENTRO */
+.cases-model-container {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    z-index: 10;
+}
+
+.cases-model-container model-viewer {
+    width: 100%;
+    height: 100%;
+    --poster-color: transparent;
+    outline: none;
+}
+
+/* --- ELEMENTOS DE INTERFAZ (LÍNEAS Y CUENTAS) --- */
+.cases-ui-elements {
+    position: absolute;
+    inset: 0;
+    z-index: 15;
+    pointer-events: none; 
+}
+
+/* 🚀 Tarjetas de cuentas */
+.ui-card {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    width: 46vw;
+    max-width: none;
+    opacity: 0; 
+}
+
+/* 🎯 LÍNEAS Y TÍTULOS EN SU LUGAR ORIGINAL */
+.ui-left { 
+    top: 15%; 
+    right: 50%;
+    padding-left: 2vw;
+}
+
+.ui-right { 
+    bottom: 15%; 
+    left: 50%;
+    align-items: flex-end; 
+    text-align: right;
+    padding-right: 2vw;
+}
+
+/* ALINEACIÓN Y ANCHO AMPLIADO */
+.ui-left .ui-title {
+    width: 100%;
+    max-width: 600px; /* Ampliado para que textos largos quepan sin cortar */
+    justify-content: flex-start;
+}
+
+.ui-right .ui-title {
+    width: 100%;
+    max-width: 600px;
+    justify-content: flex-end;
+}
+
+/* DESPLAZAMIENTO DE LAS IMÁGENES */
+.ui-left .ui-image-wrapper {
+    width: 100%;
+    max-width: 480px;
+    align-self: flex-start; 
+    margin-top: 40px;
+    margin-bottom: 10px;
+}
+
+.ui-right .ui-image-wrapper {
+    width: 100%;
+    max-width: 480px;
+    align-self: flex-end;   
+    margin-bottom: 40px;
+    margin-top: 10px;
+}
+
+/* ==========================================
+   TÍTULOS DE CUENTAS (FORZAR 1 SOLA LÍNEA)
+   ========================================== */
+.ui-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 1.35rem; /* Ajustado ligeramente para garantizar espacio perfecto */
+    color: #ffffff;
+    transform: translateY(35px);
+    opacity: 0;
+    will-change: transform, opacity;
+    display: flex;
+    align-items: center;
+    white-space: nowrap; /* 👈 ¡CLAVE! Prohíbe que el precio baje de renglón */
+}
+
+/* LAS LÍNEAS ROJAS (Sólidas, nítidas sin difuminado) */
+.ui-line-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 4px;
+    margin: 15px 0;
+}
+
+.line-left {
+    flex-direction: row-reverse; 
+}
+
+.line-right {
+    flex-direction: row; 
+}
+
+.ui-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #FF0000;
+    border-radius: 50%;
+    flex-shrink: 0; 
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    /* Sin box-shadow para evitar difuminado */
+}
+
+.ui-line {
+    height: 2px;
+    background-color: #FF0000;
+    width: 0%; 
+    will-change: width;
+    /* Sin box-shadow para evitar difuminado */
+}
+
+/* 🖼️ LAS IMÁGENES (Suben limpiamente desde abajo) */
+.ui-image-wrapper {
+    position: relative;
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    opacity: 0;
+    padding: 2.5px;
+    background: transparent;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9);
+    will-change: transform, opacity; /* 👈 Optimización para animaciones fluidas */
+}
+
+.ui-image-wrapper::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    /* 🔴 Combinación Conic Gradient Rojo y Negro 🖤 */
+    background: conic-gradient(from 0deg, #FF0000, #000000, #D60027, #111111, #FF0000);
+    animation: rotateImgBorder 4s linear infinite;
+    z-index: 0;
+}
+
+.ui-image-wrapper img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 9.5px;
+}
+
+@keyframes rotateImgBorder {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 📍 BLOQUE ESQUINA INFERIOR IZQUIERDA */
+.ui-bottom-left {
+    position: absolute;
+    bottom: 10%; 
+    left: 6vw;  
+    max-width: 460px; /* Aumentado ligeramente para mantener el balance */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.4rem;
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: auto;
+    z-index: 20;
+}
+
+/* 💥 TEXTO CON ESTILO HERO (SECCIÓN 1) 💥 */
+.ui-bottom-text {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800; /* Igual que el título de la Sección 1 */
+    font-size: 2.2rem; /* Tamaño grande e impactante */
+    color: #ffffff;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    text-transform: uppercase; /* Mayúsculas tipo Hero */
+}
+
+/* 🔴 UN SOLO BOTÓN ROJO SÓLIDO */
+.btn-red-solid {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.85rem 2.2rem;
+    background-color: #FF0000;
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    border-radius: 50px;
+    border: none;
+    outline: none;
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+    transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-red-solid:hover {
+    background-color: #d60000;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(255, 0, 0, 0.6);
+}
+
+/* ==========================================
+   📱 RESPONSIVE - SECCIÓN 2 (MÓVIL / CELULAR)
+   ========================================== */
+@media (max-width: 900px) {
+
+    /* 1. Ocultar la segunda cuenta en celular */
+    #uiRight {
+        display: none !important;
+    }
+
+    /* 2. OCULTAR EL TEXTO DE FONDO EN CELULAR ("CUENTAS DESTACADAS") */
+    .cases-bg-text {
+        display: none !important;
+    }
+
+    /* 3. Modelo 3D desplazado a la derecha */
+    .cases-model-container {
+        position: absolute;
+        top: 34%;
+        right: -32%;
+        width: 290px;
+        height: 290px;
+        z-index: 8;
+        pointer-events: none;
+    }
+
+    /* 4. Tarjeta Única de Cuenta (uiLeft) en Móvil aqui te equivocaste y ya lo solucione */
+    .ui-card.ui-left {
+        position: absolute;
+        top: 15%; /* 👈 LO REGRESAMOS A SU LUGAR ORIGINAL BRO. (Antes estaba en 24%) */
+        left: 5vw;
+        right: auto;
+        width: 65vw; 
+        max-width: 280px;
+        padding-left: 0;
+        display: flex;
+        flex-direction: column;
+        z-index: 15;
+    }
+
+    /* 🔥 LÍNEA ROJA 🔥 */
+    .ui-left .line-left {
+        order: 1;
+        margin: 0 0 15px 0;
+        width: 140%; /* La estiramos hacia la derecha */
+    }
+
+    .ui-left .ui-image-wrapper {
+        order: 2;
+        width: 100%;
+        max-width: 100%;
+        margin-top: 0;
+        margin-bottom: 0;
+        align-self: center; /* Centramos la imagen */
+    }
+
+    /* CONTENEDOR DEL TÍTULO */
+    .ui-left .ui-title {
+        order: 3;
+        display: flex;
+        flex-direction: column;
+        align-items: center; 
+        text-align: center;  
+        width: 100%;
+        white-space: normal; 
+        gap: 6px; 
+        margin-top: 55px; 
+        
+        position: relative;
+        right: 25px; 
+        top: 35px; /* 👈 AQUÍ ESTÁ LA MAGIA BRO: Esto lo baja un poquito */
+    }
+
+    /* 🔥 TÍTULO DE LA CUENTA (APILADO AUTOMÁTICAMENTE EN 3 LÍNEAS) 🔥 */
+    .ui-left .ui-title-text {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.5rem; 
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        line-height: 1.1;
+        text-align: center;
+        
+        /* 💡 EL TRUCO BRO: Fuerza a que cada palabra baje de renglón si es muy largo */
+        max-width: min-content; 
+        
+        /* Efecto de degradado intacto */
+        background: linear-gradient(to top, #4a0000 0%, #ff0000 100%);
+        -webkit-background-clip: text;
+        background-clip: text; /* 👈 CON ESTO ELIMINAMOS LA LÍNEA AMARILLA QUE TE MOLESTABA */
+        -webkit-text-fill-color: transparent;
+        color: transparent; 
+    }
+
+    /* Estilo del Precio de la Cuenta (Más pequeño) */
+    .ui-left .ui-price-text {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 0.95rem; /* 👈 Más discreto */
+        font-weight: 600;
+        color: #aaaaaa;
+        margin-left: 0;
+        letter-spacing: 0.5px;
+        text-align: center;
+    }
+
+    /* 5. Bloque Inferior: Texto + Botón Centrados */
+    .ui-bottom-left {
+        position: absolute;
+        bottom: 7%;
+        left: 5%;
+        width: 90%;
+        max-width: 360px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1.2rem;
+    }
+
+    .ui-bottom-text {
+        font-size: 1.4rem;
+        text-align: center;
+        line-height: 1.15;
+        width: 100%;
+    }
+
+    .btn-red-solid {
+        align-self: center;
+    }
+}
+
+/* ==========================================
+   SECCIÓN 3: POR QUÉ ANXIE & DISCORD
+   ========================================== */
+.seccion-tres-scroll-wrapper {
+    position: relative;
+    width: 100vw;
+    min-height: 100vh;
+    background-color: #ffffff;
+    z-index: 25;
+}
+
+.seccion-tres {
+    position: relative;
+    width: 100vw;
+    min-height: 100vh;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 3.5rem;
+    overflow: hidden;
+}
+
+/* Contenedor principal en Grid de 2 Columnas (ORIGINAL DE PC) */
+.seccion-tres-container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 1280px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+/* 🌟 Animación de desplazamiento al entrar */
+.seccion-tres-left, 
+.seccion-tres-right {
+    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* 📍 COLUMNA IZQUIERDA */
+.seccion-tres-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    will-change: transform, opacity;
+}
+
+.seccion-tres-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.seccion-tres-title-alt {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 3.8rem;
+    color: #000000;
+    line-height: 1.02;
+    letter-spacing: -1.5px;
+    text-transform: uppercase;
+}
+
+.seccion-tres-description {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: 1.1rem;
+    color: #222222;
+    line-height: 1.6;
+    max-width: 480px;
+}
+
+.seccion-tres-model-left {
+    width: 100%;
+    height: 380px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.seccion-tres-model-left spline-viewer {
+    width: 100%;
+    height: 100%;
+}
+
+/* Ocultamos el modelo chiquito en PC por defecto */
+.seccion-tres-model-mobile {
+    display: none;
+}
+
+/* 📍 COLUMNA DERECHA DISCORD */
+.seccion-tres-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;    
+    gap: 1.5rem;
+    will-change: transform, opacity;
+}
+
+.seccion-tres-model-right {
+    width: 100%;
+    height: 380px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.seccion-tres-model-right spline-viewer {
+    width: 100%;
+    height: 100%;
+}
+
+.seccion-tres-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1.5rem;
+}
+
+.seccion-tres-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 3.2rem;
+    color: #000000;
+    line-height: 1.05;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+    text-align: right;
+}
+
+.seccion-tres-buttons {
+    display: flex;
+    justify-content: flex-end; 
+}
+
+/* 🔻 SOMBRA DE TRANSICIÓN AL FOOTER */
+.seccion-tres-bottom-shadow {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    pointer-events: none;
+    z-index: 15;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(0, 0, 0, 0.4) 100%
+    );
+}
+
+/* 📱 RESPONSIVE (MÓVILES) - AQUÍ ACHICAMOS Y ESCONDEMOS */
+@media (max-width: 900px) {
+    .seccion-tres {
+        padding: 4rem 1.5rem;
+        min-height: auto;
+    }
+    
+    .seccion-tres-container {
+        grid-template-columns: 1fr;
+        gap: 2.5rem; /* Menos espacio entre los textos y el modelo */
+    }
+    
+    .seccion-tres-left, 
+    .seccion-tres-right {
+        text-align: center;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .seccion-tres-content {
+        align-items: center;
+    }
+    
+    /* ACHICAMOS TEXTOS */
+    .seccion-tres-title-alt, 
+    .seccion-tres-title {
+        font-size: 2.2rem; 
+        text-align: center;
+    }
+    
+    .seccion-tres-description {
+        font-size: 0.95rem;
+    }
+
+    /* 🔥 AQUÍ ESTÁ LA CLAVE: Desaparecemos los modelos de PC 🔥 */
+    .seccion-tres-model-left,
+    .seccion-tres-model-right {
+        display: none !important;
+    }
+
+    /* Mostramos el modelo nuevo chiquito */
+    .seccion-tres-model-mobile {
+        display: flex;
+        width: 100%;
+        height: 250px;
+        justify-content: center;
+        align-items: center;
+        margin: 10px 0;
+    }
+
+    .seccion-tres-model-mobile spline-viewer {
+        width: 100%;
+        height: 100%;
+    }
+
+    /* ACHICAMOS EL BOTÓN */
+    .btn-s3 .btn-animated-inner {
+        padding: 0.7rem 1.4rem;
+        font-size: 0.85rem;
+    }
+    .btn-s3 .btn-icon {
+        width: 22px;
+        height: 22px;
+        font-size: 0.95rem;
+    }
+}
+
+/* --- BLOQUEO DE SCROLL SOLO DURANTE LA INTRO --- */
+body.bloqueado {
+    overflow: hidden !important;
+}
+
+/* --- CAPA INTRO NEGRA Y CENTRADA --- */
+.intro-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000000;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 1.2s ease, visibility 1.2s ease;
+}
+
+/* Fondo 3D de Spline (Estrellitas) al fondo */
+.intro-layer spline-viewer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Contenedor del Logo + Puntos al frente */
+.intro-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.8rem;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 1.2s ease, transform 1.2s ease;
+    pointer-events: none;
+}
+
+.intro-content.revelado {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Imagen anxie.png con sombra Neón BLANCA y más grande */
+.intro-logo {
+    width: 100%;
+    max-width: 500px; /* Tamaño mucho más grande bro 💥 */
+    height: auto;
+    object-fit: contain;
+    /* 👈 Eliminamos la línea de filter: drop-shadow(...) que estaba aquí */ 
+}
+
+/* 🔴 3 PUNTITOS DE CARGA ANIMADOS 🔴 */
+.loading-dots {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.loading-dots span {
+    width: 10px;
+    height: 10px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    animation: dotPulse 1.4s infinite ease-in-out both;
+    box-shadow: 0 0 10px rgba(196, 194, 194, 0.8);
+}
+
+.loading-dots span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.loading-dots span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes dotPulse {
+    0%, 80%, 100% {
+        transform: scale(0.4);
+        opacity: 0.3;
+    }
+    40% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+
+/* Salida suave de toda la capa */
+.intro-layer.oculto {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* ==========================================
+   FOOTER / BARRA INFERIOR DE REDES SOCIALES
+   ========================================== */
+.footer-social {
+    position: relative;
+    z-index: 30;
+    width: 100%;
+    background-color: #000000;
+    padding: 2rem 1rem 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.social-spline-wrapper {
+    width: 100%;
+    max-width: 500px;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.social-spline-wrapper spline-viewer {
+    width: 100%;
+    height: 100%;
+}
+
+.footer-copy {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    color: #555555;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+
+/* 📱 RESPONSIVE FOOTER */
+@media (max-width: 600px) {
+    .social-spline-wrapper {
+        height: 120px;
+    }
+}
+
+/* 💥 Forzar transparencia en todos los visores de Spline */
+spline-viewer {
+    width: 100%;
+    height: 100%;
+    background: transparent !important;
+    outline: none;
+}
+
+/* ==========================================
+   PRECIO EN ROJO AL LADO DEL TÍTULO (SIN CAJA)
+   ========================================== */
+.ui-price-text {
+    display: inline-block;
+    color: #FF0000;
+    font-weight: 800;
+    font-size: 1.05rem;
+    margin-left: 12px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+
+    /* ==========================================
+       1. FIX: LOGO DE INTRO MÁS GRANDE EN CELULAR
+       ========================================== */
+    .intro-logo {
+        width: 250px; /* 👈 Sube o baja este número para cambiar el tamaño exacto bro */
+        max-width: 90vw; /* Evita que se salga de la pantalla si lo haces muy grande */
+    }
+
+    /* ==========================================
+       2. FIX: LOGO DE NAVBAR RECORTADO AL SCROLEAR
+       ========================================== */
+    .logo-container {
+        position: absolute;
+        left: 50%;
+        top: 20px; /* 👈 AQUÍ ESTÁ LA MAGIA: Forzamos la distancia desde el techo para que NO suba ni se recorte */
+        transform: translateX(-50%);
+    }
+
+}

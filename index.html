@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>ANXIE STORE</title>
+
+    <!-- Google Fonts: Montserrat + Rock Salt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Rock+Salt&display=swap" rel="stylesheet">
+
+    <!-- CSS y visor de Spline -->
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
+    
+    <!-- Visor 3D de Google para archivos .glb (Sección 2) -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+
+    <!-- CDN de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bloqueado">
+
+    <!-- 🖤 CAPA INTRO CON FONDO 3D Y LOGO 🖤 -->
+    <div class="intro-layer" id="introLayer">
+        <!-- Fondo 3D de Spline (Estrellitas) -->
+        <spline-viewer url="https://prod.spline.design/3Vv30SzKg0wcuP8S/scene.splinecode"></spline-viewer>
+
+        <!-- Logo + Puntitos -->
+        <div class="intro-content" id="introContent">
+            <img src="assets/anxie.png" alt="ANXIE STORE Logo" class="intro-logo">
+            <div class="loading-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌟 BARRA DE NAVEGACIÓN SUPERIOR 🌟 -->
+    <nav class="navbar">
+        <div class="logo-container">
+            <img src="assets/logo.jpg" alt="Logo ANXIE STORE" class="logo-img">
+            <span class="logo-texto">ANXIE STORE</span>
+        </div>
+
+        <!-- 💻 LINKS PARA COMPUTADORA (Se ocultan en cel) -->
+        <ul class="nav-links">
+            <li><a href="#home">Inicio</a></li>
+            <li><a href="catalogo.html#cases">Catálogo</a></li>
+            <li><a href="#features">Contacto</a></li>
+        </ul>
+
+        <!-- 📱 BOTÓN HAMBURGUESA (Solo visible en cel) -->
+        <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Abrir Menú">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
+    </nav>
+
+    <!-- 🚪 BARRA LATERAL (SIDEBAR) & OVERLAY PARA MÓVIL -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+        <button class="sidebar-close-btn" id="sidebarClose">&times;</button>
+        
+        <div class="sidebar-header">
+            <img src="assets/logo.jpg" alt="Logo ANXIE STORE" class="sidebar-logo">
+            <span class="sidebar-title">ANXIE STORE</span>
+        </div>
+
+        <ul class="sidebar-links">
+            <li><a href="#home">Inicio</a></li>
+            <li><a href="catalogo.html#cases">Catálogo</a></li>
+            <li><a href="#features">Contacto</a></li>
+        </ul>
+    </aside>
+
+    <!-- WRAPPER PARA EL EFECTO SCROLL-JACKING -->
+    <div class="hero-scroll-wrapper" id="home">
+        
+        <!-- SECCIÓN 1: HERO (Partículas Rojas) -->
+        <header class="hero">
+
+            <!-- Fondo 3D: Partículas Rojas (Capa 1: Fondo) -->
+            <div class="contenedor-3d">
+                <spline-viewer url="https://prod.spline.design/t2Ye0Y98VTQQyFyc/scene.splinecode"></spline-viewer>
+            </div>
+
+            <!-- 🎯 MERO CENTRO: MARCA (Capa 5) -->
+            <div class="hero-center-brand" id="heroBrand">
+                <h1 class="brand-title">
+                    <span class="brand-red">ANXIE</span>
+                    <span class="brand-black">STORE</span>
+                </h1>
+                <span class="brand-sub-red">TIENDA DE CUENTAS</span>
+
+                <!-- 📱 BOTÓN VER CATÁLOGO SOLO PARA CELULARES (Sin el +) -->
+                <div class="hero-mobile-btn">
+                    <a href="catalogo.html#cases" class="btn-animated">
+                        <span class="btn-animated-inner btn-centered">
+                            Ver Catálogo
+                        </span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 🔻 ESQUINAS INFERIORES (Capa 10: Botones y sombras por encima) -->
+            <div class="hero-bottom-content" id="heroBottomContent">
+                
+                <div class="hero-left">
+                    <h2 class="hero-title">
+                        COMPRA TUS CUENTAS<br>DE VIDEOJUEGOS
+                    </h2>
+                </div>
+
+                <div class="hero-right">
+                    <p class="hero-description">
+                        Revisa nuestro catálogo de cuentas de Fortnite y elige la que más te guste.
+                    </p>
+
+                    <div class="hero-buttons">
+                        <a href="#features" class="btn-animated">
+                            <span class="btn-animated-inner">
+                                Contáctanos
+                            </span>
+                        </a>
+                        <a href="catalogo.html#cases" class="btn-animated">
+                            <span class="btn-animated-inner">
+                                Ver Catálogo
+                                <span class="btn-icon">+</span>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+        </header>
+    </div>
+
+    <!-- SECCIÓN 2: CATÁLOGO ANIMADO (SCROLL-JACKING) -->
+    <div class="cases-scroll-wrapper" id="cases-wrapper">
+        <section class="cases-sticky" id="cases">
+            
+            <!-- 1. Texto Gigante de fondo -->
+            <div class="cases-bg-text" id="casesBgText">
+                <span class="text-red">CUENTAS</span> <span class="text-gray">DESTACADAS</span>
+            </div>
+
+            <!-- 2. Modelo 3D Fijo al centro -->
+            <div class="cases-model-container">
+                <model-viewer 
+                    id="coronaModel"
+                    src="assets/chanti.glb" 
+                    alt="Corona Fortnite 3D Dorada" 
+                    disable-zoom
+                    disable-pan
+                    shadow-intensity="1"
+                    interaction-prompt="none"
+                    camera-orbit="0deg 75deg 105%"
+                    ar>
+                </model-viewer>
+            </div>
+
+            <!-- 3. Interfaz (Líneas, Textos, Cuentas y CTA) -->
+            <div class="cases-ui-elements">
+                
+                <!-- Tarjeta Izquierda (Cuenta #1 Más Cara) -->
+                <div class="ui-card ui-left" id="uiLeft">
+                    <h3 class="ui-title">Cargando...</h3>
+                    <div class="ui-line-container line-left">
+                        <div class="ui-dot"></div>
+                        <div class="ui-line"></div>
+                    </div>
+                    <div class="ui-image-wrapper">
+                        <img src="assets/cuenta.png" alt="Cuenta Fortnite 1">
+                    </div>
+                </div>
+
+                <!-- Tarjeta Derecha (Cuenta #2 Más Cara) -->
+                <div class="ui-card ui-right" id="uiRight">
+                    <div class="ui-image-wrapper">
+                        <img src="assets/cuenta2.png" alt="Cuenta Fortnite 2">
+                    </div>
+                    <div class="ui-line-container line-right">
+                        <div class="ui-dot"></div>
+                        <div class="ui-line"></div>
+                    </div>
+                    <h3 class="ui-title">Cargando...</h3>
+                </div>
+
+                <!-- BLOQUE INFERIOR IZQUIERDA -->
+                <div class="ui-bottom-left" id="uiBottomLeft">
+                    <p class="ui-bottom-text">Revisa nuestro catálogo completo de cuentas.</p>
+                    <a href="catalogo.html#cases" class="btn-red-solid">Ver catálogo</a>
+                </div>
+
+            </div>
+        </section>
+    </div>
+
+    <!-- SECCIÓN 3: POR QUÉ ANXIE STORE & DISCORD -->
+    <div class="seccion-tres-scroll-wrapper" id="features">
+        <section class="seccion-tres">
+            <div class="seccion-tres-container">
+                
+                <!-- 👈 COLUMNA IZQUIERDA: ¿Por qué Anxie Store? + Personaje Corazón -->
+                <div class="seccion-tres-left" id="s3Left">
+                    <div class="seccion-tres-info">
+                        <h2 class="seccion-tres-title-alt">
+                            ¿POR QUÉ<br>ANXIE STORE?
+                        </h2>
+                        <p class="seccion-tres-description">
+                            Con 2 años de experiencia y más de 700 referencias, en AnxieStore priorizamos tu confianza y una atención personalizada. Buscamos ofrecerte un servicio cercano, seguro y diferente. Podrás encontrar nuestras referencias en Discord.
+                        </p>
+                    </div>
+
+                    <!-- Modelo Original (Visible solo en PC) -->
+                    <div class="seccion-tres-model-left">
+                        <spline-viewer url="https://prod.spline.design/Jp-A6ubDqiAveFPY/scene.splinecode"></spline-viewer>
+                    </div>
+
+                    <!-- 📱 MODELO MÓVIL NUEVO (Visible SOLO en celular) -->
+                    <div class="seccion-tres-model-mobile">
+                        <spline-viewer url="https://prod.spline.design/XKsR2uz1pm2A4ada/scene.splinecode"></spline-viewer>
+                    </div>
+                </div>
+
+                <!-- 👉 COLUMNA DERECHA: Mascot Mono Discord + Título + Botón -->
+                <div class="seccion-tres-right" id="s3Right">
+                    
+                    <!-- Modelo Original (Visible solo en PC) -->
+                    <div class="seccion-tres-model-right">
+                        <spline-viewer url="https://prod.spline.design/HFQiKc5wRilijMuJ/scene.splinecode"></spline-viewer>
+                    </div>
+
+                    <div class="seccion-tres-content">
+                        <h2 class="seccion-tres-title">
+                            ÚNETE AL<br>SERVIDOR<br>DE DISCORD
+                        </h2>
+                        <div class="seccion-tres-buttons">
+                            <a href="https://discord.gg/YuTzCPu3tS" target="_blank" class="btn-animated btn-s3">
+                                <span class="btn-animated-inner">
+                                    Unirse al Discord
+                                    <span class="btn-icon">+</span>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Sombra en el borde inferior para conectar suave con el footer -->
+            <div class="seccion-tres-bottom-shadow"></div>
+        </section>
+    </div>
+
+    <!-- 🌐 FOOTER / BARRA INFERIOR DE REDES SOCIALES 🌐 -->
+    <footer class="footer-social">
+        <div class="footer-container">
+            <!-- Modelo 3D de Botones de Redes Sociales (Spline) -->
+            <div class="social-spline-wrapper">
+                <spline-viewer url="https://prod.spline.design/4uAm5uYQsL5uXqW6/scene.splinecode"></spline-viewer>
+            </div>
+            
+            <p class="footer-copy">&copy; 2026 ANXIE STORE. By Matthew.</p>
+        </div>
+    </footer>
+
+    <script>
+        // 🟢 CONFIGURACIÓN SUPABASE Y CARGA DE CUENTAS MÁS CARAS (SECCIÓN 2)
+        const SUPABASE_URL = 'https://jayxntvpiduxvgvluaky.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpheXhudHZwaWR1eHZndmx1YWt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2NDgxNjMsImV4cCI6MjEwMjIyNDE2M30.U7Hrie3HIBAcp_2fYU0YHgP8McGnpYYYjdBiW-9AMjw';
+        
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // 🟢 REEMPLAZA LA FUNCIÓN cargarCuentasMasCaras() EN TU index.html POR ESTA:
+        async function cargarCuentasMasCaras() {
+            try {
+                const { data: cuentas, error } = await _supabase
+                    .from('Cuentas')
+                    .select('*');
+
+                if (error) throw error;
+                if (!cuentas || cuentas.length === 0) return;
+
+                // Ordenar por precio en MXN de mayor a menor
+                cuentas.sort((a, b) => Number(b.preciomxn) - Number(a.preciomxn));
+
+                // 1ª MÁS CARA -> Tarjeta Izquierda (uiLeft)
+                if (cuentas[0]) {
+                    const leftTitle = document.querySelector('#uiLeft .ui-title');
+                    const leftImg = document.querySelector('#uiLeft .ui-image-wrapper img');
+                    
+                    if (leftTitle) {
+                        leftTitle.innerHTML = `<span class="ui-title-text">${cuentas[0].titulo}</span> <span class="ui-price-text">$${cuentas[0].preciomxn} MXN</span>`;
+                    }
+                    if (leftImg && cuentas[0].image_url) {
+                        leftImg.src = cuentas[0].image_url;
+                        leftImg.alt = cuentas[0].titulo;
+                    }
+                }
+
+                // 2ª MÁS CARA -> Tarjeta Derecha (uiRight)
+                if (cuentas[1]) {
+                    const rightTitle = document.querySelector('#uiRight .ui-title');
+                    const rightImg = document.querySelector('#uiRight .ui-image-wrapper img');
+                    
+                    if (rightTitle) {
+                        rightTitle.innerHTML = `<span class="ui-title-text">${cuentas[1].titulo}</span> <span class="ui-price-text">$${cuentas[1].preciomxn} MXN</span>`;
+                    }
+                    if (rightImg && cuentas[1].image_url) {
+                        rightImg.src = cuentas[1].image_url;
+                        rightImg.alt = cuentas[1].titulo;
+                    }
+                }
+
+            } catch (err) {
+                console.error("Error al cargar cuentas destacadas de Supabase:", err);
+            }
+        }
+
+        // Suscripción en Tiempo Real
+        function suscribirCambiosTiempoReal() {
+            _supabase
+                .channel('schema-db-changes')
+                .on(
+                    'postgres_changes',
+                    { event: '*', schema: 'public', table: 'Cuentas' },
+                    () => {
+                        cargarCuentasMasCaras();
+                    }
+                )
+                .subscribe();
+        }
+
+        // Iniciar carga de datos de Supabase
+        window.addEventListener('DOMContentLoaded', () => {
+            cargarCuentasMasCaras();
+            suscribirCambiosTiempoReal();
+        });
+
+        // 🛑 0. BLOQUEO DE ZOOM EN SPLINE
+        window.addEventListener('DOMContentLoaded', () => {
+            const splineViewers = document.querySelectorAll('spline-viewer');
+            
+            splineViewers.forEach(viewer => {
+                viewer.addEventListener('wheel', (e) => {
+                    e.stopPropagation(); 
+                }, { capture: true });
+            });
+        });
+
+        // 🎬 1. TRANSICIÓN: INTRO -> TIENDA
+        window.addEventListener('DOMContentLoaded', () => {
+            const intro = document.getElementById('introLayer');
+            const introContent = document.getElementById('introContent');
+            const heroBrand = document.getElementById('heroBrand');
+            const heroBottom = document.getElementById('heroBottomContent');
+
+            setTimeout(() => {
+                if (introContent) introContent.classList.add('revelado');
+            }, 500);
+
+            setTimeout(() => {
+                if (intro) intro.classList.add('oculto');
+                
+                if (heroBrand) heroBrand.classList.add('visible');
+                if (heroBottom) {
+                    heroBottom.style.opacity = '1';
+                    heroBottom.style.transform = 'translateY(0)';
+                }
+                
+                document.body.classList.remove('bloqueado');
+            }, 2000); 
+        });
+
+        // 🎯 2. NAVEGACIÓN INTELIGENTE DE NAVBAR Y SCROLL
+        window.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.nav-links a, .hero-buttons a[href^="#"]');
+            
+            navLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const targetId = this.getAttribute('href');
+                    if (!targetId || targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        e.preventDefault();
+                        
+                        if (targetId === '#cases') {
+                            const wrapper = document.getElementById('cases-wrapper');
+                            if (wrapper) {
+                                const targetPosition = wrapper.offsetTop + (window.innerHeight * 0.8);
+                                window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+                                return;
+                            }
+                        }
+                        
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        });
+
+        // 🎮 3. LÓGICA DE ANIMACIONES Y SCROLL
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            const windowHeight = window.innerHeight;
+
+            // --- ANIMACIÓN SECCIÓN 1 (HERO) ---
+            const bottomContent = document.getElementById('heroBottomContent');
+            if (bottomContent) {
+                const opacidad = Math.max(0, 1 - (scrollY / windowHeight));
+                const movimiento = scrollY * 0.15; 
+                bottomContent.style.opacity = opacidad.toString();
+                bottomContent.style.transform = `translateY(-${movimiento}px)`;
+            }
+
+            // --- ANIMACIÓN SECCIÓN 2 ---
+            const casesWrapper = document.getElementById('cases-wrapper');
+            if (casesWrapper) {
+                const rect = casesWrapper.getBoundingClientRect();
+                const startScroll = rect.top; 
+                const totalScroll = rect.height - windowHeight; 
+
+                if (startScroll <= 0 && startScroll >= -totalScroll) {
+                    let progreso = Math.abs(startScroll) / totalScroll; 
+
+                    const coronaModel = document.getElementById('coronaModel');
+                    if (coronaModel) {
+                        let rotation = progreso * 360; 
+                        coronaModel.setAttribute('camera-orbit', `${rotation}deg 75deg 105%`);
+                    }
+
+                    const bgText = document.getElementById('casesBgText');
+                    if (bgText) {
+                        let textMove = 100 - (progreso * 260);
+                        bgText.style.transform = `translateX(${textMove}vw)`;
+                        bgText.style.opacity = '1'; 
+                    }
+
+                    let lineProgress = Math.max(0, Math.min(1, (progreso - 0.1) / 0.35));
+                    let lineWidth = lineProgress * 100;
+                    let titleProgress = Math.max(0, Math.min(1, (progreso - 0.42) / 0.20));
+                    let contentProgress = Math.max(0, Math.min(1, (progreso - 0.62) / 0.26));
+
+                    const cards = [
+                        { card: document.getElementById('uiLeft'), side: 'left' },
+                        { card: document.getElementById('uiRight'), side: 'right' }
+                    ];
+
+                    cards.forEach(({ card }) => {
+                        if (!card) return;
+                        const line = card.querySelector('.ui-line');
+                        const dot = card.querySelector('.ui-dot');
+                        const title = card.querySelector('.ui-title');
+                        const img = card.querySelector('.ui-image-wrapper');
+
+                        card.style.opacity = lineProgress > 0 ? '1' : '0';
+
+                        if (line) line.style.width = `${lineWidth}%`;
+                        if (dot) dot.style.opacity = lineProgress > 0 ? '1' : '0'; 
+
+                        if (title) {
+                            let titleY = (1 - titleProgress) * 35;
+                            title.style.opacity = titleProgress.toString();
+                            title.style.transform = `translateY(${titleY}px)`;
+                        }
+
+                        if (img) {
+                            let imgY = (1 - contentProgress) * 60;
+                            img.style.opacity = contentProgress.toString();
+                            img.style.transform = `translateY(${imgY}px)`;
+                        }
+                    });
+
+                    const uiBottomLeft = document.getElementById('uiBottomLeft');
+                    if (uiBottomLeft) {
+                        let bY = (1 - contentProgress) * 40;
+                        uiBottomLeft.style.opacity = contentProgress.toString();
+                        uiBottomLeft.style.transform = `translateY(${bY}px)`;
+                    }
+                }
+            }
+
+            // --- ANIMACIÓN SECCIÓN 3 ---
+            const s3Wrapper = document.getElementById('features');
+            const s3Left = document.getElementById('s3Left');
+            const s3Right = document.getElementById('s3Right');
+
+            if (s3Wrapper && s3Left && s3Right) {
+                const rect3 = s3Wrapper.getBoundingClientRect();
+                
+                if (rect3.top <= windowHeight * 0.75 && rect3.bottom >= 0) {
+                    s3Left.style.transform = 'translateX(0px)';
+                    s3Left.style.opacity = '1';
+                    s3Right.style.transform = 'translateX(0px)';
+                    s3Right.style.opacity = '1';
+                } else if (rect3.top > windowHeight * 0.75) {
+                    s3Left.style.transform = 'translateX(-150px)';
+                    s3Left.style.opacity = '0';
+                    s3Right.style.transform = 'translateX(150px)';
+                    s3Right.style.opacity = '0';
+                }
+            }
+        });
+
+        // 🛑 ELIMINACIÓN AGRESIVA DE MARCA DE AGUA DE SPLINE
+        function limpiarSplineViewer(viewer) {
+            const aplicarOcultamiento = () => {
+                if (!viewer.shadowRoot) return;
+
+                if (!viewer.shadowRoot.querySelector('#estilo-sin-logo')) {
+                    const style = document.createElement('style');
+                    style.id = 'estilo-sin-logo';
+                    style.textContent = `
+                        #logo, #spline-logo, a[href*="spline"], .spline-watermark, #watermark, [class*="watermark"] {
+                            display: none !important;
+                            opacity: 0 !important;
+                            pointer-events: none !important;
+                            visibility: hidden !important;
+                            transform: scale(0) !important;
+                            width: 0 !important;
+                            height: 0 !important;
+                        }
+                    `;
+                    viewer.shadowRoot.appendChild(style);
+                }
+
+                const logo = viewer.shadowRoot.querySelector('#logo, #spline-logo, a[href*="spline"], .spline-watermark, #watermark');
+                if (logo) {
+                    logo.remove();
+                }
+            };
+
+            const arrancarObservador = () => {
+                if (viewer.shadowRoot && !viewer.dataset.observed) {
+                    viewer.dataset.observed = 'true';
+                    aplicarOcultamiento();
+
+                    const observer = new MutationObserver(() => aplicarOcultamiento());
+                    observer.observe(viewer.shadowRoot, { childList: true, subtree: true });
+                }
+            };
+
+            const intervaloRapido = setInterval(() => {
+                aplicarOcultamiento();
+                arrancarObservador();
+                if (viewer.shadowRoot && viewer.shadowRoot.querySelector('#estilo-sin-logo')) {
+                    clearInterval(intervaloRapido);
+                }
+            }, 20);
+
+            viewer.addEventListener('load', () => {
+                aplicarOcultamiento();
+                arrancarObservador();
+            });
+        }
+
+        function ocultarLogosSpline() {
+            document.querySelectorAll('spline-viewer').forEach(limpiarSplineViewer);
+
+            const docObserver = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.tagName && node.tagName.toLowerCase() === 'spline-viewer') {
+                            limpiarSplineViewer(node);
+                        }
+                    });
+                });
+            });
+
+            const target = document.body || document.documentElement;
+            if (target) {
+                docObserver.observe(target, { childList: true, subtree: true });
+            }
+        }
+
+        ocultarLogosSpline();
+        if (document.readyState === 'loading') {
+            window.addEventListener('DOMContentLoaded', ocultarLogosSpline);
+        }
+
+        // 📱 LÓGICA DE MENÚ LATERAL (SIDEBAR MÓVIL)
+        window.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('sidebarToggle');
+            const closeBtn = document.getElementById('sidebarClose');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const sidebarLinks = document.querySelectorAll('.sidebar-links a');
+
+            function openSidebar() {
+                if (sidebar && overlay) {
+                    sidebar.classList.add('active');
+                    overlay.classList.add('active');
+                }
+            }
+
+            function closeSidebar() {
+                if (sidebar && overlay) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                }
+            }
+
+            if (toggleBtn) toggleBtn.addEventListener('click', openSidebar);
+            if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+            if (overlay) overlay.addEventListener('click', closeSidebar);
+
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', closeSidebar);
+            });
+        });
+
+    </script>
+
+</body>
+</html>
