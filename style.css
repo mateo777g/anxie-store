@@ -463,11 +463,16 @@ spline-viewer { width: 100%; height: 100%; }
 /* ==========================================
    📱 MEDIA QUERY UNIFICADO PARA MÓVIL (FINAL)
    ========================================== */
+
 @media (max-width: 900px) {
 
-    /* 🔴 1. FIX DE BARRA Y CONTENEDOR FLUIDO */
-    html, body {
-        overflow-x: hidden !important;
+    /* 🚫 DESAPARECER INTRO Y LIBERAR SCROLL EN CELULAR 🚫 */
+    .intro-layer {
+        display: none !important;
+    }
+
+    body.bloqueado {
+        overflow-y: auto !important;
     }
 
     /* Imagen del logo de la Intro (Ajustado) */
@@ -538,15 +543,21 @@ spline-viewer { width: 100%; height: 100%; }
         margin-top: 0.7rem !important;
     }
 
-    /* 🔴 3. MOSTRAR BOTÓN MÓVIL Y DARLE RESPLANDOR NEÓN */
+    /* 🔴 BOTÓN MÓVIL (SIN ANIMACIÓN GIRATORIA, CON BORDE ROJO ESTÁTICO) */
     .hero-mobile-btn {
         display: flex !important;
         justify-content: center !important;
-        margin-top: 4.5rem !important; /* 👈 Aumentado de 2.2rem a 4.5rem para despegarlo del texto */
+        margin-top: 4.5rem !important;
     }
 
     .hero-mobile-btn .btn-animated {
         box-shadow: 0 8px 25px rgba(255, 0, 0, 0.55) !important;
+    }
+
+    /* 🛑 Desactivamos la animación giratoria solo en celular manteniendo el borde rojo */
+    .hero-mobile-btn .btn-animated::before {
+        animation: none !important;
+        background: #FF0000 !important;
     }
 
     .hero-bottom-content {
@@ -998,7 +1009,13 @@ spline-viewer { width: 100%; height: 100%; }
         max-width: 100%;
         margin-top: 0;
         margin-bottom: 0;
-        align-self: center; /* Centramos la imagen */
+        align-self: center;
+    }
+
+    /* 🔴 MARCO CON DEGRADADO ROJO IGUAL AL TÍTULO (SOLO MÓVIL) */
+    .ui-image-wrapper::before {
+        animation: none !important;
+        background: linear-gradient(to top, #4a0000 0%, #c70707 100%) !important;
     }
 
     /* CONTENEDOR DEL TÍTULO */
@@ -1231,9 +1248,10 @@ spline-viewer { width: 100%; height: 100%; }
 
 /* 📱 RESPONSIVE (MÓVILES) - AQUÍ ACHICAMOS Y ESCONDEMOS */
 @media (max-width: 900px) {
-    .seccion-tres {
-        padding: 4rem 1.5rem;
-        min-height: auto;
+    /* 🔴 4. SECCIÓN DISCORD (AJUSTE PARA CELULAR) */
+    .seccion-tres { 
+        padding: 4rem 1.5rem 6.5rem 1.5rem !important; /* Aumentamos el espacio inferior a 6.5rem para que el botón respire */
+        min-height: auto; 
     }
     
     .seccion-tres-container {
@@ -1263,33 +1281,49 @@ spline-viewer { width: 100%; height: 100%; }
         font-size: 0.95rem;
     }
 
-    /* 🔥 AQUÍ ESTÁ LA CLAVE: Desaparecemos los modelos de PC 🔥 */
+    /* 🔥 Desaparecemos los modelos 3D pesados de PC cuando se navega en Celular 🔥 */
     .seccion-tres-model-left,
     .seccion-tres-model-right {
         display: none !important;
     }
 
-    /* Mostramos el modelo nuevo chiquito */
+    /* 📱 Mostramos la imagen 2D de Wumpus centrada perfectamente en Celular */
     .seccion-tres-model-mobile {
-        display: flex;
-        width: 100%;
-        height: 250px;
+        display: flex !important;
+        width: 80%;
+        height: auto;
         justify-content: center;
         align-items: center;
-        margin: 10px 0;
+        margin: 1.5rem 0;
     }
 
-    .seccion-tres-model-mobile spline-viewer {
+    .wumpus-mobile-img {
         width: 100%;
-        height: 100%;
+        max-width: 240px; /* Tamaño ajustado a tu maqueta */
+        height: auto;
+        object-fit: contain;
+        filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.12)); /* Sombra suave para darle presencia */
+    }
+    
+    /* 🛑 QUITAR ANIMACIÓN GIRATORIA SOLO EN MÓVIL */
+    .seccion-tres .btn-animated::before,
+    .btn-s3::before {
+        animation: none !important;
+        background: #FF0000 !important;
     }
 
-    /* ACHICAMOS EL BOTÓN */
-    .btn-s3 .btn-animated-inner {
+    .seccion-tres .btn-animated {
+        box-shadow: 0 6px 20px rgba(255, 0, 0, 0.35) !important;
+    }
+
+    /* ACHICAMOS Y AJUSTAMOS EL BOTÓN */
+    .btn-s3 .btn-animated-inner,
+    .seccion-tres .btn-animated-inner {
         padding: 0.7rem 1.4rem;
         font-size: 0.85rem;
     }
-    .btn-s3 .btn-icon {
+    .btn-s3 .btn-icon,
+    .seccion-tres .btn-icon {
         width: 22px;
         height: 22px;
         font-size: 0.95rem;

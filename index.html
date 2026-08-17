@@ -208,7 +208,7 @@
         <section class="seccion-tres">
             <div class="seccion-tres-container">
                 
-                <!-- 👈 COLUMNA IZQUIERDA: ¿Por qué Anxie Store? + Personaje Corazón -->
+                <!-- 👈 COLUMNA IZQUIERDA: ¿Por qué Anxie Store? -->
                 <div class="seccion-tres-left">
                     <div class="seccion-tres-info" id="s3Left">
                         <h2 class="seccion-tres-title-alt">
@@ -219,14 +219,14 @@
                         </p>
                     </div>
 
-                    <!-- Modelo Original (Visible solo en PC) -->
+                    <!-- Modelo Original 3D (Visible SOLO en PC) -->
                     <div class="seccion-tres-model-left">
                         <spline-viewer url="https://prod.spline.design/Jp-A6ubDqiAveFPY/scene.splinecode"></spline-viewer>
                     </div>
 
-                    <!-- 📱 MODELO MÓVIL NUEVO (Visible SOLO en celular) -->
+                    <!-- 📱 IMAGEN 2D DE WUMPUS (Visible SOLO en Celulares) -->
                     <div class="seccion-tres-model-mobile">
-                        <spline-viewer url="https://prod.spline.design/XKsR2uz1pm2A4ada/scene.splinecode"></spline-viewer>
+                        <img src="assets/discordcelular.png" alt="Wumpus Anxie Store" class="wumpus-mobile-img">
                     </div>
                 </div>
 
@@ -364,6 +364,19 @@
             const heroBrand = document.getElementById('heroBrand');
             const heroBottom = document.getElementById('heroBottomContent');
 
+            // 📱 CELULAR: Saltear intro al instante sin demoras
+            if (window.innerWidth <= 900) {
+                if (intro) intro.style.display = 'none';
+                document.body.classList.remove('bloqueado');
+                if (heroBrand) heroBrand.classList.add('visible');
+                if (heroBottom) {
+                    heroBottom.style.opacity = '1';
+                    heroBottom.style.transform = 'translateY(0)';
+                }
+                return;
+            }
+
+            // 💻 COMPUTADORA: Mantiene la intro animada de 2 segundos intacta
             setTimeout(() => {
                 if (introContent) introContent.classList.add('revelado');
             }, 500);
