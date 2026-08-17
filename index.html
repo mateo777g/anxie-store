@@ -209,8 +209,8 @@
             <div class="seccion-tres-container">
                 
                 <!-- 👈 COLUMNA IZQUIERDA: ¿Por qué Anxie Store? + Personaje Corazón -->
-                <div class="seccion-tres-left" id="s3Left">
-                    <div class="seccion-tres-info">
+                <div class="seccion-tres-left">
+                    <div class="seccion-tres-info" id="s3Left">
                         <h2 class="seccion-tres-title-alt">
                             ¿POR QUÉ<br>ANXIE STORE?
                         </h2>
@@ -231,14 +231,14 @@
                 </div>
 
                 <!-- 👉 COLUMNA DERECHA: Mascot Mono Discord + Título + Botón -->
-                <div class="seccion-tres-right" id="s3Right">
+                <div class="seccion-tres-right">
                     
                     <!-- Modelo Original (Visible solo en PC) -->
                     <div class="seccion-tres-model-right">
                         <spline-viewer url="https://prod.spline.design/HFQiKc5wRilijMuJ/scene.splinecode"></spline-viewer>
                     </div>
 
-                    <div class="seccion-tres-content">
+                    <div class="seccion-tres-content" id="s3Right">
                         <h2 class="seccion-tres-title">
                             ÚNETE AL<br>SERVIDOR<br>DE DISCORD
                         </h2>
@@ -417,56 +417,52 @@
             // --- ANIMACIÓN SECCIÓN 1 (HERO) ---
             const bottomContent = document.getElementById('heroBottomContent');
             if (bottomContent) {
-                const opacidad = Math.max(0, 1 - (scrollY / windowHeight));
-                const movimiento = scrollY * 0.15; 
-                bottomContent.style.opacity = opacidad.toString();
-                bottomContent.style.transform = `translateY(-${movimiento}px)`;
+                if (window.innerWidth <= 900) {
+                    // 📱 CELULAR: El texto "COMPRA TUS CUENTAS DE VIDEOJUEGOS" sube y desaparece suavemente al hacer scroll
+                    const progress = Math.min(1, Math.max(0, scrollY / (windowHeight * 0.6)));
+                    bottomContent.style.opacity = (1 - progress).toString();
+                    bottomContent.style.transform = `translateY(-${progress * 70}px)`;
+                } else {
+                    // 💻 PC: Comportamiento intacto para computadora
+                    const opacidad = Math.max(0, 1 - (scrollY / windowHeight));
+                    const movimiento = scrollY * 0.15; 
+                    bottomContent.style.opacity = opacidad.toString();
+                    bottomContent.style.transform = `translateY(-${movimiento}px)`;
+                }
             }
 
             // --- ANIMACIÓN SECCIÓN 2 ---
             const casesWrapper = document.getElementById('cases-wrapper');
             if (casesWrapper) {
                 const rect = casesWrapper.getBoundingClientRect();
-                const startScroll = rect.top; 
-                const totalScroll = rect.height - windowHeight; 
 
-                if (startScroll <= 0 && startScroll >= -totalScroll) {
-                    let progreso = Math.abs(startScroll) / totalScroll; 
+                if (window.innerWidth <= 900) {
+                    // 📱 CELULAR: Animación fluida en scroll natural (reemplaza el scroll-jacking)
+                    let progreso = Math.max(0, Math.min(1, (windowHeight - rect.top) / (windowHeight * 0.85)));
 
                     const coronaModel = document.getElementById('coronaModel');
                     if (coronaModel) {
-                        let rotation = progreso * 360; 
+                        let rotation = progreso * 360;
                         coronaModel.setAttribute('camera-orbit', `${rotation}deg 75deg 105%`);
                     }
 
-                    const bgText = document.getElementById('casesBgText');
-                    if (bgText) {
-                        let textMove = 100 - (progreso * 260);
-                        bgText.style.transform = `translateX(${textMove}vw)`;
-                        bgText.style.opacity = '1'; 
-                    }
-
-                    let lineProgress = Math.max(0, Math.min(1, (progreso - 0.1) / 0.35));
+                    // Fases exactas de aparición réplica del scroll-jacking
+                    let lineProgress = Math.max(0, Math.min(1, (progreso - 0.05) / 0.35));
                     let lineWidth = lineProgress * 100;
-                    let titleProgress = Math.max(0, Math.min(1, (progreso - 0.42) / 0.20));
-                    let contentProgress = Math.max(0, Math.min(1, (progreso - 0.62) / 0.26));
+                    let titleProgress = Math.max(0, Math.min(1, (progreso - 0.28) / 0.30));
+                    let contentProgress = Math.max(0, Math.min(1, (progreso - 0.48) / 0.35));
 
-                    const cards = [
-                        { card: document.getElementById('uiLeft'), side: 'left' },
-                        { card: document.getElementById('uiRight'), side: 'right' }
-                    ];
+                    const uiLeft = document.getElementById('uiLeft');
+                    if (uiLeft) {
+                        const line = uiLeft.querySelector('.ui-line');
+                        const dot = uiLeft.querySelector('.ui-dot');
+                        const title = uiLeft.querySelector('.ui-title');
+                        const img = uiLeft.querySelector('.ui-image-wrapper');
 
-                    cards.forEach(({ card }) => {
-                        if (!card) return;
-                        const line = card.querySelector('.ui-line');
-                        const dot = card.querySelector('.ui-dot');
-                        const title = card.querySelector('.ui-title');
-                        const img = card.querySelector('.ui-image-wrapper');
-
-                        card.style.opacity = lineProgress > 0 ? '1' : '0';
+                        uiLeft.style.opacity = lineProgress > 0 ? '1' : '0';
 
                         if (line) line.style.width = `${lineWidth}%`;
-                        if (dot) dot.style.opacity = lineProgress > 0 ? '1' : '0'; 
+                        if (dot) dot.style.opacity = lineProgress > 0 ? '1' : '0';
 
                         if (title) {
                             let titleY = (1 - titleProgress) * 35;
@@ -479,13 +475,76 @@
                             img.style.opacity = contentProgress.toString();
                             img.style.transform = `translateY(${imgY}px)`;
                         }
-                    });
+                    }
 
                     const uiBottomLeft = document.getElementById('uiBottomLeft');
                     if (uiBottomLeft) {
                         let bY = (1 - contentProgress) * 40;
                         uiBottomLeft.style.opacity = contentProgress.toString();
                         uiBottomLeft.style.transform = `translateY(${bY}px)`;
+                    }
+                } else {
+                    // 💻 PC: Comportamiento de Scroll-Jacking (400vh) completamente intacto
+                    const startScroll = rect.top; 
+                    const totalScroll = rect.height - windowHeight; 
+
+                    if (startScroll <= 0 && startScroll >= -totalScroll) {
+                        let progreso = Math.abs(startScroll) / totalScroll; 
+
+                        const coronaModel = document.getElementById('coronaModel');
+                        if (coronaModel) {
+                            let rotation = progreso * 360; 
+                            coronaModel.setAttribute('camera-orbit', `${rotation}deg 75deg 105%`);
+                        }
+
+                        const bgText = document.getElementById('casesBgText');
+                        if (bgText) {
+                            let textMove = 100 - (progreso * 260);
+                            bgText.style.transform = `translateX(${textMove}vw)`;
+                            bgText.style.opacity = '1'; 
+                        }
+
+                        let lineProgress = Math.max(0, Math.min(1, (progreso - 0.1) / 0.35));
+                        let lineWidth = lineProgress * 100;
+                        let titleProgress = Math.max(0, Math.min(1, (progreso - 0.42) / 0.20));
+                        let contentProgress = Math.max(0, Math.min(1, (progreso - 0.62) / 0.26));
+
+                        const cards = [
+                            { card: document.getElementById('uiLeft'), side: 'left' },
+                            { card: document.getElementById('uiRight'), side: 'right' }
+                        ];
+
+                        cards.forEach(({ card }) => {
+                            if (!card) return;
+                            const line = card.querySelector('.ui-line');
+                            const dot = card.querySelector('.ui-dot');
+                            const title = card.querySelector('.ui-title');
+                            const img = card.querySelector('.ui-image-wrapper');
+
+                            card.style.opacity = lineProgress > 0 ? '1' : '0';
+
+                            if (line) line.style.width = `${lineWidth}%`;
+                            if (dot) dot.style.opacity = lineProgress > 0 ? '1' : '0'; 
+
+                            if (title) {
+                                let titleY = (1 - titleProgress) * 35;
+                                title.style.opacity = titleProgress.toString();
+                                title.style.transform = `translateY(${titleY}px)`;
+                            }
+
+                            if (img) {
+                                let imgY = (1 - contentProgress) * 60;
+                                img.style.opacity = contentProgress.toString();
+                                img.style.transform = `translateY(${imgY}px)`;
+                            }
+                        });
+
+                        const uiBottomLeft = document.getElementById('uiBottomLeft');
+                        if (uiBottomLeft) {
+                            let bY = (1 - contentProgress) * 40;
+                            uiBottomLeft.style.opacity = contentProgress.toString();
+                            uiBottomLeft.style.transform = `translateY(${bY}px)`;
+                        }
                     }
                 }
             }
