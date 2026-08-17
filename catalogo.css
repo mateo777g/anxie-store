@@ -928,3 +928,46 @@ body.no-scroll {
 .buy-modal-overlay:not(.active) spline-viewer {
     pointer-events: none !important;
 }
+
+/* ==========================================
+   FOOTER REDES SOCIALES (EXCLUSIVO MÓVIL)
+   ========================================== */
+
+/* En PC el contenedor 2D se oculta totalmente */
+.footer-mobile-social {
+    display: none;
+}
+
+/* En Móvil ocultamos el 3D y mostramos la cápsula 2D */
+@media (max-width: 650px) {
+    .social-spline-wrapper {
+        display: none !important;
+    }
+
+    .footer-mobile-social {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 22px;
+        background-color: #121212;
+        border: 1px solid #222222;
+        padding: 12px 26px;
+        border-radius: 50px;
+        margin: 20px auto 15px auto;
+        width: fit-content;
+    }
+
+    .footer-social-link {
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .footer-social-link:hover,
+    .footer-social-link:active {
+        opacity: 0.7;
+        transform: scale(1.1);
+    }
+}
