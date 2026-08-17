@@ -11,7 +11,7 @@ body {
     font-family: 'Montserrat', -apple-system, sans-serif;
     background-color: #000000; 
     color: #ffffff; 
-    overflow-x: hidden;
+    overflow-x: hidden !important;
 }
 
 /* ==========================================
@@ -460,34 +460,93 @@ spline-viewer { width: 100%; height: 100%; }
     100% { transform: rotate(360deg); }
 }
 
-/* 📱 RESPONSIVE - SECCIÓN 1 📱 */
+/* ==========================================
+   📱 MEDIA QUERY UNIFICADO PARA MÓVIL (FINAL)
+   ========================================== */
 @media (max-width: 900px) {
-    /* 🔴 Ocultar links de PC y activar botón hamburguesa */
-    .nav-links { display: none !important; }
-    .sidebar-toggle-btn { display: flex !important; }
 
-    /* 🎯 OCULTAR TEXTO Y CENTRAR LOGO EN CELULAR */
-    .logo-texto { 
-        display: none; 
+    /* 🔴 1. FIX DE BARRA Y CONTENEDOR FLUIDO */
+    html, body {
+        overflow-x: hidden !important;
     }
 
-    .logo-container {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
+    /* Imagen del logo de la Intro (Ajustado) */
+    .intro-logo {
+        width: 75% !important; /* 👈 Le damos margen a los lados para que respire */
+        max-width: 320px !important; /* 👈 Cambiado de 500px a 260px para que no quede gigante */
+        height: auto;
+        object-fit: contain;
     }
 
+    /* 🔴 1. FIX DE BARRA, LOGO Y HAMBURGUESA (MÁS ABAJO Y SOMBRA SUAVE) */
     .navbar { 
-        padding: 1.5rem 2rem; 
-        justify-content: flex-end; 
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 85px !important; 
+        padding: 0 1.5rem !important; 
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        box-sizing: border-box !important;
+        z-index: 9000 !important;
+        /* Degradado difuminado suave sin corte brusco */
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.18) 65%, rgba(0, 0, 0, 0) 100%) !important;
     }
 
-    .brand-title { font-size: 2.5rem; letter-spacing: 4px; gap: 0.4rem; }
-    .brand-sub-red { font-size: 0.75rem; letter-spacing: 4px; }
+    .nav-links, .logo-texto { 
+        display: none !important; 
+    }
 
-    /* 📱 MOSTRAR EL BOTÓN CENTRAL EN CELULARES */
+    /* Logo circular bajado para despegarlo del techo */
+    .logo-container {
+        position: absolute !important;
+        left: 50% !important;
+        top: 46px !important; /* 👈 Posición exacta más abajo */
+        transform: translate(-50%, -50%) !important; 
+        margin: 0 !important;
+        z-index: 9002 !important;
+    }
+
+    .logo-img {
+        width: 52px !important;
+        height: 52px !important;
+        border-radius: 50% !important;
+        object-fit: cover !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    /* Hamburguesa alineada a la altura del logo */
+    .sidebar-toggle-btn { 
+        display: flex !important; 
+        margin-left: auto !important; 
+        position: relative !important;
+        transform: translateY(-1px) !important; /* 👈 Cambiado de translateY(10px) a translateY(-2px) para subirlo */
+        z-index: 9003 !important;
+    }
+
+    /* 🔴 2. TEXTOS "ANXIE STORE" Y "TIENDA DE CUENTAS" MÁS GRANDES */
+    .brand-title { 
+        font-size: 2.8rem !important; 
+        letter-spacing: 2px !important; 
+    }
+
+    .brand-sub-red { 
+        font-size: 0.88rem !important; 
+        letter-spacing: 3.5px !important; 
+        margin-top: 0.7rem !important;
+    }
+
+    /* 🔴 3. MOSTRAR BOTÓN MÓVIL Y DARLE RESPLANDOR NEÓN */
     .hero-mobile-btn {
-        display: block;
+        display: flex !important;
+        justify-content: center !important;
+        margin-top: 4.5rem !important; /* 👈 Aumentado de 2.2rem a 4.5rem para despegarlo del texto */
+    }
+
+    .hero-mobile-btn .btn-animated {
+        box-shadow: 0 8px 25px rgba(255, 0, 0, 0.55) !important;
     }
 
     .hero-bottom-content {
@@ -495,33 +554,119 @@ spline-viewer { width: 100%; height: 100%; }
         bottom: 2rem;
         left: 0;
         width: 100%;
-        padding: 0 1.5rem;
+        padding: 0 1rem;
         display: flex;
         justify-content: center;
+        text-align: center;
+    }
+
+    .hero-right { display: none !important; }
+    .hero-left { max-width: 100%; width: 100%; }
+    .hero-title { font-size: 2rem; text-align: center; width: 100%; }
+
+    .hero-scroll-wrapper, .hero {
+        position: relative !important;
+        height: auto !important;
+        min-height: 100vh;
+        overflow: hidden !important;
+    }
+
+    /* 🔴 3. SECCIÓN CUENTAS (FIX DE DESBORDAMIENTO) */
+    .cases-scroll-wrapper, .cases-sticky {
+        position: relative !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        overflow: hidden !important;
+    }
+
+    #uiRight, .cases-bg-text { display: none !important; }
+
+    .cases-model-container {
+        position: absolute;
+        top: 35%;
+        right: -5%; /* Ajustado para que no cause scroll horizontal */
+        width: 250px;
+        height: 250px;
+        z-index: 8;
+        pointer-events: none;
+    }
+
+    .ui-card.ui-left {
+        position: absolute;
+        top: 15%;
+        left: 5vw;
+        width: 85vw; /* Ancho ajustado a la pantalla real */
+        max-width: 320px;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        z-index: 15;
+    }
+
+    .ui-left .line-left {
+        order: 1;
+        margin: 0 0 15px 0;
+        width: 100% !important; /* Limitado al 100% para evitar fuga */
+    }
+
+    .ui-left .ui-image-wrapper {
+        order: 2;
+        width: 100%;
+        align-self: center;
+    }
+
+    .ui-left .ui-title {
+        order: 3;
+        display: flex;
+        flex-direction: column;
+        align-items: center; 
+        text-align: center;  
+        width: 100%;
+        white-space: normal; 
+        gap: 6px; 
+        margin-top: 20px; 
+    }
+
+    .ui-left .ui-title-text {
+        font-size: 1.4rem; 
+        font-weight: 900;
+        text-align: center;
+        background: linear-gradient(to top, #4a0000 0%, #ff0000 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .ui-left .ui-price-text {
+        font-size: 0.95rem;
+        color: #aaaaaa;
+        text-align: center;
+    }
+
+    .ui-bottom-left {
+        position: absolute;
+        bottom: 5%;
+        left: 5%;
+        width: 90%;
+        display: flex;
+        flex-direction: column;
         align-items: center;
         text-align: center;
     }
 
-    /* 🔴 OCULTAR DESCRIPCIÓN Y BOTONES EN CELULAR */
-    .hero-right { 
-        display: none !important; 
-    }
+    /* 🔴 4. SECCIÓN DISCORD */
+    .seccion-tres { padding: 3rem 1rem; min-height: auto; }
+    .seccion-tres-container { grid-template-columns: 1fr; gap: 2rem; }
+    .seccion-tres-left, .seccion-tres-right { text-align: center; align-items: center; }
+    .seccion-tres-title-alt, .seccion-tres-title { font-size: 2rem; text-align: center; }
+    .seccion-tres-model-left, .seccion-tres-model-right { display: none !important; }
 
-    .hero-left { 
-        max-width: 100%; 
+    .seccion-tres-model-mobile {
+        display: flex;
         width: 100%;
-    }
-
-    .hero-title {
-        font-size: 2.1rem;
-        text-align: center;
-        line-height: 1.1;
-        width: 100%;
-    }
-
-    /* 🔴 QUITAR SCROLL-JACKING EN CELULAR PARA SECCIÓN 1 */
-    .hero-scroll-wrapper {
-        height: 100vh !important;
+        height: 220px;
+        justify-content: center;
+        align-items: center;
     }
 }
 
@@ -793,9 +938,16 @@ spline-viewer { width: 100%; height: 100%; }
    ========================================== */
 @media (max-width: 900px) {
 
-    /* 🔴 QUITAR SCROLL-JACKING EN CELULAR PARA SECCIÓN 2 */
+    /* 🔴 QUITAR SCROLL-JACKING Y STICKY EN CELULAR PARA SECCIÓN 2 */
     .cases-scroll-wrapper {
+        height: auto !important;
+        min-height: 100vh !important;
+    }
+
+    .cases-sticky {
+        position: relative !important; /* 👈 Desactiva el sticky enganchoso */
         height: 100vh !important;
+        overflow: visible !important;
     }
 
     /* 1. Ocultar la segunda cuenta en celular */
@@ -819,10 +971,10 @@ spline-viewer { width: 100%; height: 100%; }
         pointer-events: none;
     }
 
-    /* 4. Tarjeta Única de Cuenta (uiLeft) en Móvil aqui te equivocaste y ya lo solucione */
+    /* 4. Tarjeta Única de Cuenta (uiLeft) en Móvil */
     .ui-card.ui-left {
         position: absolute;
-        top: 15%; /* 👈 LO REGRESAMOS A SU LUGAR ORIGINAL BRO. (Antes estaba en 24%) */
+        top: 16%; /* 👈 Controla la altura vertical (justo entre la hamburguesa y la punta del 3D) */
         left: 5vw;
         right: auto;
         width: 65vw; 
@@ -833,11 +985,11 @@ spline-viewer { width: 100%; height: 100%; }
         z-index: 15;
     }
 
-    /* 🔥 LÍNEA ROJA 🔥 */
+    /* 🔥 LÍNEA ROJA (Extendida hasta el borde derecho) 🔥 */
     .ui-left .line-left {
         order: 1;
         margin: 0 0 15px 0;
-        width: 140%; /* La estiramos hacia la derecha */
+        width: 90vw !important; /* 👈 Con 88vw se estira hasta llegar justo arriba de la punta del modelo 3D */
     }
 
     .ui-left .ui-image-wrapper {
@@ -1319,26 +1471,4 @@ spline-viewer {
     margin-left: 12px;
     letter-spacing: 0.5px;
     white-space: nowrap;
-}
-
-@media (max-width: 900px) {
-
-    /* ==========================================
-       1. FIX: LOGO DE INTRO MÁS GRANDE EN CELULAR
-       ========================================== */
-    .intro-logo {
-        width: 250px; /* 👈 Sube o baja este número para cambiar el tamaño exacto bro */
-        max-width: 90vw; /* Evita que se salga de la pantalla si lo haces muy grande */
-    }
-
-    /* ==========================================
-       2. FIX: LOGO DE NAVBAR RECORTADO AL SCROLEAR
-       ========================================== */
-    .logo-container {
-        position: absolute;
-        left: 50%;
-        top: 20px; /* 👈 AQUÍ ESTÁ LA MAGIA: Forzamos la distancia desde el techo para que NO suba ni se recorte */
-        transform: translateX(-50%);
-    }
-
 }
