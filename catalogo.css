@@ -468,16 +468,18 @@ body.no-scroll {
 }
 
 /* ==========================================
-   VENTANA MODAL OPCIONES DE COMPRA (IG / DISCORD)
+   FIX DEFINITIVO: PANTALLA COMPLETA PARA MÓVIL
    ========================================== */
 .buy-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.65);
-    z-index: 99999;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: rgba(0, 0, 0, 0.75) !important; /* Oscurece toda la pantalla */
+    z-index: 999999 !important; /* Queda por encima del header y títulos */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -611,34 +613,81 @@ body.no-scroll {
     display: none;
 }
 
-/* 🔴 EL TRUCO PARA CELULARES (LA MAQUETA) 🔴 */
+/* Ocultamos las imágenes estáticas de móvil por defecto en PC */
+.buy-img-box-mobile {
+    display: none;
+}
+
+/* 🔴 VISTA EXCLUSIVA PARA MÓVIL (SIN MODELOS 3D DE SPLINE) 🔴 */
 @media (max-width: 650px) {
-    /* Mostramos el título general y ocultamos los individuales y la rayita */
+    .buy-modal-card {
+        padding: 30px 18px 25px 18px;
+        max-width: 380px;
+        margin: 0 auto;
+    }
+
+    /* Título superior para móviles */
     .buy-modal-mobile-title {
-        display: block;
+        display: block !important;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #222222;
+        text-align: center;
+        margin-bottom: 20px;
+        line-height: 1.35;
     }
-    .buy-col-title, .buy-modal-divider {
-        display: none;
+
+    /* Ocultamos los títulos individuales de columna y la línea vertical */
+    .buy-col-title, 
+    .buy-modal-divider {
+        display: none !important;
     }
-    /* Partimos el contenedor en 2 mitades exactas */
-    .buy-modal-body {
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-    }
+
+    /* 🚫 Ocultamos totalmente los lienzos 3D de Spline en el móvil */
     .buy-spline-box {
-        height: 110px;
+        display: none !important;
     }
+
+    /* 📏 LOGOS MÁS GRANDES Y BALANCED ÓPTICO */
+    .buy-img-box-mobile {
+        width: 100%;
+        height: 115px;                  /* 👈 Más espacio de altura para que respiren */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px !important; /* 👈 Mantiene el espacio simétrico con el botón */
+    }
+
+    .buy-img-mobile {
+        width: 98px !important;         /* 👈 Instagram más grande */
+        height: 98px !important;
+        object-fit: contain !important;
+    }
+
+    /* 🎯 COMPENSACIÓN ÓPTICA: Discord un pelín más grande para emparejar el peso visual */
+    .buy-img-mobile[src*="discord"] {
+        width: 107px !important;        /* 👈 +9px para que al ojo se vean exactamente iguales */
+        height: 107px !important;
+    }
+
+    /* Grid simétrico de dos columnas */
+    .buy-modal-body {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 15px !important;
+    }
+
     .btn-buy-option {
-        font-size: 0.8rem; 
-        padding: 10px 5px; 
+        font-size: 0.82rem; 
+        padding: 11px 5px; 
     }
     
-    /* MAGIA DEL TEXTO: Oculta el largo, muestra el corto */
+    /* Cambiamos el texto de los botones para celular */
     .text-pc {
-        display: none;
+        display: none !important;
     }
     .text-mobile {
-        display: inline;
+        display: inline !important;
     }
 }
 
