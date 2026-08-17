@@ -956,7 +956,7 @@ spline-viewer { width: 100%; height: 100%; }
     }
 
     .cases-sticky {
-        position: relative !important; /* 👈 Desactiva el sticky enganchoso */
+        position: relative !important;
         height: 100vh !important;
         overflow: visible !important;
     }
@@ -966,130 +966,128 @@ spline-viewer { width: 100%; height: 100%; }
         display: none !important;
     }
 
-    /* 2. OCULTAR EL TEXTO DE FONDO EN CELULAR ("CUENTAS DESTACADAS") */
+    /* 2. OCULTAR EL TEXTO DE FONDO EN CELULAR */
     .cases-bg-text {
         display: none !important;
     }
 
-    /* 3. Modelo 3D desplazado a la derecha */
+    /* 3. MODELO 3D DORADO (BAJADO PARA NO ESTORBAR A LA IMAGEN) */
     .cases-model-container {
-        position: absolute;
-        top: 34%;
-        right: -32%;
-        width: 290px;
-        height: 290px;
-        z-index: 8;
-        pointer-events: none;
+        position: absolute !important;
+        top: 57% !important; /* 👈 BAJADO: Queda libre de la imagen y centrado con el título */
+        right: -38% !important; /* 👈 Mantiene la mitad oculta a la derecha */
+        width: 310px !important;
+        height: 310px !important;
+        transform: translateY(-50%) !important;
+        z-index: 8 !important;
+        pointer-events: none !important;
     }
 
-    /* 4. Tarjeta Única de Cuenta (uiLeft) en Móvil */
+    /* 4. TARJETA ÚNICA DE CUENTA (BAJA LA LÍNEA ROJA + LA IMAGEN) */
     .ui-card.ui-left {
-        position: absolute;
-        top: 16%; /* 👈 Controla la altura vertical (justo entre la hamburguesa y la punta del 3D) */
-        left: 5vw;
-        right: auto;
-        width: 65vw; 
-        max-width: 280px;
-        padding-left: 0;
-        display: flex;
-        flex-direction: column;
-        z-index: 15;
+        position: absolute !important;
+        top: 11% !important; /* 👈 Cambiado de 8% a 13% para bajar la línea roja y la imagen */
+        left: 5vw !important;
+        right: auto !important;
+        width: 90vw !important;
+        max-width: 360px !important;
+        padding-left: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        z-index: 15 !important;
     }
 
-    /* 🔥 LÍNEA ROJA (Extendida hasta el borde derecho) 🔥 */
+    /* 🔥 LÍNEA ROJA SUPERIOR 🔥 */
     .ui-left .line-left {
-        order: 1;
-        margin: 0 0 15px 0;
-        width: 90vw !important; /* 👈 Con 88vw se estira hasta llegar justo arriba de la punta del modelo 3D */
+        order: 1 !important;
+        margin: 0 0 12px 0 !important;
+        width: 90vw !important;
     }
 
+    /* 🖼️ IMAGEN DE LA CUENTA */
     .ui-left .ui-image-wrapper {
-        order: 2;
-        width: 100%;
-        max-width: 100%;
-        margin-top: 0;
-        margin-bottom: 0;
-        align-self: center;
+        order: 2 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
     }
 
-    /* 🔴 MARCO CON DEGRADADO ROJO IGUAL AL TÍTULO (SOLO MÓVIL) */
+    /* 🔴 MARCO DEGRADADO EN MÓVIL */
     .ui-image-wrapper::before {
         animation: none !important;
         background: linear-gradient(to top, #4a0000 0%, #c70707 100%) !important;
     }
 
-    /* CONTENEDOR DEL TÍTULO */
+    /* 1. CONTENEDOR DEL TÍTULO Y PRECIO (MÁS ABAJO) */
     .ui-left .ui-title {
-        order: 3;
-        display: flex;
-        flex-direction: column;
-        align-items: center; 
-        text-align: center;  
-        width: 100%;
-        white-space: normal; 
-        gap: 6px; 
-        margin-top: 55px; 
-        
-        position: relative;
-        right: 25px; 
-        top: 35px; /* 👈 AQUÍ ESTÁ LA MAGIA BRO: Esto lo baja un poquito */
+        order: 3 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important; 
+        text-align: left !important;  
+        width: 100% !important;
+        white-space: normal !important; 
+        gap: 4px !important; 
+        margin-top: 90px !important; /* 👈 AQUÍ LO BAJAS O SUBES (sube o baja este valor en px según tu gusto) */
+        position: static !important;
     }
 
-    /* 🔥 TÍTULO DE LA CUENTA (APILADO AUTOMÁTICAMENTE EN 3 LÍNEAS) 🔥 */
+    /* 2 Y 3. TÍTULO DE LA CUENTA (MÁS ANCHO PARA QUE ENTRES LA "T") */
     .ui-left .ui-title-text {
-        font-family: 'Montserrat', sans-serif;
-        font-size: 1.5rem; 
-        font-weight: 900;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        line-height: 1.1;
-        text-align: center;
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 2.3rem !important;
+        font-weight: 900 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        line-height: 0.95 !important;
+        text-align: left !important;
+        max-width: 260px !important; /* 👈 AUMENTADO: Ahora "WILDCAT" cabe completo sin soltar la "T" */
+        word-break: break-word !important;
         
-        /* 💡 EL TRUCO BRO: Fuerza a que cada palabra baje de renglón si es muy largo */
-        max-width: min-content; 
-        
-        /* Efecto de degradado intacto */
-        background: linear-gradient(to top, #4a0000 0%, #ff0000 100%);
-        -webkit-background-clip: text;
-        background-clip: text; /* 👈 CON ESTO ELIMINAMOS LA LÍNEA AMARILLA QUE TE MOLESTABA */
-        -webkit-text-fill-color: transparent;
-        color: transparent; 
+        background: linear-gradient(to top, #4a0000 0%, #ff0000 100%) !important;
+        -webkit-background-clip: text !important;
+        background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        color: transparent !important; 
     }
 
-    /* Estilo del Precio de la Cuenta (Más pequeño) */
+    /* 2. PRECIO DE LA CUENTA (LETRAS MÁS DELGADAS Y GRIS FUERTE) */
     .ui-left .ui-price-text {
-        font-family: 'Montserrat', sans-serif;
-        font-size: 0.95rem; /* 👈 Más discreto */
-        font-weight: 600;
-        color: #aaaaaa;
-        margin-left: 0;
-        letter-spacing: 0.5px;
-        text-align: center;
+        font-family: 'Montserrat', sans-serif !important;
+        font-size: 1.4rem !important;
+        font-weight: 500 !important; /* 👈 Letra más delgada */
+        color: #888888 !important;   /* 👈 Gris fuerte */
+        margin-left: 0 !important;
+        margin-top: 10px !important;
+        letter-spacing: 1px !important;
+        text-align: left !important;
+        text-shadow: none !important;
     }
 
-    /* 5. Bloque Inferior: Texto + Botón Centrados */
+    /* 5. Bloque Inferior: Texto + Botón "Ver catálogo" */
     .ui-bottom-left {
-        position: absolute;
-        bottom: 7%;
-        left: 5%;
-        width: 90%;
-        max-width: 360px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        gap: 1.2rem;
+        position: absolute !important;
+        bottom: 4% !important;
+        left: 5% !important;
+        width: 90% !important;
+        max-width: 360px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        gap: 1.2rem !important;
     }
 
     .ui-bottom-text {
-        font-size: 1.4rem;
-        text-align: center;
-        line-height: 1.15;
-        width: 100%;
+        font-size: 1.35rem !important;
+        text-align: center !important;
+        line-height: 1.15 !important;
+        width: 100% !important;
     }
 
     .btn-red-solid {
-        align-self: center;
+        align-self: center !important;
     }
 }
 
@@ -1471,6 +1469,34 @@ body.bloqueado {
     height: 100%;
 }
 
+/* 📱 ÍCONOS REDES SOCIALES MÓVIL (CÁPSULA MODERNA) */
+.footer-mobile-social {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    background-color: #121212;
+    border: 1px solid #222222;
+    padding: 12px 26px;
+    border-radius: 50px;
+    margin: 10px auto 15px auto;
+    width: fit-content;
+}
+
+.footer-social-link {
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.footer-social-link:hover,
+.footer-social-link:active {
+    opacity: 0.7;
+    transform: scale(1.1);
+}
+
 .footer-copy {
     font-family: 'Montserrat', sans-serif;
     font-size: 0.8rem;
@@ -1480,18 +1506,14 @@ body.bloqueado {
 }
 
 /* 📱 RESPONSIVE FOOTER */
-@media (max-width: 600px) {
+@media (max-width: 900px) {
     .social-spline-wrapper {
-        height: 120px;
+        display: none !important;
     }
-}
 
-/* 💥 Forzar transparencia en todos los visores de Spline */
-spline-viewer {
-    width: 100%;
-    height: 100%;
-    background: transparent !important;
-    outline: none;
+    .footer-mobile-social {
+        display: flex !important;
+    }
 }
 
 /* ==========================================
