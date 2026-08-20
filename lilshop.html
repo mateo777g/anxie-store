@@ -376,6 +376,7 @@
         if (insertError) throw insertError;
 
         mostrarMensaje("¡Cuenta guardada exitosamente!", "success");
+        try { sessionStorage.removeItem('anxie_catalog_v1'); } catch(e) {}
         form.reset();
 
       } catch (err) {
@@ -459,6 +460,7 @@
         if (error) throw error;
 
         alert("¡Cuenta eliminada con éxito!");
+        try { sessionStorage.removeItem('anxie_catalog_v1'); } catch(e) {}
         cargarCuentasParaEditar();
         cargarEstadisticas();
       } catch (err) {
@@ -531,6 +533,7 @@
         if (updateError) throw updateError;
 
         alert("¡Cuenta actualizada con éxito!");
+        try { sessionStorage.removeItem('anxie_catalog_v1'); } catch(e) {}
         cerrarModalEditar();
         cargarCuentasParaEditar();
 
