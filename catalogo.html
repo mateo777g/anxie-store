@@ -24,6 +24,9 @@
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
     <!-- CDN de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="supabase-config.js"></script>
+    <script src="catalog-cache.js"></script>
 </head>
 <body>
 
@@ -305,13 +308,6 @@
 
         ocultarLogosSpline();
 
-        // 🟢 CONFIGURACIÓN SUPABASE Y CATÁLOGO
-        const SUPABASE_URL = 'https://jayxntvpiduxvgvluaky.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpheXhudHZwaWR1eHZndmx1YWt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2NDgxNjMsImV4cCI6MjEwMjIyNDE2M30.U7Hrie3HIBAcp_2fYU0YHgP8McGnpYYYjdBiW-9AMjw';
-        
-        const { createClient } = supabase;
-        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
         let globalCuentas = [];
 
         function renderPlataformasHTML(texto) {
@@ -355,25 +351,16 @@
             return found.join('');
         }
 
+        // ✅ REEMPLAZAR la función completa por esta:
         async function cargarCatalogo() {
             const grid = document.getElementById('product-grid');
-
             try {
-                const { data: cuentas, error } = await _supabase
-                    .from('Cuentas')
-                    .select('*');
-
-                if (error) throw error;
-
-                globalCuentas = cuentas || [];
-
+                globalCuentas = await getCatalogData(); // ← usa caché + query optimizada
                 if (globalCuentas.length === 0) {
                     grid.innerHTML = '<div id="loading-msg">Aún no hay cuentas en el catálogo.</div>';
                     return;
                 }
-
                 ordenarYRenderizarGrid('high-low');
-
             } catch (err) {
                 console.error("Error al cargar el catálogo:", err);
                 grid.innerHTML = '<div id="loading-msg" style="color:red;">Hubo un error al cargar el catálogo.</div>';
@@ -393,7 +380,7 @@
                     <div class="product-card" id="${safeId}">
                         <span class="platform-badge">${badgeHTML}</span>
                         <div class="image-container">
-                            <img src="${cuenta.image_url}" alt="${cuenta.titulo}">
+                            <img src="${cuenta.image_url}" alt="${cuenta.titulo}" loading="lazy">
                         </div>
                         <div class="product-info">
                             <h3 class="product-title">${cuenta.titulo}</h3>

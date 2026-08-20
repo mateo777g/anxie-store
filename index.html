@@ -25,6 +25,9 @@
 
     <!-- CDN de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="supabase-config.js"></script>
+    <script src="catalog-cache.js"></script>
 </head>
 <body class="bloqueado">
 
@@ -295,25 +298,38 @@
     </footer>
 
     <script>
-        // 🟢 CONFIGURACIÓN SUPABASE Y CARGA DE CUENTAS MÁS CARAS (SECCIÓN 2)
-        const SUPABASE_URL = 'https://jayxntvpiduxvgvluaky.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpheXhudHZwaWR1eHZndmx1YWt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2NDgxNjMsImV4cCI6MjEwMjIyNDE2M30.U7Hrie3HIBAcp_2fYU0YHgP8McGnpYYYjdBiW-9AMjw';
-        
-        const { createClient } = supabase;
-        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // 🟢 REEMPLAZA LA FUNCIÓN cargarCuentasMasCaras() EN TU index.html POR ESTA:
         async function cargarCuentasMasCaras() {
             try {
-                const { data: cuentas, error } = await _supabase
-                    .from('Cuentas')
-                    .select('*');
+                let cuentas = null;
 
-                if (error) throw error;
+                // Intentar usar el caché si el usuario ya visitó el catálogo
+                try {
+                    const cachedStr = sessionStorage.getItem('anxie_catalog_v1');
+                    if (cachedStr) {
+                        const cached = JSON.parse(cachedStr);
+                        if (Date.now() - cached.timestamp < 5 * 60 * 1000) {
+                            cuentas = [...cached.data]
+                                .sort((a, b) => Number(b.preciomxn) - Number(a.preciomxn))
+                                .slice(0, 2);
+                        }
+                    }
+                } catch (e) {}
+
+                // Si no hay caché, query mínima: solo 2 filas y solo lo que necesitas
+                if (!cuentas || cuentas.length === 0) {
+                    const { data, error } = await _supabase
+                        .from('Cuentas')
+                        .select('titulo, preciomxn, image_url')
+                        .order('preciomxn', { ascending: false })
+                        .limit(2);
+
+                    if (error) throw error;
+                    cuentas = data || [];
+                }
+
                 if (!cuentas || cuentas.length === 0) return;
-
-                // Ordenar por precio en MXN de mayor a menor
-                cuentas.sort((a, b) => Number(b.preciomxn) - Number(a.preciomxn));
 
                 // 1ª MÁS CARA -> Tarjeta Izquierda (uiLeft)
                 if (cuentas[0]) {
