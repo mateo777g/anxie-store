@@ -1,0 +1,14 @@
+name = "anxie-store-uploads"
+main = "index.js"
+compatibility_date = "2026-08-01"
+
+# Acceso nativo al bucket R2 -- sin exponer ninguna key S3.
+[[r2_buckets]]
+binding = "FOTOS"
+bucket_name = "anxie-store-fotos"
+
+[vars]
+SUPABASE_URL = "https://jayxntvpiduxvgvluaky.supabase.co"
+SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpheXhudHZwaWR1eHZndmx1YWt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2NDgxNjMsImV4cCI6MjEwMjIyNDE2M30.U7Hrie3HIBAcp_2fYU0YHgP8McGnpYYYjdBiW-9AMjw"
+ADMIN_EMAIL = "matthewsantreys13@gmail.com"
+R2_PUBLIC_BASE = "https://pub-221a2b6aa265453ea4b027de0d0c4ed4.r2.dev"

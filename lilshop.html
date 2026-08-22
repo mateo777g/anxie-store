@@ -11,6 +11,11 @@
 </head>
 <body>
 
+  <!-- Toast global de estado: reemplaza los alert() bloqueantes.
+       Vive fuera de lock-screen/app-container para que se pueda mostrar
+       sin importar qué vista esté activa. -->
+  <div id="toast"></div>
+
   <!-- ==========================================
        PANTALLA DE LOGIN
        ========================================== -->
@@ -149,7 +154,6 @@
             </div>
 
             <button type="submit" id="btn-guardar" class="login-btn" style="margin-top: 10px;">Subir Cuenta al Catálogo</button>
-            <div id="status-msg"></div>
           </form>
         </div>
       </section>
@@ -225,18 +229,74 @@
   <!-- LÓGICA DE JAVASCRIPT -->
   <script>
     // ==========================================
-    // 1. CONFIGURACIÓN DE SUPABASE
+    // 1. CONFIGURACIÓN DE SUPABASE Y R2
     // ==========================================
     const SUPABASE_URL = 'https://jayxntvpiduxvgvluaky.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpheXhudHZwaWR1eHZndmx1YWt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2NDgxNjMsImV4cCI6MjEwMjIyNDE2M30.U7Hrie3HIBAcp_2fYU0YHgP8McGnpYYYjdBiW-9AMjw'; // 👈 Pon tu anon key aquí
 
     const ADMIN_EMAIL = 'matthewsantreys13@gmail.com';
 
+    // Worker de Cloudflare que sube/borra en R2 (ver /worker). lilshop.html
+    // nunca toca R2 directamente -- no hay ninguna credencial de R2 en el
+    // navegador, solo el token de sesión de Supabase Auth del admin, que el
+    // Worker valida contra ADMIN_EMAIL antes de tocar el bucket.
+    const WORKER_URL = 'https://anxie-store-uploads.matthewsantreys13.workers.dev';
+    const R2_PUBLIC_BASE = 'https://pub-221a2b6aa265453ea4b027de0d0c4ed4.r2.dev';
+
+    // lilshop.html SÍ necesita sesión real y persistida (a diferencia de
+    // index.html/catalogo.html) -- por eso usa createClient con sus valores
+    // por defecto en vez del cliente compartido de supabase-config.js.
+    // Ver la nota de persistSession:false en ese archivo para el contexto completo.
     const { createClient } = supabase;
     const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // ==========================================
-    // 2. SISTEMA DE SEGURIDAD Y LOGIN
+    // 2. UTILIDADES: ESCAPADO HTML Y MENSAJES
+    // ==========================================
+
+    // Escapa texto antes de insertarlo con innerHTML. Los datos de Cuentas
+    // hoy solo los escribe este mismo panel, pero si la fuente de datos se
+    // amplía algún día, esto evita que un valor con < > " ' rompa el layout
+    // o inyecte HTML/JS en el propio panel de admin.
+    function escapeHTML(valor) {
+      if (valor === null || valor === undefined) return '';
+      return String(valor).replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+
+    // Toast único para todo el panel: reemplaza tanto el <div id="status-msg">
+    // que solo vivía en el formulario de "Agregar" como los alert()/confirm()
+    // de éxito o error que usaba "Editar/Eliminar" -- antes cada flujo avisaba
+    // distinto, ahora agregar/editar/eliminar usan el mismo mensaje consistente.
+    const toastEl = document.getElementById('toast');
+    let toastTimeoutId = null;
+
+    function mostrarMensaje(texto, tipo) {
+      if (toastTimeoutId) {
+        clearTimeout(toastTimeoutId);
+        toastTimeoutId = null;
+      }
+      if (!texto) {
+        toastEl.style.display = 'none';
+        return;
+      }
+      toastEl.innerText = texto;
+      toastEl.className = tipo; // 'success' | 'error'
+      toastEl.style.display = 'block';
+      toastTimeoutId = setTimeout(() => { toastEl.style.display = 'none'; }, 5000);
+    }
+
+    // Borra el caché compartido del catálogo (anxie_catalog_v1). Debe llamarse
+    // después de CUALQUIER escritura (insert/update/delete) -- si se agrega un
+    // nuevo flujo de escritura más adelante, hay que llamarla ahí también o el
+    // catálogo público sirve datos viejos hasta por 5 minutos.
+    function invalidarCacheCatalogo() {
+      try { sessionStorage.removeItem('anxie_catalog_v1'); } catch (e) {}
+    }
+
+    // ==========================================
+    // 3. SISTEMA DE SEGURIDAD Y LOGIN
     // ==========================================
     const nipForm = document.getElementById('nip-form');
     const nipInput = document.getElementById('nip-input');
@@ -286,7 +346,7 @@
     }
 
     // ==========================================
-    // 3. UI Y NAVEGACIÓN
+    // 4. UI Y NAVEGACIÓN
     // ==========================================
     function establecerFecha() {
       const opciones = { weekday: 'long', day: 'numeric', month: 'long' };
@@ -320,88 +380,193 @@
     }
 
     // ==========================================
-    // 4. SUBIR NUEVA CUENTA
+    // 5. IMÁGENES: CONVERSIÓN A WEBP Y SUBIDA/BORRADO EN R2
+    // ==========================================
+    // Mismo criterio de calidad que la Fase 2 (WebP 80%), más un tope de
+    // resolución -- las fotos que llegan de celular pueden venir a 4000px+
+    // de lado, y subir eso sin reducir es justo el tipo de desperdicio de
+    // almacenamiento/egress que ya causó problemas antes en este proyecto.
+    const WEBP_CALIDAD = 0.8;
+    const MAX_DIMENSION = 1600; // px, lado mayor
+
+    // Convierte un File de imagen (cualquier formato) a un Blob WebP en el
+    // propio navegador, vía <canvas>, antes de mandarlo al Worker.
+    function convertirAWebP(file) {
+      return new Promise((resolve, reject) => {
+        if (!file.type || !file.type.startsWith('image/')) {
+          reject(new Error('El archivo seleccionado no es una imagen.'));
+          return;
+        }
+
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+
+        img.onload = () => {
+          URL.revokeObjectURL(objectUrl);
+
+          let { width, height } = img;
+          if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+            const escala = MAX_DIMENSION / Math.max(width, height);
+            width = Math.round(width * escala);
+            height = Math.round(height * escala);
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob((blob) => {
+            if (!blob) {
+              reject(new Error('Tu navegador no pudo convertir la imagen a WebP. Prueba con Chrome o Edge actualizado.'));
+              return;
+            }
+            resolve(blob);
+          }, 'image/webp', WEBP_CALIDAD);
+        };
+
+        img.onerror = () => {
+          URL.revokeObjectURL(objectUrl);
+          reject(new Error('No se pudo leer la imagen seleccionada.'));
+        };
+
+        img.src = objectUrl;
+      });
+    }
+
+    // Sube un Blob WebP ya convertido al Worker, que lo guarda en R2 y
+    // devuelve su URL pública. Requiere sesión activa: el Worker vuelve a
+    // validar ese token contra Supabase Auth + ADMIN_EMAIL del lado servidor,
+    // así que no hay forma de subir nada sin haber iniciado sesión aquí.
+    async function subirImagenAR2(blob) {
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (!session) throw new Error('Tu sesión expiró. Vuelve a iniciar sesión.');
+
+      let resp;
+      try {
+        resp = await fetch(`${WORKER_URL}/upload`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'image/webp'
+          },
+          body: blob
+        });
+      } catch (err) {
+        throw new Error('No se pudo conectar con el servidor de imágenes. Revisa tu conexión.');
+      }
+
+      const resultado = await resp.json().catch(() => null);
+      if (!resp.ok || !resultado || !resultado.ok) {
+        throw new Error((resultado && resultado.error) || `Error al subir la imagen (HTTP ${resp.status}).`);
+      }
+      return resultado.url;
+    }
+
+    // Extrae el nombre de archivo de una image_url solo si es una URL de
+    // nuestro propio bucket de R2. Devuelve null para cualquier otra cosa
+    // (p. ej. una URL vieja de Supabase Storage que aún no se migró) -- así
+    // el borrado nunca intenta tocar un archivo que no le pertenece.
+    function nombreArchivoR2(imageUrl) {
+      if (!imageUrl || !imageUrl.startsWith(R2_PUBLIC_BASE + '/')) return null;
+      return imageUrl.slice(R2_PUBLIC_BASE.length + 1);
+    }
+
+    // Borra una imagen de R2 vía el Worker. Se usa para (a) limpiar la
+    // imagen vieja tras un edit exitoso con imagen nueva, (b) limpiar una
+    // imagen recién subida si el guardado en la base falla después, y
+    // (c) limpiar la imagen de una cuenta que se eliminó. Nunca lanza: un
+    // fallo de limpieza en R2 no debe tumbar el flujo principal (guardar,
+    // editar o eliminar la cuenta), solo se registra en consola.
+    async function borrarImagenDeR2(imageUrl) {
+      const nombre = nombreArchivoR2(imageUrl);
+      if (!nombre) return;
+
+      try {
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (!session) return;
+
+        const resp = await fetch(`${WORKER_URL}/delete?file=${encodeURIComponent(nombre)}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${session.access_token}` }
+        });
+        if (!resp.ok) {
+          console.error('No se pudo borrar en R2:', nombre, resp.status);
+        }
+      } catch (err) {
+        console.error('Error de red al borrar imagen en R2:', nombre, err);
+      }
+    }
+
+    // ==========================================
+    // 6. SUBIR NUEVA CUENTA
     // ==========================================
     const form = document.getElementById('cuenta-form');
-    const statusMsg = document.getElementById('status-msg');
     const btnGuardar = document.getElementById('btn-guardar');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
       btnGuardar.disabled = true;
-      btnGuardar.innerText = "Subiendo imagen y guardando...";
-      mostrarMensaje("", "");
+      mostrarMensaje('', '');
 
       try {
         const fileInput = document.getElementById('imagen');
         const file = fileInput.files[0];
+        if (!file) throw new Error('Por favor selecciona una imagen.');
 
-        if (!file) throw new Error("Por favor selecciona una imagen.");
+        btnGuardar.innerText = 'Optimizando imagen...';
+        const webpBlob = await convertirAWebP(file);
 
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}.${fileExt}`;
+        btnGuardar.innerText = 'Subiendo imagen...';
+        const imagenUrl = await subirImagenAR2(webpBlob);
 
-        const { data: uploadData, error: uploadError } = await _supabase.storage
-          .from('cuentas-fotos')
-          .upload(fileName, file);
+        const nuevaCuenta = {
+          titulo: document.getElementById('titulo').value,
+          preciomxn: parseFloat(document.getElementById('preciomxn').value),
+          preciousd: parseFloat(document.getElementById('preciousd').value),
+          vbucks: document.getElementById('vbucks').value,
+          disponibilidad: document.getElementById('disponibilidad').value,
+          descripcion: document.getElementById('descripcion').value,
+          image_url: imagenUrl
+        };
 
-        if (uploadError) throw uploadError;
+        btnGuardar.innerText = 'Guardando cuenta...';
+        const { error: insertError } = await _supabase.from('Cuentas').insert([nuevaCuenta]);
 
-        const { data: urlData } = _supabase.storage
-          .from('cuentas-fotos')
-          .getPublicUrl(fileName);
+        if (insertError) {
+          // La imagen ya quedó en R2 pero la fila no se guardó -- revertir
+          // para no dejar un huérfano (la misma clase de problema que
+          // obligó a la limpieza de Fase 1).
+          await borrarImagenDeR2(imagenUrl);
+          throw insertError;
+        }
 
-        const imagenUrl = urlData.publicUrl;
-
-        const titulo = document.getElementById('titulo').value;
-        const preciomxn = parseFloat(document.getElementById('preciomxn').value);
-        const preciousd = parseFloat(document.getElementById('preciousd').value);
-        const vbucks = document.getElementById('vbucks').value;
-        const disponibilidad = document.getElementById('disponibilidad').value;
-        const descripcion = document.getElementById('descripcion').value;
-
-        const { error: insertError } = await _supabase
-          .from('Cuentas')
-          .insert([{
-            titulo: titulo,
-            preciomxn: preciomxn,
-            preciousd: preciousd,
-            vbucks: vbucks,
-            disponibilidad: disponibilidad,
-            descripcion: descripcion,
-            image_url: imagenUrl
-          }]);
-
-        if (insertError) throw insertError;
-
-        mostrarMensaje("¡Cuenta guardada exitosamente!", "success");
-        try { sessionStorage.removeItem('anxie_catalog_v1'); } catch(e) {}
+        mostrarMensaje('¡Cuenta guardada exitosamente!', 'success');
+        invalidarCacheCatalogo();
         form.reset();
 
       } catch (err) {
-        console.error(err);
-        mostrarMensaje("Error: " + (err.message || "Ocurrió un problema"), "error");
+        console.error('Error al guardar cuenta:', err);
+        mostrarMensaje('Error: ' + (err.message || 'Ocurrió un problema.'), 'error');
       } finally {
         btnGuardar.disabled = false;
-        btnGuardar.innerText = "Subir Cuenta al Catálogo";
+        btnGuardar.innerText = 'Subir Cuenta al Catálogo';
       }
     });
 
-    function mostrarMensaje(texto, tipo) {
-      if (!texto) {
-        statusMsg.style.display = 'none';
-        return;
-      }
-      statusMsg.innerText = texto;
-      statusMsg.className = tipo;
-      statusMsg.style.display = 'block';
-      setTimeout(() => statusMsg.style.display = 'none', 5000);
-    }
+    // ==========================================
+    // 7. GESTIÓN DE INVENTARIO (EDITAR Y ELIMINAR)
+    // ==========================================
 
-    // ==========================================
-    // 5. GESTIÓN DE INVENTARIO (EDITAR Y ELIMINAR)
-    // ==========================================
+    // Cuentas de la última carga, indexadas por id. abrirModalEditar() y
+    // eliminarCuenta() la usan en vez de recibir el objeto completo por el
+    // atributo onclick -- JSON.stringify(c) metido en un onclick='...' se
+    // rompía si titulo/descripcion traían una comilla simple, y de paso esto
+    // evita tener que re-consultar Supabase solo para saber la image_url
+    // vieja al eliminar.
+    let cuentasPorId = {};
+
     async function cargarCuentasParaEditar() {
       const contenedor = document.getElementById('lista-cuentas-editar');
       contenedor.innerHTML = '<p style="color: var(--text-muted);">Cargando inventario...</p>';
@@ -414,6 +579,8 @@
 
         if (error) throw error;
 
+        cuentasPorId = {};
+
         if (!cuentas || cuentas.length === 0) {
           contenedor.innerHTML = '<p style="color: var(--text-muted);">No hay cuentas publicadas.</p>';
           return;
@@ -421,19 +588,21 @@
 
         contenedor.innerHTML = '';
         cuentas.forEach(c => {
+          cuentasPorId[c.id] = c;
+
           const card = document.createElement('div');
           card.className = 'card-admin';
           card.innerHTML = `
-            <img src="${c.image_url}" alt="${c.titulo}" class="card-admin-img">
+            <img src="${escapeHTML(c.image_url)}" alt="${escapeHTML(c.titulo)}" class="card-admin-img">
             <div class="card-admin-body">
-              <div class="card-admin-title">${c.titulo}</div>
-              <div class="card-admin-price">$${c.preciomxn} MXN / $${c.preciousd} USD</div>
+              <div class="card-admin-title">${escapeHTML(c.titulo)}</div>
+              <div class="card-admin-price">$${escapeHTML(c.preciomxn)} MXN / $${escapeHTML(c.preciousd)} USD</div>
               <div class="card-admin-details">
-                <strong>Pavos:</strong> ${c.vbucks}<br>
-                <strong>Plataformas:</strong> ${c.disponibilidad}
+                <strong>Pavos:</strong> ${escapeHTML(c.vbucks)}<br>
+                <strong>Plataformas:</strong> ${escapeHTML(c.disponibilidad)}
               </div>
               <div class="card-actions-grid">
-                <button class="btn-card-edit" onclick='abrirModalEditar(${JSON.stringify(c)})'>✏️ Editar</button>
+                <button class="btn-card-edit" onclick="abrirModalEditar(${c.id})">✏️ Editar</button>
                 <button class="btn-card-delete" onclick="eliminarCuenta(${c.id})">🗑️ Eliminar</button>
               </div>
             </div>
@@ -442,34 +611,41 @@
         });
 
       } catch (err) {
-        console.error(err);
+        console.error('Error al cargar cuentas para editar:', err);
         contenedor.innerHTML = '<p style="color: var(--accent-red);">Error al cargar las cuentas.</p>';
       }
     }
 
     async function eliminarCuenta(id) {
-      const confirmacion = confirm("¿Estás seguro de borrar esta cuenta? Se eliminará del catálogo.");
+      const cuenta = cuentasPorId[id];
+      const confirmacion = confirm('¿Estás seguro de borrar esta cuenta? Se eliminará del catálogo.');
       if (!confirmacion) return;
 
       try {
-        const { error } = await _supabase
-          .from('Cuentas')
-          .delete()
-          .eq('id', id);
-
+        // Primero la fila de la base: si esto falla, no queda ninguna
+        // referencia rota (la imagen en R2 sigue intacta, solo se queda
+        // huérfana hasta que se reintente eliminar).
+        const { error } = await _supabase.from('Cuentas').delete().eq('id', id);
         if (error) throw error;
 
-        alert("¡Cuenta eliminada con éxito!");
-        try { sessionStorage.removeItem('anxie_catalog_v1'); } catch(e) {}
+        invalidarCacheCatalogo();
+        if (cuenta && cuenta.image_url) {
+          await borrarImagenDeR2(cuenta.image_url);
+        }
+
+        mostrarMensaje('¡Cuenta eliminada con éxito!', 'success');
         cargarCuentasParaEditar();
         cargarEstadisticas();
       } catch (err) {
-        console.error(err);
-        alert("Error al eliminar: " + err.message);
+        console.error('Error al eliminar cuenta:', err);
+        mostrarMensaje('Error al eliminar: ' + (err.message || 'Ocurrió un problema.'), 'error');
       }
     }
 
-    function abrirModalEditar(cuenta) {
+    function abrirModalEditar(id) {
+      const cuenta = cuentasPorId[id];
+      if (!cuenta) return;
+
       document.getElementById('edit-id').value = cuenta.id;
       document.getElementById('edit-titulo').value = cuenta.titulo;
       document.getElementById('edit-preciomxn').value = cuenta.preciomxn;
@@ -492,31 +668,25 @@
       e.preventDefault();
       const btn = document.getElementById('btn-guardar-edit');
       btn.disabled = true;
-      btn.innerText = "Guardando...";
+      btn.innerText = 'Guardando...';
+
+      const id = document.getElementById('edit-id').value;
+      const imagenActual = document.getElementById('edit-imagen-actual').value;
+      let imagenUrl = imagenActual;
+      let imagenNuevaSubida = null; // si algo falla después de subir, hay que revertir esto
 
       try {
-        const id = document.getElementById('edit-id').value;
-        let imagenUrl = document.getElementById('edit-imagen-actual').value;
-
         const fileInput = document.getElementById('edit-imagen');
         if (fileInput.files.length > 0) {
-          const file = fileInput.files[0];
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${Date.now()}.${fileExt}`;
+          btn.innerText = 'Optimizando imagen...';
+          const webpBlob = await convertirAWebP(fileInput.files[0]);
 
-          const { error: uploadError } = await _supabase.storage
-            .from('cuentas-fotos')
-            .upload(fileName, file);
-
-          if (uploadError) throw uploadError;
-
-          const { data: urlData } = _supabase.storage
-            .from('cuentas-fotos')
-            .getPublicUrl(fileName);
-
-          imagenUrl = urlData.publicUrl;
+          btn.innerText = 'Subiendo imagen...';
+          imagenUrl = await subirImagenAR2(webpBlob);
+          imagenNuevaSubida = imagenUrl;
         }
 
+        btn.innerText = 'Guardando...';
         const { error: updateError } = await _supabase
           .from('Cuentas')
           .update({
@@ -532,17 +702,29 @@
 
         if (updateError) throw updateError;
 
-        alert("¡Cuenta actualizada con éxito!");
-        try { sessionStorage.removeItem('anxie_catalog_v1'); } catch(e) {}
+        invalidarCacheCatalogo();
+
+        // La fila ya apunta a la imagen nueva -- ahora sí es seguro borrar
+        // la vieja de R2 sin dejar nada roto.
+        if (imagenNuevaSubida && imagenActual !== imagenNuevaSubida) {
+          await borrarImagenDeR2(imagenActual);
+        }
+
+        mostrarMensaje('¡Cuenta actualizada con éxito!', 'success');
         cerrarModalEditar();
         cargarCuentasParaEditar();
 
       } catch (err) {
-        console.error(err);
-        alert("Error al actualizar: " + err.message);
+        console.error('Error al actualizar cuenta:', err);
+        // Se alcanzó a subir una imagen nueva pero la base no se actualizó:
+        // revertir el upload para no dejar un huérfano en R2.
+        if (imagenNuevaSubida) {
+          await borrarImagenDeR2(imagenNuevaSubida);
+        }
+        mostrarMensaje('Error al actualizar: ' + (err.message || 'Ocurrió un problema.'), 'error');
       } finally {
         btn.disabled = false;
-        btn.innerText = "Guardar Cambios";
+        btn.innerText = 'Guardar Cambios';
       }
     });
   </script>

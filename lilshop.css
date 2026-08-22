@@ -330,6 +330,27 @@ body {
 .success { background-color: #065f46; color: #34d399; }
 .error { background-color: #881337; color: #f87171; }
 
+/* Toast global de estado (ver #toast en lilshop.html) -- flota arriba a la
+   derecha y reutiliza los colores de .success/.error de arriba. */
+#toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  min-width: 260px;
+  max-width: 90vw;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  text-align: center;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  display: none;
+}
+@media (max-width: 900px) {
+  #toast { left: 20px; right: 20px; min-width: 0; }
+}
+
 /* GRID DE TARJETAS EN ADMIN */
 .cuentas-grid-admin {
   display: grid;
