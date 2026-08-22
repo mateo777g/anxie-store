@@ -310,6 +310,17 @@
 
         let globalCuentas = [];
 
+        // Escapa texto antes de insertarlo con innerHTML. Hoy titulo/disponibilidad
+        // solo los escribe el propio dueño desde lilshop.html, pero si esta fuente
+        // de datos se amplía algún día, esto evita que un valor con < > " ' rompa el
+        // layout o inyecte HTML.
+        function escapeHTML(valor) {
+            if (valor === null || valor === undefined) return '';
+            return String(valor).replace(/[&<>"']/g, (c) => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
+        }
+
         function renderPlataformasHTML(texto) {
             if (!texto) return 'DISPONIBLE';
 
@@ -345,7 +356,7 @@
 
             if (found.length === 0) {
                 let limpio = texto.replace(/:\w+:/g, '').trim();
-                return limpio || texto;
+                return escapeHTML(limpio || texto);
             }
 
             return found.join('');
@@ -380,12 +391,12 @@
                     <div class="product-card" id="${safeId}">
                         <span class="platform-badge">${badgeHTML}</span>
                         <div class="image-container">
-                            <img src="${cuenta.image_url}" alt="${cuenta.titulo}" loading="lazy">
+                            <img src="${escapeHTML(cuenta.image_url)}" alt="${escapeHTML(cuenta.titulo)}" loading="lazy">
                         </div>
                         <div class="product-info">
-                            <h3 class="product-title">${cuenta.titulo}</h3>
+                            <h3 class="product-title">${escapeHTML(cuenta.titulo)}</h3>
                             <div class="product-price">
-                                $${cuenta.preciomxn} MXN 
+                                $${cuenta.preciomxn} MXN
                                 <span class="price-usd">$${cuenta.preciousd} USD</span>
                             </div>
                             <button type="button" class="btn-buy open-buy-modal-btn">¡Contáctanos!</button>
@@ -448,8 +459,8 @@
 
                 const itemHTML = `
                     <a href="javascript:void(0)" class="search-result-item scroll-to-account" data-id="${safeId}">
-                        <img src="${cuenta.image_url}" alt="${cuenta.titulo}" class="search-result-img">
-                        <span class="search-result-title">${cuenta.titulo}</span>
+                        <img src="${escapeHTML(cuenta.image_url)}" alt="${escapeHTML(cuenta.titulo)}" class="search-result-img">
+                        <span class="search-result-title">${escapeHTML(cuenta.titulo)}</span>
                         <span class="search-result-price">$${cuenta.preciomxn} MXN</span>
                     </a>
                 `;

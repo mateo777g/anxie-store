@@ -1,0 +1,9 @@
+venv/
+_respaldo_huerfanos/
+_respaldo_png_originales/
+_respaldo_webp_supabase/
+_scripts/
+.wrangler/
+worker/.wrangler/
+worker/.env
+nul

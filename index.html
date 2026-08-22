@@ -299,23 +299,40 @@
 
     <script>
 
+        // Escapa texto antes de insertarlo con innerHTML. Hoy titulo/disponibilidad
+        // solo los escribe el propio dueño desde lilshop.html, pero si esta fuente
+        // de datos se amplía algún día, esto evita que un valor con < > " ' rompa el
+        // layout o inyecte HTML.
+        function escapeHTML(valor) {
+            if (valor === null || valor === undefined) return '';
+            return String(valor).replace(/[&<>"']/g, (c) => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
+        }
+
         // 🟢 REEMPLAZA LA FUNCIÓN cargarCuentasMasCaras() EN TU index.html POR ESTA:
-        async function cargarCuentasMasCaras() {
+        // forceRefresh=true salta el caché -- lo usa la suscripción Realtime para
+        // que un cambio en Supabase se refleje al instante en vez de esperar a que
+        // expire el caché de 5 minutos (que puede seguir "fresco" aunque los datos
+        // ya hayan cambiado en la base).
+        async function cargarCuentasMasCaras(forceRefresh = false) {
             try {
                 let cuentas = null;
 
                 // Intentar usar el caché si el usuario ya visitó el catálogo
-                try {
-                    const cachedStr = sessionStorage.getItem('anxie_catalog_v1');
-                    if (cachedStr) {
-                        const cached = JSON.parse(cachedStr);
-                        if (Date.now() - cached.timestamp < 5 * 60 * 1000) {
-                            cuentas = [...cached.data]
-                                .sort((a, b) => Number(b.preciomxn) - Number(a.preciomxn))
-                                .slice(0, 2);
+                if (!forceRefresh) {
+                    try {
+                        const cachedStr = sessionStorage.getItem('anxie_catalog_v1');
+                        if (cachedStr) {
+                            const cached = JSON.parse(cachedStr);
+                            if (Date.now() - cached.timestamp < 5 * 60 * 1000) {
+                                cuentas = [...cached.data]
+                                    .sort((a, b) => Number(b.preciomxn) - Number(a.preciomxn))
+                                    .slice(0, 2);
+                            }
                         }
-                    }
-                } catch (e) {}
+                    } catch (e) {}
+                }
 
                 // Si no hay caché, query mínima: solo 2 filas y solo lo que necesitas
                 if (!cuentas || cuentas.length === 0) {
@@ -337,7 +354,7 @@
                     const leftImg = document.querySelector('#uiLeft .ui-image-wrapper img');
                     
                     if (leftTitle) {
-                        leftTitle.innerHTML = `<span class="ui-title-text">${cuentas[0].titulo}</span> <span class="ui-price-text">$${cuentas[0].preciomxn} MXN</span>`;
+                        leftTitle.innerHTML = `<span class="ui-title-text">${escapeHTML(cuentas[0].titulo)}</span> <span class="ui-price-text">$${cuentas[0].preciomxn} MXN</span>`;
                     }
                     if (leftImg && cuentas[0].image_url) {
                         leftImg.src = cuentas[0].image_url;
@@ -351,7 +368,7 @@
                     const rightImg = document.querySelector('#uiRight .ui-image-wrapper img');
                     
                     if (rightTitle) {
-                        rightTitle.innerHTML = `<span class="ui-title-text">${cuentas[1].titulo}</span> <span class="ui-price-text">$${cuentas[1].preciomxn} MXN</span>`;
+                        rightTitle.innerHTML = `<span class="ui-title-text">${escapeHTML(cuentas[1].titulo)}</span> <span class="ui-price-text">$${cuentas[1].preciomxn} MXN</span>`;
                     }
                     if (rightImg && cuentas[1].image_url) {
                         rightImg.src = cuentas[1].image_url;
@@ -372,7 +389,12 @@
                     'postgres_changes',
                     { event: '*', schema: 'public', table: 'Cuentas' },
                     () => {
-                        cargarCuentasMasCaras();
+                        // El caché compartido (anxie_catalog_v1) quedó desactualizado
+                        // en cuanto llega este evento -- invalidarlo para que catalogo.html
+                        // también recargue de Supabase en su próxima visita, y forzar
+                        // que esta página lea directo de la base ahora mismo.
+                        try { sessionStorage.removeItem('anxie_catalog_v1'); } catch (e) {}
+                        cargarCuentasMasCaras(true);
                     }
                 )
                 .subscribe();
