@@ -188,7 +188,10 @@ body {
     top: 0;
     right: -320px;
     width: 300px;
+    /* svh: con 100vh el cajon medía la pantalla completa y su último tramo
+       quedaba debajo de la barra de Safari en iPhone. */
     height: 100vh;
+    height: 100svh;
     background: rgba(10, 10, 10, 0.98);
     /* 👇 Borramos el border-left que estaba aquí 👇 */
     box-shadow: -10px 0 30px rgba(0, 0, 0, 0.8);
@@ -574,7 +577,13 @@ spline-viewer { width: 100%; height: 100%; }
         /* 🎬 Estado inicial de la intro: arranca más abajo y transparente */
         transform: translate(-50%, 70px) !important;
         width: auto !important;
+        /* Acompaña al hero: si el hero pasa a medir 100svh, el avatar debe
+           medirse contra lo mismo para conservar EXACTAMENTE la proporción
+           de siempre (ocupa del 42% al 105% del alto del hero, o sea que su
+           borde inferior sigue quedando fuera de pantalla, como dice el
+           comentario de arriba). */
         height: 63vh !important;
+        height: 63svh !important;
         max-width: none !important;
         z-index: 2 !important;
         opacity: 0 !important;
@@ -594,7 +603,12 @@ spline-viewer { width: 100%; height: 100%; }
     /* 🔴 2. TEXTOS "ANXIE STORE" Y "TIENDA DE CUENTAS" MÁS GRANDES */
     /* "TIENDA DE CUENTAS" arriba (negra) y "ANXIE STORE" abajo en rojo sólido */
     .brand-title {
-        font-size: 2.8rem !important;
+        /* "ANXIE STORE" mide 339px a 2.8rem, así que en pantallas de menos de
+           340px (iPhone SE 1a gen = 320px, Galaxy Fold cerrado = 280px) se
+           salía cortado por ambos lados. min() mantiene EXACTAMENTE 2.8rem de
+           360px para arriba (o sea en todos los celulares normales) y solo lo
+           encoge en las angostas, donde hoy se ve mocho. */
+        font-size: min(2.8rem, 12.5vw) !important;
         letter-spacing: 2px !important;
     }
 
@@ -727,92 +741,27 @@ spline-viewer { width: 100%; height: 100%; }
     .hero-scroll-wrapper, .hero {
         position: relative !important;
         height: auto !important;
+        /* 📐 svh = alto de la pantalla CON la barra del navegador puesta.
+           100vh en iPhone mide la pantalla COMPLETA e ignora la barra de
+           Safari, así que el hero quedaba ~130px más alto de lo que se ve
+           y "COMPRA TUS CUENTAS DE VIDEOJUEGOS" (que va en bottom: 2rem)
+           caía debajo de la barra: se ocultaba entre el 81% y el 100%.
+           svh es estable (no cambia al colapsarse la barra), así que
+           tampoco produce reflow al scrollear. La línea vh se queda de
+           respaldo para navegadores viejos que no entiendan svh. */
         min-height: 100vh;
+        min-height: 100svh;
         overflow: hidden !important;
     }
 
-    /* 🔴 3. SECCIÓN CUENTAS (FIX DE DESBORDAMIENTO) */
-    .cases-scroll-wrapper, .cases-sticky {
-        position: relative !important;
-        height: auto !important;
-        min-height: 100vh !important;
-        overflow: hidden !important;
-    }
-
-    #uiRight, .cases-bg-text { display: none !important; }
-
-    .cases-model-container {
-        position: absolute;
-        top: 35%;
-        right: -5%; /* Ajustado para que no cause scroll horizontal */
-        width: 250px;
-        height: 250px;
-        z-index: 8;
-        pointer-events: none;
-    }
-
-    .ui-card.ui-left {
-        position: absolute;
-        top: 15%;
-        left: 5vw;
-        width: 85vw; /* Ancho ajustado a la pantalla real */
-        max-width: 320px;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        z-index: 15;
-    }
-
-    .ui-left .line-left {
-        order: 1;
-        margin: 0 0 15px 0;
-        width: 100% !important; /* Limitado al 100% para evitar fuga */
-    }
-
-    .ui-left .ui-image-wrapper {
-        order: 2;
-        width: 100%;
-        align-self: center;
-    }
-
-    .ui-left .ui-title {
-        order: 3;
-        display: flex;
-        flex-direction: column;
-        align-items: center; 
-        text-align: center;  
-        width: 100%;
-        white-space: normal; 
-        gap: 6px; 
-        margin-top: 20px; 
-    }
-
-    .ui-left .ui-title-text {
-        font-size: 1.4rem; 
-        font-weight: 900;
-        text-align: center;
-        background: linear-gradient(to top, #4a0000 0%, #ff0000 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .ui-left .ui-price-text {
-        font-size: 0.95rem;
-        color: #aaaaaa;
-        text-align: center;
-    }
-
-    .ui-bottom-left {
-        position: absolute;
-        bottom: 5%;
-        left: 5%;
-        width: 90%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
+    /* 🔴 3. SECCIÓN CUENTAS (CELULAR)
+       Este bloque tenía una versión ENTERA de la sección 2 en móvil (posiciones
+       absolutas, tarjeta a 85vw, título a 1.4rem, etc.) que ya no se aplicaba:
+       más abajo hay un segundo @media (max-width: 900px) con el rediseño, y al
+       ir después ganaba en la cascada. O sea que estas reglas eran código
+       muerto que se contradecía con el que sí manda -- trampa para el próximo
+       que viniera a editar. La sección 2 en celular se define en UN solo lugar:
+       busca "SECCIÓN 2 EN CELULAR: COLUMNA EN FLUJO NORMAL" más abajo. */
 
     /* 🔴 4. SECCIÓN DISCORD */
     .seccion-tres { padding: 3rem 1rem; min-height: auto; }
@@ -888,6 +837,19 @@ spline-viewer { width: 100%; height: 100%; }
     height: 100%;
     --poster-color: transparent;
     outline: none;
+}
+
+/* 🚫 BOTÓN DE REALIDAD AUMENTADA DE <model-viewer>
+   El botón blanco del cubito lo dibuja model-viewer dentro de su shadow DOM
+   cuando el tag lleva el atributo "ar". Ya se lo quitamos en index.html, así
+   que no debería ni aparecer; esto queda de seguro por si alguien vuelve a
+   poner el atributo o si model-viewer cambia su default en una versión nueva.
+   Importa porque al tocarlo lanzaba WebXR/Scene Viewer y el navegador pedía
+   permiso para "crear un mapa 3D de tu entorno" con la cámara. Nótese que el
+   pointer-events:none del contenedor NO alcanzaba a bloquearlo, porque el
+   botón trae su propio pointer-events dentro del shadow DOM. */
+model-viewer::part(default-ar-button) {
+    display: none !important;
 }
 
 /* --- ELEMENTOS DE INTERFAZ (LÍNEAS Y CUENTAS) --- */
@@ -1102,16 +1064,49 @@ spline-viewer { width: 100%; height: 100%; }
    ========================================== */
 @media (max-width: 900px) {
 
-    /* 🔴 QUITAR SCROLL-JACKING Y STICKY EN CELULAR PARA SECCIÓN 2 */
+    /* 🔴 SECCIÓN 2 EN CELULAR: COLUMNA EN FLUJO NORMAL
+       ANTES: cada pieza iba en position:absolute con su top en % dentro de
+       una caja de alto fijo (100vh). El título sale de Supabase y la imagen
+       la sube el admin, así que ambos tienen alto VARIABLE: la tarjeta crecía
+       hacia abajo mientras el bloque del botón estaba clavado al piso, y
+       terminaban encimándose (las letras sobre la foto). Pasaba en cualquier
+       pantalla de menos de ~790px de alto, y en TODAS con títulos largos o
+       imágenes verticales.
+       AHORA: columna flex normal. Cada pieza empuja a la siguiente, así que
+       ya no se pueden encimar sin importar el largo del título, la proporción
+       de la imagen ni el alto del teléfono. El orden visual, los tamaños y
+       los espacios quedan EXACTAMENTE iguales (ver márgenes más abajo, que
+       replican los huecos que daban los porcentajes). */
     .cases-scroll-wrapper {
         height: auto !important;
         min-height: 100vh !important;
+        min-height: 100svh !important;
     }
 
     .cases-sticky {
         position: relative !important;
-        height: 100vh !important;
+        height: auto !important;          /* auto: crece si el contenido no cabe */
+        min-height: 100vh !important;
+        min-height: 100svh !important;    /* svh = alto real visible en iPhone */
         overflow: visible !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 43px 5vw 33px !important; /* mismos margenes que daba el 5%/4% */
+    }
+
+    /* La capa de tarjetas dejaba de empujar por ser absolute; ahora forma
+       parte de la columna. El margen replica el hueco etiqueta -> título. */
+    .cases-ui-elements {
+        position: static !important;
+        inset: auto !important;
+        order: 3 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        width: 100% !important;
+        margin-top: 31px !important;
     }
 
     /* 1. Ocultar la segunda cuenta en celular */
@@ -1129,10 +1124,11 @@ spline-viewer { width: 100%; height: 100%; }
        ahora se muestra como etiqueta pequeña en vez del texto gigante de PC) */
     .cases-bg-text {
         display: block !important;
-        position: absolute !important;
-        top: 22% !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
+        position: static !important;   /* antes: absolute top 22% */
+        order: 2 !important;
+        transform: none !important;
+        margin-top: 14px !important;   /* mismo hueco que tenia bajo el modelo */
+        text-align: center !important;
         font-size: 0.95rem !important;
         letter-spacing: 2px !important;
         z-index: 12 !important;
@@ -1141,13 +1137,12 @@ spline-viewer { width: 100%; height: 100%; }
     /* 3. MODELO 3D DORADO -- ARRIBA Y CENTRADO (rediseño: antes quedaba
        abajo y medio cortado a la derecha, ahora encabeza la sección) */
     .cases-model-container {
-        position: absolute !important;
-        top: 5% !important;
-        left: 50% !important;
-        right: auto !important;
+        position: static !important;   /* antes: absolute top 5% left 50% */
+        order: 1 !important;
         width: 130px !important;
         height: 130px !important;
-        transform: translateX(-50%) !important;
+        flex: 0 0 auto !important;     /* que no lo aplaste el flex */
+        transform: none !important;
         z-index: 8 !important;
         pointer-events: none !important;
     }
@@ -1155,11 +1150,9 @@ spline-viewer { width: 100%; height: 100%; }
     /* 4. TARJETA ÚNICA DE CUENTA: título+precio arriba, imagen abajo
        (rediseño: el orden visual ahora es título -> precio -> imagen) */
     .ui-card.ui-left {
-        position: absolute !important;
-        top: 28% !important; /* 👈 Debajo de la etiqueta "CUENTAS DESTACADAS" */
-        left: 5vw !important;
-        right: auto !important;
-        width: 90vw !important;
+        position: static !important;   /* antes: absolute top 28% left 5vw */
+        order: 1 !important;
+        width: 100% !important;
         max-width: 360px !important;
         padding-left: 0 !important;
         display: flex !important;
@@ -1238,11 +1231,11 @@ spline-viewer { width: 100%; height: 100%; }
 
     /* 5. Bloque Inferior: línea divisoria + Texto + Botón "Ver catálogo" */
     .ui-bottom-left {
-        position: absolute !important;
-        bottom: 4% !important;
-        left: 5% !important;
-        width: 90% !important;
+        position: static !important;   /* antes: absolute bottom 4% */
+        order: 2 !important;
+        width: 100% !important;
         max-width: 360px !important;
+        margin-top: 29px !important;   /* mismo hueco que tenia bajo la imagen */
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
@@ -1281,6 +1274,7 @@ spline-viewer { width: 100%; height: 100%; }
     position: relative;
     width: 100vw;
     min-height: 100vh;
+    min-height: 100svh;
     background-color: #ffffff;
     z-index: 25;
 }

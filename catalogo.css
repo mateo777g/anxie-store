@@ -177,6 +177,7 @@ body.no-scroll {
     background-color: #ffffff;
     color: #000000;
     min-height: 100vh;
+    min-height: 100svh;
     padding: 50px 25px 100px 25px;
     max-width: 1650px;
     width: 95%;
@@ -314,7 +315,10 @@ body.no-scroll {
     top: 0;
     left: 0;
     width: 100vw;
+    /* svh: el modal medía la pantalla completa, así que su parte de abajo
+       (los resultados) caía debajo de la barra de Safari en iPhone. */
     height: 100vh;
+    height: 100svh;
     background-color: rgba(0, 0, 0, 0.65);
     z-index: 99999;
     display: flex;
@@ -342,6 +346,7 @@ body.no-scroll {
     display: flex;
     flex-direction: column;
     max-height: 75vh;
+    max-height: 75svh;
 }
 
 .search-bar-header {
@@ -380,6 +385,7 @@ body.no-scroll {
     margin-top: 20px;
     overflow-y: auto;
     max-height: 55vh;
+    max-height: 55svh;
 }
 
 .search-section-title {
@@ -394,7 +400,7 @@ body.no-scroll {
 
 .search-results-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(130px, 100%), 1fr));
     gap: 14px;
 }
 
@@ -450,7 +456,11 @@ body.no-scroll {
 /* RESPONSIVO */
 @media (max-width: 992px) {
     .product-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        /* min(280px, 100%): en pantallas más angostas que 280px (Galaxy Fold
+           cerrado) la columna ya no se queda clavada en 280px provocando
+           scroll horizontal; se encoge al ancho disponible. De 280px para
+           arriba se comporta exactamente igual que antes. */
+        grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
     }
     .header-top-row {
         padding: 0 15px;
@@ -750,6 +760,7 @@ body.no-scroll {
     left: -320px; /* Sale desde la izquierda porque el botón está a la izquierda */
     width: 300px;
     height: 100vh;
+    height: 100svh;
     background: #ffffff; /* Blanco puro bro */
     box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
     z-index: 9999;
@@ -836,7 +847,10 @@ body.no-scroll {
     top: 0;
     left: 0;
     width: 100vw;
+    /* svh: la imagen ampliada se centraba contra la pantalla completa, así
+       que su borde inferior quedaba tapado por la barra de Safari. */
     height: 100vh;
+    height: 100svh;
     background-color: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(8px);
     z-index: 999999;
@@ -858,6 +872,7 @@ body.no-scroll {
     width: 90%;
     max-width: 1200px;
     max-height: 90vh;
+    max-height: 90svh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -866,6 +881,7 @@ body.no-scroll {
 .image-zoom-img {
     max-width: 100%;
     max-height: 90vh;
+    max-height: 90svh;
     object-fit: contain;
     border-radius: 0 !important;
     cursor: zoom-in;
