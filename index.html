@@ -158,7 +158,10 @@
             
             <!-- 1. Texto Gigante de fondo -->
             <div class="cases-bg-text" id="casesBgText">
-                <span class="text-red">CUENTAS</span> <span class="text-gray">DESTACADAS</span>
+                <!-- 💻 PC: muestra 2 cuentas -> plural -->
+                <span class="cases-bg-text-plural"><span class="text-red">CUENTAS</span> <span class="text-gray">DESTACADAS</span></span>
+                <!-- 📱 Celular: solo muestra 1 cuenta -> singular -->
+                <span class="cases-bg-text-singular"><span class="text-red">CUENTA</span> <span class="text-gray">DESTACADA</span></span>
             </div>
 
             <!-- 2. Modelo 3D Fijo al centro -->
@@ -425,6 +428,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             const intro = document.getElementById('introLayer');
             const introContent = document.getElementById('introContent');
+            const navbar = document.querySelector('.navbar');
             const heroBrand = document.getElementById('heroBrand');
             const heroBottom = document.getElementById('heroBottomContent');
             const heroAvatar = document.getElementById('heroAvatarMobile');
@@ -434,6 +438,7 @@
             if (window.innerWidth <= 900) {
                 if (intro) intro.style.display = 'none';
                 document.body.classList.remove('bloqueado');
+                if (navbar) navbar.classList.add('visible');
                 if (heroBrand) heroBrand.classList.add('visible');
                 if (heroAvatar) heroAvatar.classList.add('visible');
                 if (heroTitle) heroTitle.classList.add('visible');
@@ -452,6 +457,7 @@
             setTimeout(() => {
                 if (intro) intro.classList.add('oculto');
 
+                if (navbar) navbar.classList.add('visible');
                 if (heroBrand) heroBrand.classList.add('visible');
                 if (heroAvatar) heroAvatar.classList.add('visible');
                 if (heroTitle) heroTitle.classList.add('visible');
@@ -461,7 +467,7 @@
                 }
 
                 document.body.classList.remove('bloqueado');
-            }, 2000); 
+            }, 2000);
         });
 
         // 🎯 2. NAVEGACIÓN INTELIGENTE DE NAVBAR Y SCROLL
