@@ -98,7 +98,7 @@
             </div>
 
             <!-- 📱 Avatar difuminado de fondo (Capa 2, SOLO celular) -->
-            <img src="assets/diseño.png" alt="" class="hero-avatar-mobile" aria-hidden="true">
+            <img src="assets/diseño.png" alt="" class="hero-avatar-mobile" id="heroAvatarMobile" aria-hidden="true">
 
             <!-- 🎯 MERO CENTRO: MARCA (Capa 5) -->
             <div class="hero-center-brand" id="heroBrand">
@@ -123,7 +123,7 @@
             <div class="hero-bottom-content" id="heroBottomContent">
                 
                 <div class="hero-left">
-                    <h2 class="hero-title">
+                    <h2 class="hero-title" id="heroTitleMobile">
                         COMPRA TUS CUENTAS<br>DE VIDEOJUEGOS
                     </h2>
                 </div>
@@ -427,12 +427,16 @@
             const introContent = document.getElementById('introContent');
             const heroBrand = document.getElementById('heroBrand');
             const heroBottom = document.getElementById('heroBottomContent');
+            const heroAvatar = document.getElementById('heroAvatarMobile');
+            const heroTitle = document.getElementById('heroTitleMobile');
 
             // 📱 CELULAR: Saltear intro al instante sin demoras
             if (window.innerWidth <= 900) {
                 if (intro) intro.style.display = 'none';
                 document.body.classList.remove('bloqueado');
                 if (heroBrand) heroBrand.classList.add('visible');
+                if (heroAvatar) heroAvatar.classList.add('visible');
+                if (heroTitle) heroTitle.classList.add('visible');
                 if (heroBottom) {
                     heroBottom.style.opacity = '1';
                     heroBottom.style.transform = 'translateY(0)';
@@ -447,13 +451,15 @@
 
             setTimeout(() => {
                 if (intro) intro.classList.add('oculto');
-                
+
                 if (heroBrand) heroBrand.classList.add('visible');
+                if (heroAvatar) heroAvatar.classList.add('visible');
+                if (heroTitle) heroTitle.classList.add('visible');
                 if (heroBottom) {
                     heroBottom.style.opacity = '1';
                     heroBottom.style.transform = 'translateY(0)';
                 }
-                
+
                 document.body.classList.remove('bloqueado');
             }, 2000); 
         });
@@ -485,6 +491,46 @@
                 });
             });
         });
+
+        // 📱 2.5. NAVBAR: se oculta al bajar y reaparece al subir (SOLO CELULAR)
+        (() => {
+            const navbar = document.querySelector('.navbar');
+            if (!navbar) return;
+
+            let lastScrollY = window.scrollY;
+            let ticking = false;
+
+            window.addEventListener('scroll', () => {
+                // 💻 PC: la navbar de arriba no se toca, nunca se oculta
+                if (window.innerWidth > 900) {
+                    navbar.classList.remove('nav-hidden');
+                    lastScrollY = window.scrollY;
+                    return;
+                }
+
+                if (ticking) return;
+                ticking = true;
+
+                requestAnimationFrame(() => {
+                    const currentScrollY = window.scrollY;
+                    const delta = currentScrollY - lastScrollY;
+
+                    if (currentScrollY <= 80) {
+                        // Cerca del tope de la página: siempre visible
+                        navbar.classList.remove('nav-hidden');
+                    } else if (delta > 5) {
+                        // Scrolleando hacia abajo -> se esconde
+                        navbar.classList.add('nav-hidden');
+                    } else if (delta < -5) {
+                        // Scrolleando hacia arriba -> reaparece
+                        navbar.classList.remove('nav-hidden');
+                    }
+
+                    lastScrollY = currentScrollY;
+                    ticking = false;
+                });
+            }, { passive: true });
+        })();
 
         // 🎮 3. LÓGICA DE ANIMACIONES Y SCROLL
         window.addEventListener('scroll', () => {
@@ -736,6 +782,9 @@
                 if (sidebar && overlay) {
                     sidebar.classList.add('active');
                     overlay.classList.add('active');
+                    // 👇 Que la hamburguesa/navbar no se quede oculta mientras el menú está abierto
+                    const navbarEl = document.querySelector('.navbar');
+                    if (navbarEl) navbarEl.classList.remove('nav-hidden');
                 }
             }
 

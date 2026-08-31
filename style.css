@@ -489,13 +489,13 @@ spline-viewer { width: 100%; height: 100%; }
     }
 
     /* 🔴 1. FIX DE BARRA, LOGO Y HAMBURGUESA (MÁS ABAJO Y SOMBRA SUAVE) */
-    .navbar { 
+    .navbar {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
         width: 100vw !important;
-        height: 85px !important; 
-        padding: 0 1.5rem !important; 
+        height: 85px !important;
+        padding: 0 1.5rem !important;
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
@@ -503,6 +503,12 @@ spline-viewer { width: 100%; height: 100%; }
         z-index: 9000 !important;
         /* Degradado difuminado suave sin corte brusco */
         background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.18) 65%, rgba(0, 0, 0, 0) 100%) !important;
+        /* 🔽 Se oculta al bajar / reaparece al subir (JS agrega/quita .nav-hidden) */
+        transition: transform 0.35s ease !important;
+    }
+
+    .navbar.nav-hidden {
+        transform: translateY(-100%) !important;
     }
 
     .nav-links, .logo-texto { 
@@ -536,7 +542,14 @@ spline-viewer { width: 100%; height: 100%; }
 
     /* 🔴 1.5. MARCA CENTRAL (LOGO/TEXTO) CENTRADA VERTICALMENTE EN LA SECCIÓN */
     .hero-center-brand {
-        top: 50% !important;
+        top: 42% !important;
+    }
+
+    /* 🔴 SIN FONDO 3D DE SPLINE (partículas rojas) EN CELULAR — queda el
+       fondo blanco de .hero solo. En PC sigue intacto (esta regla vive
+       dentro del media query). */
+    .contenedor-3d {
+        display: none !important;
     }
 
     /* 👤 AVATAR DIFUMINADO DE FONDO (asset/diseño.png ya viene en escala de grises) */
@@ -548,15 +561,24 @@ spline-viewer { width: 100%; height: 100%; }
         position: absolute !important;
         top: 42% !important;
         left: 50% !important;
-        transform: translateX(-50%) !important;
+        /* 🎬 Estado inicial de la intro: arranca más abajo y transparente */
+        transform: translate(-50%, 70px) !important;
         width: auto !important;
         height: 63vh !important;
         max-width: none !important;
         z-index: 2 !important;
-        opacity: 0.28 !important;
+        opacity: 0 !important;
         pointer-events: none !important;
         -webkit-user-select: none !important;
         user-select: none !important;
+        transition: opacity 1.2s ease 0.3s, transform 1.2s ease 0.3s !important;
+    }
+
+    /* 🎬 Intro: la imagen sube de abajo hacia arriba hasta su posición final,
+       igual que el texto de la marca (misma duración/curva/retraso) */
+    .hero-avatar-mobile.visible {
+        opacity: 0.28 !important;
+        transform: translate(-50%, 0) !important;
     }
 
     /* 🔴 2. TEXTOS "ANXIE STORE" Y "TIENDA DE CUENTAS" MÁS GRANDES */
@@ -635,8 +657,34 @@ spline-viewer { width: 100%; height: 100%; }
         white-space: nowrap;
     }
 
+    /* 🔴 DIFUMINADO NEGRO ENTRE SECCIÓN 1 Y 2 (sin línea recta de corte).
+       El de PC (declarado arriba, fuera de este media query) es muy sutil
+       (solo llega a 0.35 de opacidad); en celular la sección 2 empieza en
+       negro sólido justo debajo, así que aquí sí llega a negro 100% justo
+       en el borde para fundirse sin costura. Acotado al último 10% para que
+       la sombra no suba hasta el hombro del avatar (diseño.png) ni toque
+       "COMPRA TUS CUENTAS". Varios pasos intermedios (en vez de un salto
+       brusco de un solo tramo) para que la curva sea pareja y no se note
+       como una línea/quiebre a la mitad del desvanecido. */
+    .hero::after {
+        background: linear-gradient(
+            to bottom,
+            transparent 0%,
+            transparent 90%,
+            rgba(0, 0, 0, 0.08) 92%,
+            rgba(0, 0, 0, 0.22) 94%,
+            rgba(0, 0, 0, 0.42) 96%,
+            rgba(0, 0, 0, 0.68) 98%,
+            #000000 100%
+        ) !important;
+    }
+
     .hero-bottom-content {
         position: absolute;
+        /* 👆 De 3rem a 2rem (el original): más abajo, pegado al piso de la
+           sección, pero el difuminado ya acotado evita que el negro le
+           coma el contraste. Si se ve muy alto/bajo, solo hay que tocar
+           este valor. */
         bottom: 2rem;
         left: 0;
         width: 100%;
@@ -648,7 +696,23 @@ spline-viewer { width: 100%; height: 100%; }
 
     .hero-right { display: none !important; }
     .hero-left { max-width: 100%; width: 100%; }
-    .hero-title { font-size: 2rem; text-align: center; width: 100%; }
+
+    /* 🎬 Intro: "COMPRA TUS CUENTAS DE VIDEOJUEGOS" entra con el mismo
+       fundido/curva que "ANXIE STORE" y "TIENDA DE CUENTAS" (no con el
+       efecto de abajo-hacia-arriba de la imagen de fondo) */
+    .hero-title {
+        font-size: 2rem;
+        text-align: center;
+        width: 100%;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 1.2s ease 0.3s, transform 1.2s ease 0.3s;
+    }
+
+    .hero-title.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
 
     .hero-scroll-wrapper, .hero {
         position: relative !important;
