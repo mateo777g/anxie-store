@@ -65,6 +65,15 @@ body {
     z-index: 9000; /* Z-index altísimo para que nada la tape */
     pointer-events: none;
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.2) 55%, rgba(0, 0, 0, 0) 100%);
+
+    /* 🎬 Entra junto con el resto del contenido del hero (el JS le agrega
+       .visible al mismo tiempo que a la marca central / avatar / título) */
+    opacity: 0;
+    transition: opacity 1.2s ease 0.3s;
+}
+
+.navbar.visible {
+    opacity: 1;
 }
 
 .logo-container {
@@ -503,8 +512,9 @@ spline-viewer { width: 100%; height: 100%; }
         z-index: 9000 !important;
         /* Degradado difuminado suave sin corte brusco */
         background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.18) 65%, rgba(0, 0, 0, 0) 100%) !important;
-        /* 🔽 Se oculta al bajar / reaparece al subir (JS agrega/quita .nav-hidden) */
-        transition: transform 0.35s ease !important;
+        /* 🔽 Se oculta al bajar / reaparece al subir (JS agrega/quita .nav-hidden),
+           y además entra con fundido junto al resto del hero (.visible) */
+        transition: transform 0.35s ease, opacity 1.2s ease 0.3s !important;
     }
 
     .navbar.nav-hidden {
@@ -854,12 +864,16 @@ spline-viewer { width: 100%; height: 100%; }
     will-change: transform, opacity;
 }
 
-.cases-bg-text .text-red { 
-    color: #FF0000; 
+.cases-bg-text .text-red {
+    color: #FF0000;
 }
-.cases-bg-text .text-gray { 
-    color: #d8d8d8; 
+.cases-bg-text .text-gray {
+    color: #d8d8d8;
 }
+
+/* 💻 PC: "CUENTAS DESTACADAS" (se muestran 2). En celular (media query de
+   abajo) se invierte, porque ahí solo se muestra 1 sola cuenta. */
+.cases-bg-text-singular { display: none; }
 
 /* MODELO 3D EN EL CENTRO */
 .cases-model-container {
@@ -1105,27 +1119,44 @@ spline-viewer { width: 100%; height: 100%; }
         display: none !important;
     }
 
-    /* 2. OCULTAR EL TEXTO DE FONDO EN CELULAR */
+    /* En celular solo se muestra 1 cuenta (#uiRight va oculto arriba), así
+       que la etiqueta va en singular: "CUENTA DESTACADA" */
+    .cases-bg-text-plural { display: none !important; }
+    .cases-bg-text-singular { display: inline !important; }
+
+    /* 2. ETIQUETA "CUENTA DESTACADA" -- CHICA Y CENTRADA ARRIBA DEL MODELO 3D
+       (rediseño según assets/maqueta2.png: antes iba oculta por completo;
+       ahora se muestra como etiqueta pequeña en vez del texto gigante de PC) */
     .cases-bg-text {
-        display: none !important;
+        display: block !important;
+        position: absolute !important;
+        top: 22% !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        font-size: 0.95rem !important;
+        letter-spacing: 2px !important;
+        z-index: 12 !important;
     }
 
-    /* 3. MODELO 3D DORADO (BAJADO PARA NO ESTORBAR A LA IMAGEN) */
+    /* 3. MODELO 3D DORADO -- ARRIBA Y CENTRADO (rediseño: antes quedaba
+       abajo y medio cortado a la derecha, ahora encabeza la sección) */
     .cases-model-container {
         position: absolute !important;
-        top: 57% !important; /* 👈 BAJADO: Queda libre de la imagen y centrado con el título */
-        right: -38% !important; /* 👈 Mantiene la mitad oculta a la derecha */
-        width: 310px !important;
-        height: 310px !important;
-        transform: translateY(-50%) !important;
+        top: 5% !important;
+        left: 50% !important;
+        right: auto !important;
+        width: 130px !important;
+        height: 130px !important;
+        transform: translateX(-50%) !important;
         z-index: 8 !important;
         pointer-events: none !important;
     }
 
-    /* 4. TARJETA ÚNICA DE CUENTA (BAJA LA LÍNEA ROJA + LA IMAGEN) */
+    /* 4. TARJETA ÚNICA DE CUENTA: título+precio arriba, imagen abajo
+       (rediseño: el orden visual ahora es título -> precio -> imagen) */
     .ui-card.ui-left {
         position: absolute !important;
-        top: 11% !important; /* 👈 Cambiado de 8% a 13% para bajar la línea roja y la imagen */
+        top: 28% !important; /* 👈 Debajo de la etiqueta "CUENTAS DESTACADAS" */
         left: 5vw !important;
         right: auto !important;
         width: 90vw !important;
@@ -1136,19 +1167,18 @@ spline-viewer { width: 100%; height: 100%; }
         z-index: 15 !important;
     }
 
-    /* 🔥 LÍNEA ROJA SUPERIOR 🔥 */
+    /* 🔥 LÍNEA ROJA SUPERIOR -- la maqueta ya no la muestra aquí, la línea
+       divisoria ahora va abajo del todo, ver .ui-bottom-left::before 🔥 */
     .ui-left .line-left {
-        order: 1 !important;
-        margin: 0 0 12px 0 !important;
-        width: 90vw !important;
+        display: none !important;
     }
 
-    /* 🖼️ IMAGEN DE LA CUENTA */
+    /* 🖼️ IMAGEN DE LA CUENTA -- ahora va DESPUÉS del título/precio */
     .ui-left .ui-image-wrapper {
         order: 2 !important;
         width: 100% !important;
         max-width: 100% !important;
-        margin-top: 0 !important;
+        margin-top: 46px !important; /* 👈 Baja la imagen para acercarla a la línea de abajo */
         margin-bottom: 0 !important;
     }
 
@@ -1158,21 +1188,22 @@ spline-viewer { width: 100%; height: 100%; }
         background: linear-gradient(to top, #4a0000 0%, #c70707 100%) !important;
     }
 
-    /* 1. CONTENEDOR DEL TÍTULO Y PRECIO (MÁS ABAJO) */
+    /* 1. CONTENEDOR DEL TÍTULO Y PRECIO -- CENTRADO Y PRIMERO EN EL ORDEN */
     .ui-left .ui-title {
-        order: 3 !important;
+        order: 1 !important;
         display: flex !important;
         flex-direction: column !important;
-        align-items: flex-start !important; 
-        text-align: left !important;  
+        align-items: center !important;
+        text-align: center !important;
         width: 100% !important;
-        white-space: normal !important; 
-        gap: 4px !important; 
-        margin-top: 90px !important; /* 👈 AQUÍ LO BAJAS O SUBES (sube o baja este valor en px según tu gusto) */
+        white-space: normal !important;
+        gap: 4px !important;
+        margin-top: 14px !important; /* 👈 Centra el título+precio en el hueco entre la etiqueta y la imagen */
         position: static !important;
     }
 
-    /* 2 Y 3. TÍTULO DE LA CUENTA (MÁS ANCHO PARA QUE ENTRES LA "T") */
+    /* 2 Y 3. TÍTULO DE LA CUENTA -- centrado, con resplandor rojo (como en
+       la maqueta) además del degradado que ya tenía */
     .ui-left .ui-title-text {
         font-family: 'Montserrat', sans-serif !important;
         font-size: 2.3rem !important;
@@ -1180,15 +1211,16 @@ spline-viewer { width: 100%; height: 100%; }
         text-transform: uppercase !important;
         letter-spacing: 1px !important;
         line-height: 0.95 !important;
-        text-align: left !important;
+        text-align: center !important;
         max-width: 260px !important; /* 👈 AUMENTADO: Ahora "WILDCAT" cabe completo sin soltar la "T" */
+        margin: 0 auto !important;
         word-break: break-word !important;
-        
+
         background: linear-gradient(to top, #4a0000 0%, #ff0000 100%) !important;
         -webkit-background-clip: text !important;
         background-clip: text !important;
         -webkit-text-fill-color: transparent !important;
-        color: transparent !important; 
+        color: transparent !important;
     }
 
     /* 2. PRECIO DE LA CUENTA (LETRAS MÁS DELGADAS Y GRIS FUERTE) */
@@ -1198,13 +1230,13 @@ spline-viewer { width: 100%; height: 100%; }
         font-weight: 500 !important; /* 👈 Letra más delgada */
         color: #888888 !important;   /* 👈 Gris fuerte */
         margin-left: 0 !important;
-        margin-top: 10px !important;
+        margin-top: 6px !important;
         letter-spacing: 1px !important;
-        text-align: left !important;
+        text-align: center !important;
         text-shadow: none !important;
     }
 
-    /* 5. Bloque Inferior: Texto + Botón "Ver catálogo" */
+    /* 5. Bloque Inferior: línea divisoria + Texto + Botón "Ver catálogo" */
     .ui-bottom-left {
         position: absolute !important;
         bottom: 4% !important;
@@ -1216,6 +1248,18 @@ spline-viewer { width: 100%; height: 100%; }
         align-items: center !important;
         text-align: center !important;
         gap: 1.2rem !important;
+    }
+
+    /* Línea roja divisoria arriba del texto "Revisa nuestro catálogo..."
+       (reemplaza a la línea que antes iba arriba de la imagen) */
+    .ui-bottom-left::before {
+        content: '' !important;
+        display: block !important;
+        width: 100% !important;
+        height: 2px !important;
+        background: #ff0000 !important;
+        box-shadow: 0 0 10px 2px rgba(255, 0, 0, 0.6) !important;
+        margin-bottom: 6px !important; /* 👈 Centra la línea en el hueco entre la imagen y el texto de abajo */
     }
 
     .ui-bottom-text {
