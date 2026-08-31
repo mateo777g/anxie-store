@@ -23,6 +23,24 @@ To develop the Worker locally: `cd worker && npx wrangler dev`. This gives you a
 Deploy the storefront = copy the tracked files (everything except `venv/`, `worker/`, and the `_respaldo_*` dirs) to any static host.
 Deploy the Worker = `cd worker && npx wrangler deploy`.
 
+Production is `anxiestore.com` on Hostinger, deployed from the `main` branch of
+`github.com/mateo777g/anxie-store` (root dir `public_html`, manual deploy from hPanel).
+
+### Cache busting — bump `?v=` when you touch CSS or JS
+
+Hostinger serves `.css`/`.js` with `Cache-Control: public, max-age=604800` (7 days) but
+serves `.html` with no `Cache-Control`. So after a deploy, browsers and Hostinger's edge
+CDN pick up the new HTML while still using the *old* CSS/JS for up to a week — the page
+renders as a broken mix of new markup and stale styles, on devices that never even visited
+before (stale edge-cached copies). This already burned us once, in August 2026.
+
+Every local `.css`/`.js` reference in the three HTML pages therefore carries a version
+token, e.g. `<link rel="stylesheet" href="style.css?v=20260831">`. **When you change any
+`.css` or `.js` file, bump that token (a date works) in every page that references it**, or
+returning visitors keep the old file. Only local assets need it — CDN URLs are already
+versioned in their own paths. Purging the cache in hPanel helps the edge but does nothing
+for browsers that already cached the file; changing the URL is what actually fixes both.
+
 ## The three pages
 
 | Page | Role | Supabase client |
