@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260831">
+    <link rel="stylesheet" href="style.css?v=20260831c">
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
     
     <!-- Visor 3D de Google para archivos .glb (Sección 2) -->
@@ -26,8 +26,8 @@
     <!-- CDN de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <script src="supabase-config.js?v=20260831"></script>
-    <script src="catalog-cache.js?v=20260831"></script>
+    <script src="supabase-config.js?v=20260831c"></script>
+    <script src="catalog-cache.js?v=20260831c"></script>
 </head>
 <body class="bloqueado">
 
@@ -174,8 +174,7 @@
                     disable-pan
                     shadow-intensity="1"
                     interaction-prompt="none"
-                    camera-orbit="0deg 75deg 105%"
-                    ar>
+                    camera-orbit="0deg 75deg 105%">
                 </model-viewer>
             </div>
 
@@ -538,10 +537,33 @@
             }, { passive: true });
         })();
 
+        // 📐 ALTO DE VIEWPORT ESTABLE (fix del scroll raro en iPhone)
+        // En iOS, window.innerHeight NO es constante: crece ~130px solo cuando
+        // Safari colapsa su barra al scrollear. Como las animaciones de abajo
+        // dividen entre ese valor, el progreso brincaba hacia atrás a media
+        // scroll (la opacidad subía de golpe y el texto se movía al revés).
+        // Lo cacheamos y solo lo recalculamos cuando cambia el ANCHO, que es
+        // lo único que significa un cambio real de viewport (girar el celular).
+        let _vpAlto = window.innerHeight;
+        let _vpAncho = window.innerWidth;
+        window.addEventListener('resize', () => {
+            if (window.innerWidth !== _vpAncho) {
+                _vpAncho = window.innerWidth;
+                _vpAlto = window.innerHeight;
+            }
+        }, { passive: true });
+
+        // En PC no existe barra que se colapse, así que ahí usamos el valor
+        // vivo (permite redimensionar la ventana sin recargar). En celular
+        // usamos el cacheado para que la animación no salte.
+        function altoViewport() {
+            return window.innerWidth > 900 ? window.innerHeight : _vpAlto;
+        }
+
         // 🎮 3. LÓGICA DE ANIMACIONES Y SCROLL
         window.addEventListener('scroll', () => {
             const scrollY = window.scrollY;
-            const windowHeight = window.innerHeight;
+            const windowHeight = altoViewport();
 
             // --- ANIMACIÓN SECCIÓN 1 (HERO) ---
             const bottomContent = document.getElementById('heroBottomContent');
