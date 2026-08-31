@@ -504,12 +504,10 @@ spline-viewer { width: 100%; height: 100%; }
         display: none !important; 
     }
 
-    /* Logo circular bajado para despegarlo del techo */
+    /* Logo circular a la izquierda, simétrico con la hamburguesa a la derecha */
     .logo-container {
-        position: absolute !important;
-        left: 50% !important;
-        top: 46px !important; /* 👈 Posición exacta más abajo */
-        transform: translate(-50%, -50%) !important; 
+        position: static !important;
+        transform: none !important;
         margin: 0 !important;
         z-index: 9002 !important;
     }
