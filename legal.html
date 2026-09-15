@@ -18,51 +18,63 @@
 
     <!-- CSS: esta página no necesita Supabase, spline-viewer ni model-viewer,
          así que carga solo lo indispensable (instantáneo). catalogo.css
-         tampoco hace falta: el chrome de aquí es el navbar/sidebar oscuro
-         de index.html, que style.css ya resuelve por completo. -->
-    <link rel="stylesheet" href="style.css?v=20260915c">
+         tampoco hace falta: el chrome de aquí es el menú píldora de
+         index.html, que style.css ya resuelve por completo. -->
+    <link rel="stylesheet" href="style.css?v=20260915e">
     <link rel="stylesheet" href="legal.css?v=20260901">
 </head>
 <body>
 
-    <!-- 🌟 BARRA DE NAVEGACIÓN SUPERIOR (igual que index.html, visible desde el inicio) 🌟 -->
-    <nav class="navbar visible">
-        <div class="logo-container">
-            <img src="assets/logo.jpg" alt="Logo ANXIE STORE" class="logo-img">
-            <span class="logo-texto">ANXIE STORE</span>
+    <!--
+        🟢 MENÚ PÍLDORA (el mismo de index.html).
+        Aquí el tema va fijo en "oscuro" y nadie lo cambia: esta página tiene un
+        único fondo, casi negro de arriba abajo. El JS de color solo existe en
+        index.html, que sí alterna secciones claras y verdes.
+    -->
+    <nav class="menu" data-theme="oscuro" aria-label="Menú principal">
+        <div class="menu__shell">
+            <!-- El círculo que "moja" el panel al abrir. Va detrás del texto. -->
+            <span class="menu__circle" aria-hidden="true"></span>
+
+            <button type="button" class="menu__bar" aria-expanded="false" aria-controls="menu-items">
+                <span class="menu__label">Menú</span>
+                <span class="menu__icon" aria-hidden="true"><i></i><i></i></span>
+            </button>
+
+            <ul class="menu__items" id="menu-items">
+                <li><a class="menu__item" href="index.html#home">
+                    <span class="menu__ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 10a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                            <path d="M15 21v-8H9v8" />
+                        </svg>
+                    </span>
+                    <span class="menu__text">Inicio</span>
+                </a></li>
+                <li><a class="menu__item" href="catalogo.html#cases">
+                    <span class="menu__ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 8h16l-1.2 11a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8z" />
+                            <path d="M9 11V7a3 3 0 0 1 6 0v4" />
+                        </svg>
+                    </span>
+                    <span class="menu__text">Catálogo</span>
+                </a></li>
+                <li><a class="menu__item" href="index.html#features">
+                    <span class="menu__ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z" />
+                        </svg>
+                    </span>
+                    <span class="menu__text">Contacto</span>
+                </a></li>
+            </ul>
         </div>
-
-        <!-- 💻 LINKS PARA COMPUTADORA (Se ocultan en cel) -->
-        <ul class="nav-links">
-            <li><a href="index.html#home">Inicio</a></li>
-            <li><a href="catalogo.html#cases">Catálogo</a></li>
-            <li><a href="index.html#features">Contacto</a></li>
-        </ul>
-
-        <!-- 📱 BOTÓN HAMBURGUESA (Solo visible en cel) -->
-        <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Abrir Menú">
-            <span class="bar"></span>
-            <span class="bar"></span>
-            <span class="bar"></span>
-        </button>
     </nav>
 
-    <!-- 🚪 BARRA LATERAL (SIDEBAR) & OVERLAY PARA MÓVIL -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-    <aside class="sidebar" id="sidebar">
-        <button class="sidebar-close-btn" id="sidebarClose">&times;</button>
-
-        <div class="sidebar-header">
-            <img src="assets/logo.jpg" alt="Logo ANXIE STORE" class="sidebar-logo">
-            <span class="sidebar-title">ANXIE STORE</span>
-        </div>
-
-        <ul class="sidebar-links">
-            <li><a href="index.html#home">Inicio</a></li>
-            <li><a href="catalogo.html#cases">Catálogo</a></li>
-            <li><a href="index.html#features">Contacto</a></li>
-        </ul>
-    </aside>
+    <!-- Velo del panel lateral. SOLO existe en celular. Va FUERA de .menu para
+         que el click sobre él lo recoja el listener de "click afuera". -->
+    <div class="menu-scrim" aria-hidden="true"></div>
 
     <!-- 📄 CONTENIDO LEGAL 📄 -->
     <main class="legal-main">
@@ -560,38 +572,9 @@
         </div>
     </footer>
 
-    <script>
-        // 📱 LÓGICA DE MENÚ LATERAL (SIDEBAR MÓVIL) — igual que index.html/catalogo.html
-        window.addEventListener('DOMContentLoaded', () => {
-            const toggleBtn = document.getElementById('sidebarToggle');
-            const closeBtn = document.getElementById('sidebarClose');
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            const sidebarLinks = document.querySelectorAll('.sidebar-links a');
-
-            function openSidebar() {
-                if (sidebar && overlay) {
-                    sidebar.classList.add('active');
-                    overlay.classList.add('active');
-                }
-            }
-
-            function closeSidebar() {
-                if (sidebar && overlay) {
-                    sidebar.classList.remove('active');
-                    overlay.classList.remove('active');
-                }
-            }
-
-            if (toggleBtn) toggleBtn.addEventListener('click', openSidebar);
-            if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
-            if (overlay) overlay.addEventListener('click', closeSidebar);
-
-            sidebarLinks.forEach(link => {
-                link.addEventListener('click', closeSidebar);
-            });
-        });
-    </script>
+    <!-- 🟢 Comportamiento del menú píldora (abrir/cerrar, roll del hover).
+         El mismo archivo que usa index.html. -->
+    <script src="menu.js?v=20260915e"></script>
 
 </body>
 </html>

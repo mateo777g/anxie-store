@@ -470,11 +470,8 @@ body.no-scroll {
     .catalog-nav-container {
         display: none !important;
     }
-    
-    /* Mostramos el botón hamburguesa */
-    .sidebar-toggle-btn {
-        display: flex;
-    }
+    /* El botón hamburguesa se enciende más abajo en este mismo archivo, después
+       de su regla base. Aquí perdía por orden de cascada. */
 }
 
 /* ==========================================
@@ -723,6 +720,17 @@ body.no-scroll {
     gap: 5px;
     padding: 8px;
     transition: transform 0.2s ease;
+}
+
+/* En celular sí se muestra. Va DESPUÉS de la regla base de arriba a propósito:
+   escrito en el @media de más arriba del archivo perdía contra ella por orden
+   de cascada (misma especificidad, gana la última). Antes lo tapaba un
+   `display: flex !important` que vivía en style.css junto a la navbar vieja;
+   al quitar esa navbar hubo que traer la regla aquí, que es donde le toca. */
+@media (max-width: 900px) {
+    .sidebar-toggle-btn {
+        display: flex;
+    }
 }
 
 .sidebar-toggle-btn:hover {
