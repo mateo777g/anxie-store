@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260915b">
+    <link rel="stylesheet" href="style.css?v=20260915c">
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -198,10 +198,17 @@
                  pero al coincidir exactas las dos capas el texto se leía como
                  una sola línea pasando por delante de la silueta.
                  Hace zoom de 1 a 1.22 a lo largo del recorrido: ese movimiento
-                 de fondo es lo que convierte el destapado en una zambullida. -->
+                 de fondo es lo que convierte el destapado en una zambullida.
+
+                 Dentro va el <canvas> del shader de humo (el bloque de JS al
+                 final del archivo). Al colgar del lienzo hereda su zoom, así
+                 que al destapar el humo también se te viene encima. Si WebGL
+                 falla el canvas se esconde y queda el verde plano de debajo. -->
             <div class="corona-mask" id="coronaMask">
 
-                <div class="corona-lienzo"></div>
+                <div class="corona-lienzo">
+                    <canvas class="corona-shader" id="coronaShader" aria-hidden="true"></canvas>
+                </div>
 
                 <!-- Marcas de encuadre, mitad de arriba: van DENTRO de la
                      máscara, así que cada esquina pasa de negra a blanca justo
@@ -990,6 +997,462 @@
             });
         });
 
+    </script>
+
+    <!-- ==========================================================
+         🌫️ FONDO DEL PORTAL: SHADER DE HUMO ("Smoke Ring")
+         ==========================================================
+         Lo que la corona destapa ya no es verde plano, es este shader animado.
+         Es un único <canvas> de WebGL que rellena .corona-lienzo, así que
+         hereda su zoom de 1 a 1.22: al destapar, el humo se te viene encima.
+
+         Viene del Shader Builder de 21st.dev (preset "Smoke Ring"), adaptado de
+         Paper Shaders (https://shaders.paper.design/smoke-ring), Apache-2.0. El
+         original es un componente de React; aquí va portado a JS plano porque
+         este proyecto no tiene build step. Cero dependencias.
+
+         Cuidado si lo tocas:
+           - El canvas vive DENTRO de un elemento con transform: scale(). Para
+             medirlo se usa clientWidth/clientHeight y NO getBoundingClientRect:
+             el rect llega ya escalado, y el canvas se estaría redimensionando
+             en cada fotograma del zoom, que es lo más caro que hay.
+           - Si no hay WebGL, si el contexto se pierde, o si el sistema pide
+             menos animación, el canvas se esconde y queda el verde plano de
+             .corona-lienzo, que sigue ahí de fondo.
+           - Solo dibuja con el portal en pantalla y la pestaña visible.
+         ========================================================== -->
+    <script>
+    (function () {
+        'use strict';
+
+        const canvas = document.getElementById('coronaShader');
+        if (!canvas) return;
+
+        // 🎨 PALETA: los 4 colores del preset, en RGB de 0 a 1 (NO de 0 a 255).
+        //    El [0] es el fondo oscuro y el [1] el filo brillante del anillo.
+        //    Del [4] al [7] están de relleno: colorCount = 4, el shader solo
+        //    mira los cuatro primeros.
+        //
+        //    👉 PARA PASARLO A VERDE DE LA MARCA, cambia estos cuatro por:
+        //       [0.110, 0.157, 0.125],  // #1C2820  fondo casi negro verdoso
+        //       [0.910, 0.961, 0.922],  // #E8F5EB  filo del anillo
+        //       [0.498, 0.663, 0.549],  // #7FA98C  humo verde claro
+        //       [0.110, 0.306, 0.184],  // #1C4E2F  el verde de la sección 3
+        const COLORES = [
+            [0.0627, 0.0627, 0.0627],
+            [0.9608, 0.9608, 0.9608],
+            [0.6902, 0.6902, 0.6902],
+            [0.2275, 0.2275, 0.2275],
+            [0.2275, 0.2275, 0.2275],
+            [0.2275, 0.2275, 0.2275],
+            [0.2275, 0.2275, 0.2275],
+            [0.2275, 0.2275, 0.2275]
+        ];
+
+        // Ajustes del preset, tal cual salen del Shader Builder.
+        const U = {
+            colorCount: 4,
+            scale: 1.700, intensity: 0.690, paramA: 0.740, warp: 0.300,
+            detail: 3.680, contrast: 1.005, brightness: 0.000, saturation: 1.000,
+            hue: 0.0, vignette: 0.0, blur: 0.0, grain: 0.063,
+            seed: 558.0, rotate: 1.2915, drift: 0.000, oklab: 0.0,
+            offsetX: 0.0, offsetY: 0.0,
+            timeScale: 1.069
+        };
+
+        // Techo de píxeles a dibujar. El shader hace ruido fractal de 5 octavas
+        // varias veces POR PÍXEL, así que el coste va con el área. En celular se
+        // baja a la mitad: se nota en la batería y no se nota en pantalla.
+        const MAX_PIXELES = window.innerWidth > 900 ? 2000000 : 1000000;
+
+        const esconder = function () { canvas.style.display = 'none'; };
+
+        // Si el sistema pide menos animación, ni encendemos WebGL.
+        if (window.matchMedia &&
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            esconder();
+            return;
+        }
+
+        let gl = null;
+        try {
+            const opciones = { antialias: false, alpha: false };
+            gl = canvas.getContext('webgl', opciones) ||
+                 canvas.getContext('experimental-webgl', opciones);
+        } catch (e) {
+            gl = null;
+        }
+        if (!gl) { esconder(); return; }
+
+        const VERT = `attribute vec2 a_position;
+void main() {
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}`;
+
+        const FRAG = `#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+
+uniform vec3 u_colors[8];
+uniform vec4 u_scene;      // resolucion.xy, tiempo, numero de colores
+uniform vec4 u_shape;      // scale, intensity, paramA, warp
+uniform vec4 u_surface;    // detail, contrast, brightness, saturation
+uniform vec4 u_finish;     // hue, vignette, blur, grain
+uniform vec4 u_transform;  // seed, rotate, drift, OKLab
+uniform vec4 u_space;      // offset.xy, puntero.xy
+
+#define u_resolution u_scene.xy
+#define u_time u_scene.z
+#define u_colorCount u_scene.w
+#define u_scale u_shape.x
+#define u_intensity u_shape.y
+#define u_paramA u_shape.z
+#define u_warp u_shape.w
+#define u_detail u_surface.x
+#define u_contrast u_surface.y
+#define u_brightness u_surface.z
+#define u_saturation u_surface.w
+#define u_hue u_finish.x
+#define u_vignette u_finish.y
+#define u_blur u_finish.z
+#define u_grain u_finish.w
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+#define u_seed u_transform.x
+#else
+// Mantiene las entradas del hash dentro del +-2^14 que garantiza mediump.
+#define u_seed mod(u_transform.x, 31.0)
+#endif
+#define u_rotate u_transform.y
+#define u_drift u_transform.z
+#define u_oklab u_transform.w
+#define u_offset u_space.xy
+
+float hash21(vec2 p) {
+#ifndef GL_FRAGMENT_PRECISION_HIGH
+  p = mod(p, 31.0);
+#endif
+  p = fract(p * vec2(234.34, 435.345));
+  p += dot(p, p + 34.23);
+  return fract(p.x * p.y);
+}
+
+// Ruido blanco parejo para el grano. El hash de arriba vale para el ruido de
+// valor, pero a coordenadas enteras deja una malla que se lee como una red.
+float grainHash(vec2 p) {
+  vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+  p3 += dot(p3, p3.yzx + 33.33);
+  return fract((p3.x + p3.y) * p3.z);
+}
+
+float noise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(
+    mix(hash21(i), hash21(i + vec2(1.0, 0.0)), u.x),
+    mix(hash21(i + vec2(0.0, 1.0)), hash21(i + vec2(1.0, 1.0)), u.x),
+    u.y);
+}
+
+float fbm(vec2 p) {
+  float v = 0.0;
+  float a = 0.5;
+  for (int i = 0; i < 5; i++) {
+    v += a * noise(p);
+    p = p * 2.03 + vec2(17.0, 9.2);
+    a *= 0.5;
+  }
+  return v;
+}
+
+// --- Mezcla de color en OKLab (perceptual), segun u_oklab -------------------
+vec3 srgbToLinear(vec3 c) {
+  return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)),
+    step(0.04045, c));
+}
+vec3 linearToSrgb(vec3 c) {
+  // El max() protege la rama sRGB: una interpolacion fuera de gama puede dejar
+  // un canal negativo, y pow(negativo, ...) es NaN.
+  return mix(c * 12.92, 1.055 * pow(max(c, vec3(0.0)), vec3(1.0 / 2.4)) - 0.055,
+    step(0.0031308, c));
+}
+vec3 linToOklab(vec3 c) {
+  float l = 0.4122214708 * c.r + 0.5363325363 * c.g + 0.0514459929 * c.b;
+  float m = 0.2119034982 * c.r + 0.6806995451 * c.g + 0.1073969566 * c.b;
+  float s = 0.0883024619 * c.r + 0.2817188376 * c.g + 0.6299787005 * c.b;
+  l = pow(max(l, 0.0), 1.0 / 3.0);
+  m = pow(max(m, 0.0), 1.0 / 3.0);
+  s = pow(max(s, 0.0), 1.0 / 3.0);
+  return vec3(
+    0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s,
+    1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s,
+    0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s);
+}
+vec3 oklabToLin(vec3 c) {
+  float l = c.x + 0.3963377774 * c.y + 0.2158037573 * c.z;
+  float m = c.x - 0.1055613458 * c.y - 0.0638541728 * c.z;
+  float s = c.x - 0.0894841775 * c.y - 1.2914855480 * c.z;
+  l = l * l * l; m = m * m * m; s = s * s * s;
+  return vec3(
+    4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+    -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+    -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s);
+}
+vec3 mixColour(vec3 a, vec3 b, float t) {
+  if (u_oklab > 0.5) {
+    vec3 la = linToOklab(srgbToLinear(a));
+    vec3 lb = linToOklab(srgbToLinear(b));
+    return clamp(linearToSrgb(oklabToLin(mix(la, lb, t))), 0.0, 1.0);
+  }
+  return mix(a, b, t);
+}
+
+// Recorre los colores de la paleta. WebGL1 prohibe indexar uniforms con una
+// variable en el fragment shader, de ahi el bucle con limite constante.
+vec3 palette(float x) {
+  float n = max(u_colorCount - 1.0, 1.0);
+  float f = clamp(x, 0.0, 1.0) * n;
+  vec3 col = u_colors[0];
+  for (int i = 0; i < 7; i++) {
+    if (float(i) < n)
+      col = mixColour(col, u_colors[i + 1],
+        smoothstep(0.0, 1.0, clamp(f - float(i), 0.0, 1.0)));
+  }
+  return col;
+}
+
+vec3 hueRotate(vec3 col, float a) {
+  const mat3 toYIQ = mat3(0.299, 0.596, 0.211,
+                          0.587, -0.274, -0.523,
+                          0.114, -0.322, 0.312);
+  const mat3 toRGB = mat3(1.0, 1.0, 1.0,
+                          0.956, -0.272, -1.106,
+                          0.621, -0.647, 1.703);
+  vec3 yiq = toYIQ * col;
+  float ca = cos(a), sa = sin(a);
+  yiq = vec3(yiq.x, yiq.y * ca - yiq.z * sa, yiq.y * sa + yiq.z * ca);
+  return toRGB * yiq;
+}
+
+// Aqui esta el anillo de humo: un fbm en coordenadas polares para el humo,
+// otro cartesiano para los remolinos, y un smoothstep que recorta el anillo.
+vec3 shade(vec2 uv, vec2 p, float t) {
+  vec2 q = p;
+  float angle = atan(q.y, q.x);
+  float radius = length(q);
+  float smoke = fbm(vec2(angle * 0.7 + t * 0.08, radius * 3.0 - t * 0.12) + u_seed);
+  float curl = fbm(q * (2.0 + u_intensity * 3.0) + vec2(t * 0.07, -t * 0.05));
+  float target = mix(0.24, 0.72, u_paramA);
+  float width = 0.08 + u_intensity * 0.2;
+  float ring = 1.0 - smoothstep(width * 0.35, width, abs(radius + (smoke - 0.5) * 0.28 - target));
+  float haze = exp(-3.2 * radius) * curl * 0.45;
+  return palette(clamp(ring * (0.55 + smoke * 0.75) + haze, 0.0, 1.0));
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+  vec2 screenUv = uv;
+  vec2 p = (gl_FragCoord.xy - 0.5 * u_resolution.xy)
+    / min(u_resolution.x, u_resolution.y);
+
+  p *= u_scale;
+  if (abs(u_rotate) > 0.0001) {
+    float cr = cos(u_rotate), sr = sin(u_rotate);
+    p = mat2(cr, -sr, sr, cr) * p;
+  }
+  p += u_offset;
+  if (u_drift > 0.0001)
+    p += u_drift * vec2(sin(u_time * 0.31), cos(u_time * 0.23));
+  // Deformacion organica del dominio.
+  if (u_warp > 0.0) {
+    p += u_warp * (vec2(
+      fbm(p * u_detail + u_seed),
+      fbm(p * u_detail + vec2(5.2, 1.3))) - 0.5);
+  }
+
+  vec3 col;
+  if (u_blur > 0.0) {
+    float e = u_blur;
+    float pe = e * u_scale;
+    vec2 uvE = vec2(e) * min(u_resolution.x, u_resolution.y) / u_resolution.xy;
+    col  = shade(uv, p, u_time) * 0.36;
+    col += shade(uv + vec2(uvE.x, 0.0), p + vec2(pe, 0.0), u_time) * 0.16;
+    col += shade(uv - vec2(uvE.x, 0.0), p - vec2(pe, 0.0), u_time) * 0.16;
+    col += shade(uv + vec2(0.0, uvE.y), p + vec2(0.0, pe), u_time) * 0.16;
+    col += shade(uv - vec2(0.0, uvE.y), p - vec2(0.0, pe), u_time) * 0.16;
+  } else {
+    col = shade(uv, p, u_time);
+  }
+
+  // Retoque final: contraste, saturacion, tono, brillo, vineta, grano.
+  if (abs(u_contrast - 1.0) > 0.0001)
+    col = (col - 0.5) * u_contrast + 0.5;
+  if (abs(u_saturation - 1.0) > 0.0001) {
+    float luma = dot(col, vec3(0.299, 0.587, 0.114));
+    col = mix(vec3(luma), col, u_saturation);
+  }
+  if (abs(u_hue) > 0.0001)
+    col = hueRotate(col, u_hue);
+  if (abs(u_brightness) > 0.0001)
+    col += u_brightness;
+  if (u_vignette > 0.0001) {
+    float vd = length(screenUv - 0.5) * 1.41421356;
+    col *= 1.0 - u_vignette * smoothstep(0.35, 1.0, vd);
+  }
+  if (u_grain > 0.0001)
+    col += (grainHash(
+      gl_FragCoord.xy + vec2(u_seed * 17.0, u_seed * 31.0)) - 0.5) * u_grain;
+  gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+}
+`;
+
+        function compilar(tipo, fuente) {
+            const s = gl.createShader(tipo);
+            gl.shaderSource(s, fuente);
+            gl.compileShader(s);
+            if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+                console.warn('Shader de la corona:', gl.getShaderInfoLog(s));
+                return null;
+            }
+            return s;
+        }
+
+        const vs = compilar(gl.VERTEX_SHADER, VERT);
+        const fs = compilar(gl.FRAGMENT_SHADER, FRAG);
+        if (!vs || !fs) { esconder(); return; }
+
+        const programa = gl.createProgram();
+        gl.attachShader(programa, vs);
+        gl.attachShader(programa, fs);
+        gl.linkProgram(programa);
+        gl.deleteShader(vs);
+        gl.deleteShader(fs);
+        if (!gl.getProgramParameter(programa, gl.LINK_STATUS)) {
+            console.warn('Shader de la corona:', gl.getProgramInfoLog(programa));
+            esconder();
+            return;
+        }
+        gl.useProgram(programa);
+
+        // Un solo triángulo que se sale de la pantalla: cubre todo el viewport
+        // con 3 vértices en vez de los 6 que costarían dos triángulos.
+        const buffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+        const posicion = gl.getAttribLocation(programa, 'a_position');
+        gl.enableVertexAttribArray(posicion);
+        gl.vertexAttribPointer(posicion, 2, gl.FLOAT, false, 0, 0);
+
+        const uni = {
+            colors:    gl.getUniformLocation(programa, 'u_colors'),
+            scene:     gl.getUniformLocation(programa, 'u_scene'),
+            shape:     gl.getUniformLocation(programa, 'u_shape'),
+            surface:   gl.getUniformLocation(programa, 'u_surface'),
+            finish:    gl.getUniformLocation(programa, 'u_finish'),
+            transform: gl.getUniformLocation(programa, 'u_transform'),
+            space:     gl.getUniformLocation(programa, 'u_space')
+        };
+
+        // Nada de esto cambia nunca: se sube una sola vez, no cada fotograma.
+        const planos = [];
+        for (let i = 0; i < COLORES.length; i++) {
+            planos.push(COLORES[i][0], COLORES[i][1], COLORES[i][2]);
+        }
+        gl.uniform3fv(uni.colors, new Float32Array(planos));
+        gl.uniform4f(uni.shape, U.scale, U.intensity, U.paramA, U.warp);
+        gl.uniform4f(uni.surface, U.detail, U.contrast, U.brightness, U.saturation);
+        gl.uniform4f(uni.finish, U.hue, U.vignette, U.blur, U.grain);
+        gl.uniform4f(uni.transform, U.seed, U.rotate, U.drift, U.oklab);
+        gl.uniform4f(uni.space, U.offsetX, U.offsetY, 0, 0);
+
+        let raf = 0;
+        let vivo = true;
+        let enPantalla = true;
+        let pestaniaVisible = document.visibilityState === 'visible';
+        const arranque = performance.now();
+
+        // clientWidth/clientHeight y NO getBoundingClientRect: el canvas cuelga
+        // de .corona-lienzo, que va con transform: scale(), y el rect vendría
+        // ya escalado -- el canvas se redimensionaría en cada fotograma del
+        // zoom, que es lo más caro que se puede hacer aquí.
+        function ajustarTamanio() {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const anchoCrudo = Math.max(1, Math.round(canvas.clientWidth * dpr));
+            const altoCrudo = Math.max(1, Math.round(canvas.clientHeight * dpr));
+            const recorte = Math.min(1, Math.sqrt(MAX_PIXELES / Math.max(1, anchoCrudo * altoCrudo)));
+            const ancho = Math.max(1, Math.round(anchoCrudo * recorte));
+            const alto = Math.max(1, Math.round(altoCrudo * recorte));
+            if (canvas.width !== ancho || canvas.height !== alto) {
+                canvas.width = ancho;
+                canvas.height = alto;
+                gl.viewport(0, 0, ancho, alto);
+            }
+        }
+
+        function pedirFotograma() {
+            if (vivo && enPantalla && pestaniaVisible && raf === 0) {
+                raf = requestAnimationFrame(dibujar);
+            }
+        }
+
+        function pararFotograma() {
+            if (raf !== 0) { cancelAnimationFrame(raf); raf = 0; }
+        }
+
+        function dibujar(ahora) {
+            raf = 0;
+            if (!vivo || !enPantalla || !pestaniaVisible) return;
+            ajustarTamanio();
+            gl.uniform4f(uni.scene, canvas.width, canvas.height,
+                         ((ahora - arranque) / 1000) * U.timeScale, U.colorCount);
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+            pedirFotograma();
+        }
+
+        // Fuera de pantalla no se dibuja. El portal mide varias pantallas de
+        // alto, así que la mayor parte de la visita el shader no se ve y no
+        // tiene por qué estar quemando GPU.
+        if (window.IntersectionObserver) {
+            new IntersectionObserver(function (entradas) {
+                enPantalla = entradas[0] ? entradas[0].isIntersecting : true;
+                if (enPantalla) pedirFotograma(); else pararFotograma();
+            }).observe(canvas);
+        }
+
+        document.addEventListener('visibilitychange', function () {
+            pestaniaVisible = document.visibilityState === 'visible';
+            if (pestaniaVisible) pedirFotograma(); else pararFotograma();
+        });
+
+        if (window.ResizeObserver) {
+            // ResizeObserver mide la caja de contenido, que el transform NO
+            // toca, así que aquí sí es seguro.
+            new ResizeObserver(function () {
+                ajustarTamanio();
+                pedirFotograma();
+            }).observe(canvas);
+        } else {
+            window.addEventListener('resize', function () {
+                ajustarTamanio();
+                pedirFotograma();
+            });
+        }
+
+        // Si el navegador tira el contexto (cambio de GPU, pestaña dormida
+        // mucho rato, driver que se queja) volvemos al verde plano en vez de
+        // dejar un rectángulo negro.
+        canvas.addEventListener('webglcontextlost', function (e) {
+            e.preventDefault();
+            vivo = false;
+            pararFotograma();
+            esconder();
+        });
+
+        ajustarTamanio();
+        pedirFotograma();
+    })();
     </script>
 
 </body>

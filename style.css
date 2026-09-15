@@ -656,21 +656,28 @@ body .navbar .sidebar-toggle-btn .bar {
    encima. Si vuelves a meter algo aquí, que no coincida con .corona-watermark.
 
    El zoom sí se queda: --corona-zoom va de 1 a 1.22 a lo largo del recorrido,
-   igual que el video de la maqueta de referencia. Sobre un verde liso un zoom
-   no se vería, así que el degradado radial (un verde apenas más claro en el
-   centro) es lo que hace visible el movimiento y convierte el destapado en una
-   zambullida. Es sutil a propósito: no debe leerse como una mancha. */
+   igual que el video de la maqueta de referencia. Lo que se ve moverse es el
+   shader de humo (.corona-shader) que cuelga de aquí dentro; el verde de fondo
+   es solo la red de seguridad para cuando no hay WebGL. */
 .corona-lienzo {
     position: absolute;
     inset: 0;
     background-color: var(--verde);
-    background-image: radial-gradient(circle at 50% 50%,
-                                      rgba(255, 255, 255, 0.07) 0%,
-                                      rgba(255, 255, 255, 0) 55%);
     overflow: hidden;
     transform: scale(var(--corona-zoom, 1));
     transform-origin: 50% 50%;
     will-change: transform;
+}
+
+/* El <canvas> del shader de humo. Rellena el lienzo, y como cuelga de él
+   hereda el zoom de 1 a 1.22.
+   OJO: el JS lo mide con clientWidth/clientHeight justamente porque este
+   elemento va escalado; no le pongas un tamaño que dependa del transform. */
+.corona-shader {
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
 }
 
 /* Cierre en verde plano: rellena lo que la silueta deje suelto en el último
