@@ -15,42 +15,67 @@ body {
 }
 
 /* ==========================================
-   SECCIÓN 1: HERO (SCROLL EFECTO TENZ)
+   PALETA DEL REDISEÑO (blanco + verde)
    ========================================== */
+:root {
+    --verde: #1C4E2F;
+    --verde-oscuro: #143B23;
+    --verde-medio: #3E8B5C;
+    --verde-vivo: #57C97E;
+    --verde-suave: #6FBF8C;
+    --tinta: #111111;
+    --gris-texto: #5a5a5a;
+    --gris-tenue: #8a8a8a;
+}
 
-/* Contenedor extra alto para el efecto de scroll */
-.hero-scroll-wrapper {
+/* ==========================================
+   SECCIÓN 1: HERO CLARO (sin intro, sin Spline)
+   ========================================== */
+.hero {
     position: relative;
-    width: 100vw;
-    height: 200vh; /* Te engancha por una pantalla extra */
-    background-color: #000000;
+    width: 100%;
+    min-height: 100vh;
+    /* svh: en iPhone 100vh ignora la barra de Safari y la franja de
+       plataformas caía por debajo del borde visible. */
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    color: var(--tinta);
+    overflow: hidden;
     z-index: 10;
 }
 
-/* El hero ahora se "pega" a la pantalla mientras scrolleas el wrapper */
-.hero {
-    position: sticky;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    background-color: #ffffff;
+/* 🌟 NAVBAR EN MODO CLARO
+   El hero ahora es blanco, así que la navbar necesita tinta oscura mientras
+   flota encima de él. legal.html y el resto del sitio siguen con la navbar
+   oscura de siempre, por eso esto vive en una clase aparte que solo pone el
+   JS de index.html. La regla de transition lleva `body` delante a propósito:
+   el bloque .navbar original está MÁS ABAJO en este archivo y, con la misma
+   especificidad, ganaría él y mataría el fundido de color. */
+body .navbar {
+    transition: opacity 1.2s ease 0.3s, background 0.45s ease;
 }
 
-/* Sombra inferior sutil para transición suave */
-.hero::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 3; 
-    pointer-events: none;
-    background: linear-gradient(
-        to bottom, 
-        transparent 0%, 
-        transparent 84%, 
-        rgba(0, 0, 0, 0.35) 100%
-    );
+body .navbar .logo-texto,
+body .navbar .nav-links a,
+body .navbar .sidebar-toggle-btn .bar {
+    transition: color 0.45s ease, background-color 0.45s ease, opacity 0.3s ease;
 }
+
+.navbar.navbar-claro {
+    background: linear-gradient(to bottom,
+        rgba(255, 255, 255, 0.92) 0%,
+        rgba(255, 255, 255, 0.65) 55%,
+        rgba(255, 255, 255, 0) 100%);
+}
+
+.navbar.navbar-claro .logo-texto,
+.navbar.navbar-claro .nav-links a { color: var(--tinta); }
+.navbar.navbar-claro .nav-links li::after { background: var(--verde); }
+.navbar.navbar-claro .sidebar-toggle-btn .bar { background-color: var(--tinta); }
+.navbar.navbar-claro .sidebar-toggle-btn:hover .bar { background-color: var(--verde); }
+
 
 /* 🌟 BARRA DE NAVEGACIÓN SUPERIOR (AHORA GLOBAL) 🌟 */
 .navbar {
@@ -271,125 +296,451 @@ body {
     padding-left: 8px;
 }
 
-/* Contenedor 3D al fondo */
-.contenedor-3d {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1; /* Capa inferior */
-    pointer-events: none;
+/* --- Rejilla interna: promesa arriba, marca al centro, acciones abajo --- */
+.hero-inner {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 7.5rem 3.5rem 0 3.5rem;
 }
 
-spline-viewer { width: 100%; height: 100%; }
-
-/* 📱 Avatar difuminado de fondo del hero — oculto en PC, visible solo en celular */
-.hero-avatar-mobile {
-    display: none;
+/* 🟩 PROMESA (esquina superior izquierda) */
+.hero-promesa {
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
 }
 
-/* 🎯 MARCA EN EL MERO CENTRO 🎯 */
-.hero-center-brand {
-    position: absolute;
-    top: 42%;
-    left: 50%;
-    transform: translate(-50%, -35%); /* Cambio: un poco más abajo para el efecto */
+.hero-headline {
+    font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.9rem, 3.6vw, 3.3rem);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+    text-transform: uppercase;
+    color: var(--tinta);
+}
+
+.acento-verde { color: var(--verde); }
+.acento-verde-claro { color: var(--verde-suave); }
+
+/* Línea "● ── TIENDA DE CUENTAS" (se reutiliza en la sección 2) */
+.hero-eyebrow,
+.destacada-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.eyebrow-punto {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--tinta);
+    flex-shrink: 0;
+}
+
+.eyebrow-linea {
+    width: 56px;
+    height: 2px;
+    background: var(--tinta);
+    flex-shrink: 0;
+}
+
+.eyebrow-texto {
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+}
+
+/* 👑 MARCA CENTRAL + PRUEBA SOCIAL */
+.hero-marca {
+    align-self: center;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    line-height: 1;
-    text-align: center;
-    z-index: 5;
-
-    /* Nuevas propiedades para la animación */
-    opacity: 0; 
-    transition: opacity 1.2s ease 0.3s, transform 1.2s ease 0.3s;
+    gap: 1.4rem;
 }
 
-/* Agrega esta clase nueva para que el JS active la marca central */
-.hero-center-brand.visible {
-    opacity: 1;
-    transform: translate(-50%, -50%);
-}
-
-.brand-title {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 900;
-    font-size: 5.2rem;
-    text-transform: uppercase;
-    letter-spacing: 6px;
+.hero-wordmark {
     display: flex;
-    gap: 0.6rem;
-    align-items: center;
-    justify-content: center;
-}
-
-.brand-red { color: #FF0000; text-shadow: 0 0 20px rgba(255, 26, 54, 0.2); }
-.brand-black { color: #000000; }
-
-.brand-sub-red {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: 1.2rem;
-    color: #FF0000;
+    align-items: baseline;
+    gap: clamp(8px, 1.25vw, 18px);
+    font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: clamp(3rem, 8.9vw, 8.2rem);
+    line-height: 0.88;
+    letter-spacing: -0.045em;
     text-transform: uppercase;
-    letter-spacing: 6px;
-    margin-top: 1rem;
 }
 
-/* Contenido inferior (Botones y Textos) */
-.hero-bottom-content {
-    position: absolute;
-    bottom: 3.5rem;
-    left: 0;
-    width: 100%;
-    padding: 0 3.5rem;
+.wordmark-verde { color: var(--verde); }
+.wordmark-negro { color: #000000; }
+
+.hero-stats {
+    display: flex;
+    align-items: center;
+    gap: 1.75rem;
+}
+
+.hero-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.hero-stat-num {
+    font-weight: 800;
+    font-size: 1.35rem;
+    letter-spacing: -0.4px;
+}
+
+.hero-stat-label {
+    font-weight: 600;
+    font-size: 0.68rem;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: var(--gris-tenue);
+}
+
+.hero-stat-sep {
+    width: 1px;
+    height: 34px;
+    background: #e2e2e2;
+}
+
+/* 🎯 ACCIONES (las dos esquinas de abajo) */
+.hero-acciones {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    gap: 2rem;
-    z-index: 10; /* Capa superior para no ser tapado por el 3D */
-    pointer-events: none; /* Permite que el scroll pase a través */
+    gap: 2.5rem;
+    padding-bottom: 2.2rem;
 }
 
-.hero-left { max-width: 45%; }
+.hero-acciones-izq {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    max-width: 430px;
+}
 
-.hero-title {
-    font-family: 'Montserrat', sans-serif;
+.hero-acciones-texto {
+    font-weight: 400;
+    font-size: 0.93rem;
+    line-height: 1.5;
+    color: var(--gris-texto);
+}
+
+.hero-acciones-der {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.9rem;
+}
+
+.hero-conteo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.hero-conteo-label {
+    font-weight: 600;
+    font-size: 0.68rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gris-tenue);
+}
+
+.hero-conteo-num {
     font-weight: 800;
-    color: #000000;
-    font-size: 3.8rem;
-    line-height: 1.05;
-    letter-spacing: -1.5px;
+    font-size: 1.85rem;
+    letter-spacing: -0.8px;
+}
+
+/* 🟢 BOTÓN DE CONTORNO VERDE (Discord) */
+.btn-discord-linea {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    border-radius: 50px;
+    border: 1.5px solid var(--verde);
+    color: var(--verde);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.93rem;
+    text-decoration: none;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+.btn-discord-linea svg { stroke: currentColor; }
+
+.btn-discord-linea:hover {
+    background: var(--verde);
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+/* 🟢 BOTÓN PÍLDORA VERDE SÓLIDO (se reutiliza en la sección 2) */
+.btn-verde-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 32px;
+    border-radius: 50px;
+    background: var(--verde);
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.93rem;
+    text-decoration: none;
+    white-space: nowrap;
+    box-shadow: 0 8px 20px rgba(28, 78, 47, 0.28);
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-verde-pill:hover {
+    background: var(--verde-oscuro);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(28, 78, 47, 0.38);
+}
+
+.btn-verde-pill-icono {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #ffffff;
+    color: var(--verde);
+    font-weight: 800;
+    font-size: 1rem;
+    line-height: 1;
+    transition: transform 0.35s ease;
+}
+
+.btn-verde-pill:hover .btn-verde-pill-icono { transform: translateX(3px); }
+
+/* ⬛ FRANJA NEGRA DE PLATAFORMAS (cierra el hero) */
+.hero-plataformas {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.6rem;
+    min-height: 64px;
+    padding: 0 3.5rem;
+    background: #000000;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 2.6px;
     text-transform: uppercase;
 }
 
-.hero-right {
-    max-width: 420px;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+.franja-punto {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--verde-medio);
+    flex-shrink: 0;
 }
 
-.hero-description {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 400;
-    font-size: 1.1rem;
-    color: #000000;
-    line-height: 1.5;
-    letter-spacing: -0.2px;
+/* ==========================================
+   👑 SECCIÓN 2: PORTAL DE LA CORONA
+   ==========================================
+   Solo la transición, sin contenido dentro. El wrapper mide varias pantallas,
+   la capa de dentro se queda pegada (sticky) y la silueta de
+   assets/corona-silueta.svg se usa como máscara CSS sobre un lienzo de verde
+   plano: al scrollear crece su mask-size hasta que el verde se come la
+   pantalla entera. Sin librerías: el tamaño lo escribe el JS de index.html en
+   la variable --corona-tam.
+
+   Antes la cuenta destacada vivía enmascarada aquí dentro y había que medir en
+   JS el hueco que dejaba la maqueta para que la corona en reposo no pisara la
+   tarjeta. Eso se rompía con cada cambio de layout, así que el contenido se
+   mudó a la sección 3, en flujo normal, y la corona reposa centrada y ya.
+
+   Orden de capas dentro de .corona-pin:
+     fondo blanco (lo que tapa)  ->  marca de agua (z 1)
+     ->  esquinas "bajas" (z 2)  ->  cierre verde (z 3)
+     ->  .corona-mask con el lienzo verde (z 4)  ->  pista de scroll (z 6) */
+
+.corona-portal {
+    position: relative;
+    width: 100%;
+    /* 360vh de wrapper = 260vh de scroll con la capa pineada, exactamente el
+       recorrido de la maqueta de referencia. La corona termina de destapar al
+       88%; en lo que queda el lienzo sigue haciendo zoom, así que el respiro
+       antes de soltar hacia la sección 3 no se siente parado. */
+    height: 360vh;
+    background-color: #ffffff;
+    z-index: 11;
 }
 
-/* Activa los clics exclusivamente en los botones */
-.hero-buttons {
+.corona-pin {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
+    background-color: #ffffff;
     display: flex;
     align-items: center;
-    gap: 1.2rem;
-    flex-wrap: wrap;
-    pointer-events: auto; 
+    justify-content: center;
 }
+
+/* Marca de agua tenue detrás de la corona. Va en z-index 1, o sea DEBAJO de
+   .corona-mask (z 4): la corona la tapa, que es justo lo que se quiere. Es la
+   única copia del logotipo que hay en la sección; dentro de la máscara no hay
+   texto. */
+.corona-watermark {
+    position: absolute;
+    z-index: 1;
+    font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: clamp(3.5rem, 13vw, 11rem);
+    line-height: 0.86;
+    letter-spacing: -0.045em;
+    text-align: center;
+    text-transform: uppercase;
+    color: rgba(17, 17, 17, 0.055);
+    user-select: none;
+    pointer-events: none;
+}
+
+/* La capa enmascarada. Dentro solo hay verde plano: lo único que se ve de él
+   es lo que cae dentro de la silueta de la corona. */
+.corona-mask {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 874.44'><path fill='%23000000' fill-rule='evenodd' d='M0 446.03 L0.45 463.64 L9.49 503.84 L22.58 550.36 L27.55 561.2 L41.1 596.43 L48.78 610.89 L57.36 629.86 L70.01 649.28 L82.66 670.51 L94.85 685.86 L106.59 703.03 L113.82 710.7 L121.95 721.54 L130.53 731.48 L146.12 746.16 L159.21 759.71 L191.28 785.46 L206.19 795.84 L215.67 803.52 L225.16 808.49 L236.9 816.62 L249.1 822.49 L262.65 830.17 L303.75 848.69 L315.04 851.85 L332.2 858.18 L349.82 863.14 L362.01 865.4 L375.11 869.02 L393.18 872.18 L409.44 873.08 L417.12 874.44 L420.28 874.44 L424.35 872.63 L426.83 866.98 L424.57 856.59 L423.22 840.79 L420.96 830.85 L420.51 823.17 L418.25 813.69 L416.44 795.17 L435.86 772.13 L466.58 731.93 L467.48 730.13 L467.03 722.45 L454.61 721.32 L446.03 718.61 L435.64 717.25 L418.47 712.74 L394.99 705.06 L376.47 696.93 L346.66 682.02 L322.27 668.02 L321.36 666.67 L349.37 673.89 L359.3 677.51 L379.18 682.02 L397.7 688.35 L418.47 693.32 L428.86 696.93 L436.99 698.74 L450.54 703.7 L471.32 709.12 L484.42 714.09 L500.23 717.25 L515.13 714.09 L528.23 709.12 L549.01 703.7 L576.11 694.67 L601.85 688.35 L620.37 682.02 L640.24 677.51 L650.18 673.89 L660.57 671.64 L679.09 666.21 L679.31 666.89 L678.18 667.12 L676.38 668.93 L665.99 674.35 L664.63 675.7 L661.92 676.6 L661.47 677.51 L653.34 681.57 L651.99 682.93 L648.83 683.83 L648.37 684.73 L644.31 686.09 L609.98 703.25 L581.98 712.74 L579.72 712.74 L571.59 715.45 L569.33 715.45 L564.81 717.25 L558.94 717.71 L549.01 719.96 L547.65 720.87 L539.97 722.22 L533.2 722.22 L532.52 729.22 L532.97 731.03 L540.65 741.87 L557.81 763.1 L564.59 772.58 L584.01 795.62 L579.04 830.4 L576.78 840.79 L574.98 859.3 L573.17 866.98 L575.65 872.63 L579.72 874.44 L582.43 874.44 L590.11 873.08 L606.37 872.18 L626.69 868.56 L637.53 865.4 L651.54 862.69 L670.51 857.27 L698.06 847.79 L740.97 828.36 L752.26 821.59 L764.45 815.72 L773.94 808.94 L784.78 803.07 L816.4 779.58 L841.24 759.26 L854.34 745.71 L869.92 731.03 L886.18 710.7 L893.41 703.03 L906.5 684.06 L916.44 671.86 L942.19 630.76 L953.03 607.27 L959.35 595.53 L973.35 559.39 L977.42 550.81 L984.19 527.33 L987.35 513.78 L990.51 504.29 L996.84 477.19 L999.55 464.09 L1000 452.8 L1000 444.22 L998.64 441.51 L994.13 435.64 L993.68 433.83 L988.26 427.51 L986.45 424.35 L985.09 423.44 L979.22 414.86 L960.25 390.47 L958.45 389.11 L957.54 387.31 L935.86 362.92 L908.99 335.59 L895.89 323.4 L888.21 320.23 L885.73 331.3 L883.02 337.62 L880.31 347.11 L871.73 365.18 L867.66 371.5 L861.34 384.6 L857.27 390.02 L851.17 396.12 L839.88 405.6 L832.43 413.05 L823.85 426.15 L818.43 458.67 L815.72 471.32 L812.56 479.9 L810.75 489.84 L801.72 516.49 L787.26 547.2 L775.97 566.62 L760.16 589.66 L756.1 597.34 L739.16 617.89 L751.58 583.79 L829.27 315.04 L849.14 254.07 L866.31 204.83 L876.24 173.22 L873.76 171.18 L871.05 170.73 L866.98 172.09 L856.14 171.64 L849.37 173.44 L846.21 173.44 L844.4 174.35 L836.27 175.7 L835.37 176.6 L827.24 178.41 L820.91 180.67 L818.65 180.67 L817.3 181.57 L809.62 182.93 L808.27 183.83 L798.78 185.64 L792.01 187.9 L789.75 187.9 L787.04 189.25 L771.23 192.86 L769.87 193.77 L762.2 195.12 L757.68 196.93 L753.61 197.38 L752.26 198.28 L743.68 200.09 L737.8 202.35 L735.55 202.35 L734.64 203.25 L731.48 204.16 L727.87 204.61 L706.19 211.83 L693.09 214.54 L684.73 209.35 L681.57 204.83 L679.77 203.48 L662.6 182.7 L660.34 180.89 L635.05 151.99 L623.76 137.99 L595.75 107.72 L551.04 55.78 L549.23 54.43 L509.94 7.45 L504.74 2.71 L500.23 0 L496.61 1.81 L491.64 5.87 L486.45 11.52 L447.61 58.04 L396.57 116.31 L376.69 137.53 L359.08 158.76 L326.56 195.35 L317.52 206.64 L312.33 211.83 L307.36 214.54 L298.78 213.19 L257.68 200.54 L209.8 187.9 L177.73 180.22 L159.67 174.8 L144.31 171.64 L133.47 172.09 L128.5 170.73 L126.24 171.18 L123.76 173.22 L170.28 313.23 L249.32 586.5 L260.84 617.43 L255.19 611.79 L243.9 597.34 L236.68 584.69 L235.77 584.24 L225.38 568.88 L215 551.72 L215 550.36 L214.09 549.91 L208.22 538.17 L207.77 535.91 L205.06 530.94 L205.06 529.58 L199.19 518.74 L193.77 504.74 L190.61 494.35 L190.61 492.55 L189.25 489.84 L188.35 483.51 L183.83 469.96 L183.38 465 L182.48 463.19 L178.86 445.12 L178.41 437.44 L176.15 426.15 L169.38 416.67 L168.93 414.41 L161.47 406.96 L153.79 401.08 L142.28 389.57 L138.66 384.6 L135.05 376.47 L130.53 369.24 L130.08 367.43 L128.73 366.08 L120.6 349.37 L117.89 340.33 L115.63 335.37 L115.63 333.56 L114.27 331.3 L113.37 324.98 L111.79 320.23 L104.11 323.4 L101.4 325.65 L78.59 348.01 L56.01 371.95 L36.13 394.99 L13.1 425.7 L9.03 430.22 L0.9 441.96Z'/></svg>");
+            mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 874.44'><path fill='%23000000' fill-rule='evenodd' d='M0 446.03 L0.45 463.64 L9.49 503.84 L22.58 550.36 L27.55 561.2 L41.1 596.43 L48.78 610.89 L57.36 629.86 L70.01 649.28 L82.66 670.51 L94.85 685.86 L106.59 703.03 L113.82 710.7 L121.95 721.54 L130.53 731.48 L146.12 746.16 L159.21 759.71 L191.28 785.46 L206.19 795.84 L215.67 803.52 L225.16 808.49 L236.9 816.62 L249.1 822.49 L262.65 830.17 L303.75 848.69 L315.04 851.85 L332.2 858.18 L349.82 863.14 L362.01 865.4 L375.11 869.02 L393.18 872.18 L409.44 873.08 L417.12 874.44 L420.28 874.44 L424.35 872.63 L426.83 866.98 L424.57 856.59 L423.22 840.79 L420.96 830.85 L420.51 823.17 L418.25 813.69 L416.44 795.17 L435.86 772.13 L466.58 731.93 L467.48 730.13 L467.03 722.45 L454.61 721.32 L446.03 718.61 L435.64 717.25 L418.47 712.74 L394.99 705.06 L376.47 696.93 L346.66 682.02 L322.27 668.02 L321.36 666.67 L349.37 673.89 L359.3 677.51 L379.18 682.02 L397.7 688.35 L418.47 693.32 L428.86 696.93 L436.99 698.74 L450.54 703.7 L471.32 709.12 L484.42 714.09 L500.23 717.25 L515.13 714.09 L528.23 709.12 L549.01 703.7 L576.11 694.67 L601.85 688.35 L620.37 682.02 L640.24 677.51 L650.18 673.89 L660.57 671.64 L679.09 666.21 L679.31 666.89 L678.18 667.12 L676.38 668.93 L665.99 674.35 L664.63 675.7 L661.92 676.6 L661.47 677.51 L653.34 681.57 L651.99 682.93 L648.83 683.83 L648.37 684.73 L644.31 686.09 L609.98 703.25 L581.98 712.74 L579.72 712.74 L571.59 715.45 L569.33 715.45 L564.81 717.25 L558.94 717.71 L549.01 719.96 L547.65 720.87 L539.97 722.22 L533.2 722.22 L532.52 729.22 L532.97 731.03 L540.65 741.87 L557.81 763.1 L564.59 772.58 L584.01 795.62 L579.04 830.4 L576.78 840.79 L574.98 859.3 L573.17 866.98 L575.65 872.63 L579.72 874.44 L582.43 874.44 L590.11 873.08 L606.37 872.18 L626.69 868.56 L637.53 865.4 L651.54 862.69 L670.51 857.27 L698.06 847.79 L740.97 828.36 L752.26 821.59 L764.45 815.72 L773.94 808.94 L784.78 803.07 L816.4 779.58 L841.24 759.26 L854.34 745.71 L869.92 731.03 L886.18 710.7 L893.41 703.03 L906.5 684.06 L916.44 671.86 L942.19 630.76 L953.03 607.27 L959.35 595.53 L973.35 559.39 L977.42 550.81 L984.19 527.33 L987.35 513.78 L990.51 504.29 L996.84 477.19 L999.55 464.09 L1000 452.8 L1000 444.22 L998.64 441.51 L994.13 435.64 L993.68 433.83 L988.26 427.51 L986.45 424.35 L985.09 423.44 L979.22 414.86 L960.25 390.47 L958.45 389.11 L957.54 387.31 L935.86 362.92 L908.99 335.59 L895.89 323.4 L888.21 320.23 L885.73 331.3 L883.02 337.62 L880.31 347.11 L871.73 365.18 L867.66 371.5 L861.34 384.6 L857.27 390.02 L851.17 396.12 L839.88 405.6 L832.43 413.05 L823.85 426.15 L818.43 458.67 L815.72 471.32 L812.56 479.9 L810.75 489.84 L801.72 516.49 L787.26 547.2 L775.97 566.62 L760.16 589.66 L756.1 597.34 L739.16 617.89 L751.58 583.79 L829.27 315.04 L849.14 254.07 L866.31 204.83 L876.24 173.22 L873.76 171.18 L871.05 170.73 L866.98 172.09 L856.14 171.64 L849.37 173.44 L846.21 173.44 L844.4 174.35 L836.27 175.7 L835.37 176.6 L827.24 178.41 L820.91 180.67 L818.65 180.67 L817.3 181.57 L809.62 182.93 L808.27 183.83 L798.78 185.64 L792.01 187.9 L789.75 187.9 L787.04 189.25 L771.23 192.86 L769.87 193.77 L762.2 195.12 L757.68 196.93 L753.61 197.38 L752.26 198.28 L743.68 200.09 L737.8 202.35 L735.55 202.35 L734.64 203.25 L731.48 204.16 L727.87 204.61 L706.19 211.83 L693.09 214.54 L684.73 209.35 L681.57 204.83 L679.77 203.48 L662.6 182.7 L660.34 180.89 L635.05 151.99 L623.76 137.99 L595.75 107.72 L551.04 55.78 L549.23 54.43 L509.94 7.45 L504.74 2.71 L500.23 0 L496.61 1.81 L491.64 5.87 L486.45 11.52 L447.61 58.04 L396.57 116.31 L376.69 137.53 L359.08 158.76 L326.56 195.35 L317.52 206.64 L312.33 211.83 L307.36 214.54 L298.78 213.19 L257.68 200.54 L209.8 187.9 L177.73 180.22 L159.67 174.8 L144.31 171.64 L133.47 172.09 L128.5 170.73 L126.24 171.18 L123.76 173.22 L170.28 313.23 L249.32 586.5 L260.84 617.43 L255.19 611.79 L243.9 597.34 L236.68 584.69 L235.77 584.24 L225.38 568.88 L215 551.72 L215 550.36 L214.09 549.91 L208.22 538.17 L207.77 535.91 L205.06 530.94 L205.06 529.58 L199.19 518.74 L193.77 504.74 L190.61 494.35 L190.61 492.55 L189.25 489.84 L188.35 483.51 L183.83 469.96 L183.38 465 L182.48 463.19 L178.86 445.12 L178.41 437.44 L176.15 426.15 L169.38 416.67 L168.93 414.41 L161.47 406.96 L153.79 401.08 L142.28 389.57 L138.66 384.6 L135.05 376.47 L130.53 369.24 L130.08 367.43 L128.73 366.08 L120.6 349.37 L117.89 340.33 L115.63 335.37 L115.63 333.56 L114.27 331.3 L113.37 324.98 L111.79 320.23 L104.11 323.4 L101.4 325.65 L78.59 348.01 L56.01 371.95 L36.13 394.99 L13.1 425.7 L9.03 430.22 L0.9 441.96Z'/></svg>");
+    /* 50% 50%: la silueta se queda centrada en la pantalla mientras crece, sin
+       tener que calcular el eje en JS. */
+    -webkit-mask-position: 50% 50%;
+            mask-position: 50% 50%;
+    -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+    -webkit-mask-size: var(--corona-tam, 300px);
+            mask-size: var(--corona-tam, 300px);
+    /* SIN transition y SIN will-change a propósito.
+       Aquí había `transition: mask-size 0.04s linear` para "suavizar" el salto
+       entre fotogramas, pero el JS ya suaviza por su cuenta (el bucle de rAF de
+       index.html persigue el tamaño objetivo poco a poco). Los dos suavizados a
+       la vez se pisaban: la transición arrancaba hacia un tamaño que el bucle ya
+       había cambiado, y la corona temblaba. El bucle manda solo.
+       will-change tampoco pinta nada: mask-size no se anima en el compositor,
+       así que solo gastaba memoria de capa. */
+}
+
+/* El lienzo: lo que la corona destapa. Verde SÓLIDO (el mismo #1C4E2F con el
+   que abre la sección 3, así que al soltarse el pin no hay corte de color).
+
+   OJO: aquí dentro NO va texto. Antes iba una segunda copia del logotipo en
+   blanco sobre verde, para que el destapado "invirtiera" la marca de agua del
+   fondo. Como las dos capas caían exactas una sobre otra, el texto se leía como
+   una sola línea pasando POR DELANTE de la corona, y la corona tiene que ir
+   encima. Si vuelves a meter algo aquí, que no coincida con .corona-watermark.
+
+   El zoom sí se queda: --corona-zoom va de 1 a 1.22 a lo largo del recorrido,
+   igual que el video de la maqueta de referencia. Sobre un verde liso un zoom
+   no se vería, así que el degradado radial (un verde apenas más claro en el
+   centro) es lo que hace visible el movimiento y convierte el destapado en una
+   zambullida. Es sutil a propósito: no debe leerse como una mancha. */
+.corona-lienzo {
+    position: absolute;
+    inset: 0;
+    background-color: var(--verde);
+    background-image: radial-gradient(circle at 50% 50%,
+                                      rgba(255, 255, 255, 0.07) 0%,
+                                      rgba(255, 255, 255, 0) 55%);
+    overflow: hidden;
+    transform: scale(var(--corona-zoom, 1));
+    transform-origin: 50% 50%;
+    will-change: transform;
+}
+
+/* Cierre en verde plano: rellena lo que la silueta deje suelto en el último
+   tramo (alguna esquina, según la proporción de la pantalla). */
+.corona-cierre {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background-color: var(--verde);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Marcas de encuadre en las 4 esquinas, en DOS juegos superpuestos sobre las
+   mismas coordenadas. Nada de mix-blend-mode: sobre verde sacaba fucsia.
+
+     .corona-esquina-baja  -> tinta, z-index 2, DEBAJO de la máscara. Es la que
+                              se ve sobre el blanco; el verde se la va tragando.
+     .corona-esquina-alta  -> blanca, DENTRO de .corona-mask. Solo asoma donde
+                              la corona ya destapó.
+
+   Así cada esquina pasa de negra a blanca justo en el instante en que el verde
+   la alcanza, sin una sola línea de JS. */
+.corona-esquina {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+    border: 0 solid var(--esq-color, #ffffff);
+}
+
+.corona-esquina-baja { z-index: 2; --esq-color: var(--tinta); }
+.corona-esquina-alta {             --esq-color: #ffffff; }
+
+.esq-si { top: 14px;    left: 14px;  border-top-width: 2px;    border-left-width: 2px; }
+.esq-sd { top: 14px;    right: 14px; border-top-width: 2px;    border-right-width: 2px; }
+.esq-ii { bottom: 14px; left: 14px;  border-bottom-width: 2px; border-left-width: 2px; }
+.esq-id { bottom: 14px; right: 14px; border-bottom-width: 2px; border-right-width: 2px; }
+
+/* Pista de scroll: se desvanece en cuanto la corona empieza a crecer */
+.corona-pista {
+    position: absolute;
+    z-index: 6;
+    bottom: 3.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    pointer-events: none;
+    font-weight: 700;
+    font-size: 0.68rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--verde);
+}
+
+.corona-pista-flecha {
+    width: 1px;
+    height: 34px;
+    background: linear-gradient(to bottom, var(--verde), rgba(28, 78, 47, 0));
+    animation: coronaPistaBaja 1.8s ease-in-out infinite;
+}
+
+@keyframes coronaPistaBaja {
+    0%, 100% { transform: translateY(0);    opacity: 1;   }
+    50%      { transform: translateY(10px); opacity: 0.3; }
+}
+
 
 /* 🔴 BOTONES CON BORDE ROJO ANIMADO 🔴 */
 .btn-animated {
@@ -456,22 +807,6 @@ spline-viewer { width: 100%; height: 100%; }
 
 .btn-animated:hover .btn-icon { transform: rotate(90deg); background-color: #222222; }
 
-/* ==========================================
-   BOTÓN EXCLUSIVO DE CELULAR (CENTRAL)
-   ========================================== */
-.hero-mobile-btn {
-    display: none; /* Lo ocultamos en PC */
-    margin-top: 4.5rem; /* 👈 CÁMBIALO AQUÍ: Súbelo de 2.8rem a 4.5rem (o 5rem si lo quieres más abajo) */
-    pointer-events: auto; /* Para que funcione el clic sin problemas */
-}
-
-/* Centrado perfecto para el botón sin el ícono de "+" */
-.btn-animated-inner.btn-centered {
-    padding: 0.85rem 3rem; /* Le damos más espacio a los lados para que no se vea apretado */
-    justify-content: center;
-    text-align: center;
-}
-
 @keyframes rotateBorder {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -482,23 +817,6 @@ spline-viewer { width: 100%; height: 100%; }
    ========================================== */
 
 @media (max-width: 900px) {
-
-    /* 🚫 DESAPARECER INTRO Y LIBERAR SCROLL EN CELULAR 🚫 */
-    .intro-layer {
-        display: none !important;
-    }
-
-    body.bloqueado {
-        overflow-y: auto !important;
-    }
-
-    /* Imagen del logo de la Intro (Ajustado) */
-    .intro-logo {
-        width: 75% !important; /* 👈 Le damos margen a los lados para que respire */
-        max-width: 320px !important; /* 👈 Cambiado de 500px a 260px para que no quede gigante */
-        height: auto;
-        object-fit: contain;
-    }
 
     /* 🔴 1. FIX DE BARRA, LOGO Y HAMBURGUESA (MÁS ABAJO Y SOMBRA SUAVE) */
     .navbar {
@@ -553,215 +871,116 @@ spline-viewer { width: 100%; height: 100%; }
         z-index: 9003 !important;
     }
 
-    /* 🔴 1.5. MARCA CENTRAL (LOGO/TEXTO) CENTRADA VERTICALMENTE EN LA SECCIÓN */
-    .hero-center-brand {
-        top: 42% !important;
+    /* 🟩 1.5. SECCIÓN 1 EN CELULAR (hero claro) */
+    .hero-inner {
+        padding: 5.5rem 1.25rem 0 1.25rem;
+        gap: 1.5rem;
     }
 
-    /* 🔴 SIN FONDO 3D DE SPLINE (partículas rojas) EN CELULAR — queda el
-       fondo blanco de .hero solo. En PC sigue intacto (esta regla vive
-       dentro del media query). */
-    .contenedor-3d {
-        display: none !important;
+    .hero-promesa { gap: 1rem; }
+
+    .hero-headline {
+        font-size: clamp(1.65rem, 8.2vw, 2.1rem);
+        line-height: 1.05;
+        letter-spacing: -0.025em;
     }
 
-    /* 👤 AVATAR DIFUMINADO DE FONDO (asset/diseño.png ya viene en escala de grises) */
-    /* Alto en vh (no ancho en vw) a propósito: así el borde inferior real de la
-       foto siempre queda fuera de la pantalla sin importar el alto del celular,
-       y nunca se ve el corte recto de la imagen original. */
-    .hero-avatar-mobile {
-        display: block !important;
-        position: absolute !important;
-        top: 42% !important;
-        left: 50% !important;
-        /* 🎬 Estado inicial de la intro: arranca más abajo y transparente */
-        transform: translate(-50%, 70px) !important;
-        width: auto !important;
-        /* Acompaña al hero: si el hero pasa a medir 100svh, el avatar debe
-           medirse contra lo mismo para conservar EXACTAMENTE la proporción
-           de siempre (ocupa del 42% al 105% del alto del hero, o sea que su
-           borde inferior sigue quedando fuera de pantalla, como dice el
-           comentario de arriba). */
-        height: 63vh !important;
-        height: 63svh !important;
-        max-width: none !important;
-        z-index: 2 !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-        -webkit-user-select: none !important;
-        user-select: none !important;
-        transition: opacity 1.2s ease 0.3s, transform 1.2s ease 0.3s !important;
+    .eyebrow-punto { width: 8px; height: 8px; }
+    .eyebrow-linea { width: 34px; }
+    .eyebrow-texto { font-size: 0.6rem; letter-spacing: 3.5px; }
+
+    .hero-marca { gap: 1rem; }
+
+    .hero-wordmark {
+        font-size: clamp(2.4rem, 12.8vw, 3.4rem);
+        gap: 8px;
+        letter-spacing: -0.035em;
     }
 
-    /* 🎬 Intro: la imagen sube de abajo hacia arriba hasta su posición final,
-       igual que el texto de la marca (misma duración/curva/retraso) */
-    .hero-avatar-mobile.visible {
-        opacity: 0.28 !important;
-        transform: translate(-50%, 0) !important;
+    .hero-stats { gap: 1.25rem; }
+    .hero-stat-num { font-size: 1.1rem; }
+    .hero-stat-label { font-size: 0.6rem; letter-spacing: 1.4px; }
+    .hero-stat-sep { height: 28px; }
+
+    /* Las dos esquinas se vuelven una columna de botones a todo lo ancho */
+    .hero-acciones {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.85rem;
+        padding-bottom: 1.4rem;
     }
 
-    /* 🔴 2. TEXTOS "ANXIE STORE" Y "TIENDA DE CUENTAS" MÁS GRANDES */
-    /* "TIENDA DE CUENTAS" arriba (negra) y "ANXIE STORE" abajo en rojo sólido */
-    .brand-title {
-        /* "ANXIE STORE" mide 339px a 2.8rem, así que en pantallas de menos de
-           340px (iPhone SE 1a gen = 320px, Galaxy Fold cerrado = 280px) se
-           salía cortado por ambos lados. min() mantiene EXACTAMENTE 2.8rem de
-           360px para arriba (o sea en todos los celulares normales) y solo lo
-           encoge en las angostas, donde hoy se ve mocho. */
-        font-size: min(2.8rem, 12.5vw) !important;
-        letter-spacing: 2px !important;
+    .hero-acciones-izq {
+        order: 2;
+        max-width: 100%;
+        gap: 0.75rem;
     }
 
-    .brand-title .brand-red,
-    .brand-title .brand-black {
-        color: #FF0000 !important;
-        background: none !important;
-        -webkit-background-clip: initial !important;
-        background-clip: initial !important;
-        -webkit-text-fill-color: initial !important;
-        text-shadow: none !important;
+    .hero-acciones-der {
+        order: 1;
+        align-items: stretch;
+        gap: 0.85rem;
     }
 
-    .brand-sub-red {
-        order: -1 !important;
-        color: #000000 !important;
-        font-size: 0.88rem !important;
-        letter-spacing: 3.5px !important;
-        margin-top: 0 !important;
-        margin-bottom: 0.6rem !important;
-    }
-
-    /* 🔴 BOTONES MÓVIL: "Ir a Discord" (línea) + "Ver Catálogo" (pill negro) */
-    .hero-mobile-btn {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        flex-wrap: wrap !important;
-        gap: 1.4rem !important;
-        margin-top: 1.6rem !important;
-    }
-
-    /* 🆕 "VER CATÁLOGO": pill de borde negro fino, sin brillo, tamaño reducido */
-    .btn-pill-mobile {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0.7rem 1.6rem;
-        border-radius: 50px;
-        border: 1.5px solid #000000;
-        background-color: transparent;
-        color: #000000;
-        font-family: 'Montserrat', sans-serif;
-        font-weight: 600;
-        font-size: 0.85rem;
-        letter-spacing: 0.5px;
-        text-decoration: none;
-        white-space: nowrap;
-        transition: background-color 0.25s ease, color 0.25s ease;
-    }
-
-    .btn-pill-mobile:active {
-        background-color: #000000;
-        color: #ffffff;
-    }
-
-    /* 🆕 "IR A DISCORD": texto simple con línea negra debajo */
-    .btn-underline-mobile {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding-bottom: 4px;
-        border-bottom: 1.5px solid #000000;
-        color: #000000;
-        font-family: 'Montserrat', sans-serif;
-        font-weight: 600;
-        font-size: 0.85rem;
-        letter-spacing: 0.5px;
-        text-decoration: none;
-        white-space: nowrap;
-    }
-
-    /* 🔴 DIFUMINADO NEGRO ENTRE SECCIÓN 1 Y 2 (sin línea recta de corte).
-       El de PC (declarado arriba, fuera de este media query) es muy sutil
-       (solo llega a 0.35 de opacidad); en celular la sección 2 empieza en
-       negro sólido justo debajo, así que aquí sí llega a negro 100% justo
-       en el borde para fundirse sin costura. Acotado al último 10% para que
-       la sombra no suba hasta el hombro del avatar (diseño.png) ni toque
-       "COMPRA TUS CUENTAS". Varios pasos intermedios (en vez de un salto
-       brusco de un solo tramo) para que la curva sea pareja y no se note
-       como una línea/quiebre a la mitad del desvanecido. */
-    .hero::after {
-        background: linear-gradient(
-            to bottom,
-            transparent 0%,
-            transparent 90%,
-            rgba(0, 0, 0, 0.08) 92%,
-            rgba(0, 0, 0, 0.22) 94%,
-            rgba(0, 0, 0, 0.42) 96%,
-            rgba(0, 0, 0, 0.68) 98%,
-            #000000 100%
-        ) !important;
-    }
-
-    .hero-bottom-content {
-        position: absolute;
-        /* 👆 De 3rem a 2rem (el original): más abajo, pegado al piso de la
-           sección, pero el difuminado ya acotado evita que el negro le
-           coma el contraste. Si se ve muy alto/bajo, solo hay que tocar
-           este valor. */
-        bottom: 2rem;
-        left: 0;
+    .hero-conteo {
+        order: -1;
+        flex-direction: row;
+        align-items: baseline;
+        justify-content: space-between;
         width: 100%;
-        padding: 0 1rem;
-        display: flex;
-        justify-content: center;
+    }
+
+    .hero-conteo-label { font-size: 0.6rem; letter-spacing: 2.4px; }
+    .hero-conteo-num { font-size: 1.45rem; }
+
+    .hero-acciones-texto {
+        font-size: 0.82rem;
         text-align: center;
     }
 
-    .hero-right { display: none !important; }
-    .hero-left { max-width: 100%; width: 100%; }
-
-    /* 🎬 Intro: "COMPRA TUS CUENTAS DE VIDEOJUEGOS" entra con el mismo
-       fundido/curva que "ANXIE STORE" y "TIENDA DE CUENTAS" (no con el
-       efecto de abajo-hacia-arriba de la imagen de fondo) */
-    .hero-title {
-        font-size: 2rem;
-        text-align: center;
-        width: 100%;
-        opacity: 0;
-        transform: translateY(20px);
-        transition: opacity 1.2s ease 0.3s, transform 1.2s ease 0.3s;
+    .btn-discord-linea,
+    .btn-verde-pill {
+        align-self: stretch;
+        justify-content: center;
+        height: 52px;
+        padding: 0 1.5rem;
+        font-size: 0.92rem;
     }
 
-    .hero-title.visible {
-        opacity: 1;
-        transform: translateY(0);
+    .hero-plataformas {
+        gap: 0.85rem;
+        min-height: 56px;
+        padding: 0.6rem 1rem;
+        font-size: 0.6rem;
+        letter-spacing: 2px;
     }
 
-    .hero-scroll-wrapper, .hero {
-        position: relative !important;
-        height: auto !important;
-        /* 📐 svh = alto de la pantalla CON la barra del navegador puesta.
-           100vh en iPhone mide la pantalla COMPLETA e ignora la barra de
-           Safari, así que el hero quedaba ~130px más alto de lo que se ve
-           y "COMPRA TUS CUENTAS DE VIDEOJUEGOS" (que va en bottom: 2rem)
-           caía debajo de la barra: se ocultaba entre el 81% y el 100%.
-           svh es estable (no cambia al colapsarse la barra), así que
-           tampoco produce reflow al scrollear. La línea vh se queda de
-           respaldo para navegadores viejos que no entiendan svh. */
-        min-height: 100vh;
-        min-height: 100svh;
-        overflow: hidden !important;
+    .franja-punto { width: 4px; height: 4px; }
+
+    /* 👑 PORTAL DE LA CORONA EN CELULAR
+       Menos recorrido de scroll: el dedo cansa más rápido que la rueda. El
+       tamaño de arranque de la corona lo baja el JS (tamanioReposoCorona). */
+    .corona-portal { height: 300vh; }
+
+    /* En celular el logotipo de fondo crece: a 13vw se quedaba en un sello
+       diminuto en medio de la pantalla. */
+    .corona-watermark { font-size: clamp(2.6rem, 19vw, 5.5rem); }
+
+    .corona-esquina { width: 13px; height: 13px; }
+    .esq-si, .esq-sd { top: 10px; }
+    .esq-ii, .esq-id { bottom: 10px; }
+    .esq-si, .esq-ii { left: 10px; }
+    .esq-sd, .esq-id { right: 10px; }
+
+    .corona-pista {
+        bottom: 2.2rem;
+        font-size: 0.6rem;
+        letter-spacing: 3px;
     }
 
-    /* 🔴 3. SECCIÓN CUENTAS (CELULAR)
-       Este bloque tenía una versión ENTERA de la sección 2 en móvil (posiciones
-       absolutas, tarjeta a 85vw, título a 1.4rem, etc.) que ya no se aplicaba:
-       más abajo hay un segundo @media (max-width: 900px) con el rediseño, y al
-       ir después ganaba en la cascada. O sea que estas reglas eran código
-       muerto que se contradecía con el que sí manda -- trampa para el próximo
-       que viniera a editar. La sección 2 en celular se define en UN solo lugar:
-       busca "SECCIÓN 2 EN CELULAR: COLUMNA EN FLUJO NORMAL" más abajo. */
+    .corona-pista-flecha { height: 26px; }
+
+
 
     /* 🔴 4. SECCIÓN DISCORD */
     .seccion-tres { padding: 3rem 1rem; min-height: auto; }
@@ -780,496 +999,359 @@ spline-viewer { width: 100%; height: 100%; }
 }
 
 /* ==========================================
-   SECCIÓN 2: SCROLL-JACKING AVANZADO
-   ========================================== */
-.cases-scroll-wrapper {
-    position: relative;
-    width: 100vw;
-    height: 400vh; /* 👈 Tiempo de scroll para toda la animación */
-    background-color: #000000;
-    z-index: 20;
-}
+   SECCIÓN 3: CUENTA DESTACADA
+   ==========================================
+   Sección normal del flujo, justo después del portal de la corona. Antes vivía
+   enmascarada dentro de él en position: absolute y sin poder scrollear, y por
+   eso todo estaba recortado a la fuerza para caber en un viewport. Ya no: aquí
+   crece lo que necesite.
 
-.cases-sticky {
-    position: sticky;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
+   Fondo verde plano #1C4E2F, el mismo del lienzo del portal, para que al
+   soltarse el pin no se vea un corte de color. Ni foto, ni degradado. */
+
+.destacada {
+    position: relative;
+    /* Por encima del portal (z 11), que es sticky y puede solaparla un pixel
+       en el punto exacto en que se suelta el pin. */
+    z-index: 12;
+    min-height: 100vh;
+    min-height: 100svh;
+    background-color: var(--verde);
+    color: #ffffff;
     display: flex;
+    flex-direction: column;
     justify-content: center;
-    align-items: center;
+    gap: 2.6rem;
+    /* El padding de arriba deja libre la navbar, que es fixed. */
+    padding: clamp(6rem, 11vh, 8rem) 3.5rem clamp(3.5rem, 8vh, 6rem) 3.5rem;
 }
 
-/* TEXTO DE FONDO GIGANTE */
-.cases-bg-text {
-    position: absolute;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 900;
-    font-size: 6rem;
-    white-space: nowrap;
-    z-index: 5;
-    transform: translateX(100vw);
-    will-change: transform, opacity;
+.destacada-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 2.5rem;
 }
 
-.cases-bg-text .text-red {
-    color: #FF0000;
-}
-.cases-bg-text .text-gray {
-    color: #d8d8d8;
-}
-
-/* 💻 PC: "CUENTAS DESTACADAS" (se muestran 2). En celular (media query de
-   abajo) se invierte, porque ahí solo se muestra 1 sola cuenta. */
-.cases-bg-text-singular { display: none; }
-
-/* MODELO 3D EN EL CENTRO */
-.cases-model-container {
-    position: relative;
-    width: 500px;
-    height: 500px;
-    z-index: 10;
-}
-
-.cases-model-container model-viewer {
-    width: 100%;
-    height: 100%;
-    --poster-color: transparent;
-    outline: none;
-}
-
-/* 🚫 BOTÓN DE REALIDAD AUMENTADA DE <model-viewer>
-   El botón blanco del cubito lo dibuja model-viewer dentro de su shadow DOM
-   cuando el tag lleva el atributo "ar". Ya se lo quitamos en index.html, así
-   que no debería ni aparecer; esto queda de seguro por si alguien vuelve a
-   poner el atributo o si model-viewer cambia su default en una versión nueva.
-   Importa porque al tocarlo lanzaba WebXR/Scene Viewer y el navegador pedía
-   permiso para "crear un mapa 3D de tu entorno" con la cámara. Nótese que el
-   pointer-events:none del contenedor NO alcanzaba a bloquearlo, porque el
-   botón trae su propio pointer-events dentro del shadow DOM. */
-model-viewer::part(default-ar-button) {
-    display: none !important;
-}
-
-/* --- ELEMENTOS DE INTERFAZ (LÍNEAS Y CUENTAS) --- */
-.cases-ui-elements {
-    position: absolute;
-    inset: 0;
-    z-index: 15;
-    pointer-events: none; 
-}
-
-/* 🚀 Tarjetas de cuentas */
-.ui-card {
-    position: absolute;
+.destacada-header-txt {
     display: flex;
     flex-direction: column;
-    width: 46vw;
-    max-width: none;
-    opacity: 0; 
+    gap: 1rem;
 }
 
-/* 🎯 LÍNEAS Y TÍTULOS EN SU LUGAR ORIGINAL */
-.ui-left { 
-    top: 15%; 
-    right: 50%;
-    padding-left: 2vw;
+/* La línea "● ── LO MÁS COTIZADO" hereda de .hero-eyebrow, pero aquí va sobre
+   verde: el --verde-medio de la maqueta no se leía, sube a --verde-suave */
+.destacada-eyebrow .eyebrow-punto,
+.destacada-eyebrow .eyebrow-linea { background: var(--verde-suave); }
+.destacada-eyebrow .eyebrow-texto { color: var(--verde-suave); }
+
+.destacada-titulo {
+    font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 4.2vw, 3.8rem);
+    line-height: 0.92;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
 }
 
-.ui-right { 
-    bottom: 15%; 
-    left: 50%;
-    align-items: flex-end; 
-    text-align: right;
-    padding-right: 2vw;
-}
-
-/* ALINEACIÓN Y ANCHO AMPLIADO */
-.ui-left .ui-title {
-    width: 100%;
-    max-width: 600px; /* Ampliado para que textos largos quepan sin cortar */
-    justify-content: flex-start;
-}
-
-.ui-right .ui-title {
-    width: 100%;
-    max-width: 600px;
-    justify-content: flex-end;
-}
-
-/* DESPLAZAMIENTO DE LAS IMÁGENES */
-.ui-left .ui-image-wrapper {
-    width: 100%;
-    max-width: 480px;
-    align-self: flex-start; 
-    margin-top: 40px;
-    margin-bottom: 10px;
-}
-
-.ui-right .ui-image-wrapper {
-    width: 100%;
-    max-width: 480px;
-    align-self: flex-end;   
-    margin-bottom: 40px;
-    margin-top: 10px;
-}
-
-/* ==========================================
-   TÍTULOS DE CUENTAS (FORZAR 1 SOLA LÍNEA)
-   ========================================== */
-.ui-title {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: 1.35rem; /* Ajustado ligeramente para garantizar espacio perfecto */
-    color: #ffffff;
-    transform: translateY(35px);
-    opacity: 0;
-    will-change: transform, opacity;
-    display: flex;
-    align-items: center;
-    white-space: nowrap; /* 👈 ¡CLAVE! Prohíbe que el precio baje de renglón */
-}
-
-/* LAS LÍNEAS ROJAS (Sólidas, nítidas sin difuminado) */
-.ui-line-container {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    height: 4px;
-    margin: 15px 0;
-}
-
-.line-left {
-    flex-direction: row-reverse; 
-}
-
-.line-right {
-    flex-direction: row; 
-}
-
-.ui-dot {
-    width: 8px;
-    height: 8px;
-    background-color: #FF0000;
-    border-radius: 50%;
-    flex-shrink: 0; 
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    /* Sin box-shadow para evitar difuminado */
-}
-
-.ui-line {
-    height: 2px;
-    background-color: #FF0000;
-    width: 0%; 
-    will-change: width;
-    /* Sin box-shadow para evitar difuminado */
-}
-
-/* 🖼️ LAS IMÁGENES (Suben limpiamente desde abajo) */
-.ui-image-wrapper {
-    position: relative;
-    width: 100%;
-    border-radius: 12px;
-    overflow: hidden;
-    opacity: 0;
-    padding: 2.5px;
-    background: transparent;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9);
-    will-change: transform, opacity; /* 👈 Optimización para animaciones fluidas */
-}
-
-.ui-image-wrapper::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    /* 🔴 Combinación Conic Gradient Rojo y Negro 🖤 */
-    background: conic-gradient(from 0deg, #FF0000, #000000, #D60027, #111111, #FF0000);
-    animation: rotateImgBorder 4s linear infinite;
-    z-index: 0;
-}
-
-.ui-image-wrapper img {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 9.5px;
-}
-
-@keyframes rotateImgBorder {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* 📍 BLOQUE ESQUINA INFERIOR IZQUIERDA */
-.ui-bottom-left {
-    position: absolute;
-    bottom: 10%; 
-    left: 6vw;  
-    max-width: 460px; /* Aumentado ligeramente para mantener el balance */
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1.4rem;
-    opacity: 0;
-    transform: translateY(20px);
-    pointer-events: auto;
-    z-index: 20;
-}
-
-/* 💥 TEXTO CON ESTILO HERO (SECCIÓN 1) 💥 */
-.ui-bottom-text {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 800; /* Igual que el título de la Sección 1 */
-    font-size: 2.2rem; /* Tamaño grande e impactante */
-    color: #ffffff;
-    line-height: 1.1;
-    letter-spacing: -1px;
-    text-transform: uppercase; /* Mayúsculas tipo Hero */
-}
-
-/* 🔴 UN SOLO BOTÓN ROJO SÓLIDO */
-.btn-red-solid {
+.destacada-link {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    padding: 0.85rem 2.2rem;
-    background-color: #FF0000;
-    color: #ffffff;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: 0.95rem;
-    text-decoration: none;
+    gap: 10px;
+    padding: 14px 26px;
     border-radius: 50px;
-    border: none;
-    outline: none;
-    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
-    transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+    border: 1.5px solid rgba(255, 255, 255, 0.32);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.88rem;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
-.btn-red-solid:hover {
-    background-color: #d60000;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 22px rgba(255, 0, 0, 0.6);
+.destacada-link:hover {
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.destacada-link-flecha {
+    color: var(--verde-suave);
+    font-weight: 800;
+}
+
+.destacada-cuerpo {
+    display: grid;
+    grid-template-columns: minmax(0, 430px) minmax(0, 1fr);
+    gap: 4rem;
+    align-items: center;
+}
+
+/* 🃏 TARJETA DE LA CUENTA
+   Sobre verde plano va en blanco: es el mismo blanco del hero, así que la
+   corona destapa "un papel blanco sobre fieltro verde". El borde degradado
+   oscuro de la maqueta antigua estaba pensado para fondo negro. */
+.cuenta-card {
+    border-radius: 18px;
+    padding: 0;
+    background-image: none;
+    background-color: #ffffff;
+    box-shadow: 0 22px 48px rgba(7, 28, 16, 0.30);
+}
+
+.cuenta-card-inner {
+    height: 100%;
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+}
+
+.cuenta-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Badge de plataformas: sobre tarjeta blanca se invierte a tinta */
+.cuenta-plataformas {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    background: var(--tinta);
+    color: #ffffff;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.cuenta-estado {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--verde-medio);
+}
+
+.cuenta-estado-punto {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--verde-medio);
+}
+
+.cuenta-img-box {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #e9e9e9;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.cuenta-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.cuenta-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-grow: 1;
+}
+
+.cuenta-titulo {
+    font-weight: 600;
+    font-size: 1.15rem;
+    line-height: 1.3;
+    color: var(--verde);
+}
+
+.cuenta-precios {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.cuenta-mxn {
+    font-weight: 800;
+    font-size: 1.85rem;
+    letter-spacing: -0.8px;
+    color: var(--tinta);
+}
+
+.cuenta-usd {
+    font-weight: 500;
+    font-size: 0.88rem;
+    color: var(--gris-texto);
+}
+
+.cuenta-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--verde);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.88rem;
+    letter-spacing: 0.4px;
+    padding: 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.cuenta-cta:hover {
+    background: var(--verde-oscuro);
+}
+
+/* Columna de texto al lado de la tarjeta */
+.destacada-aside {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    max-width: 460px;
+}
+
+.destacada-aside-kicker {
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--verde-suave);
+}
+
+.destacada-aside-texto {
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.destacada-aside-cta {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.6rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.destacada-aside-num {
+    font-weight: 800;
+    font-size: 1.35rem;
+    letter-spacing: -0.5px;
+}
+
+/* La píldora verde del hero se pierde sobre verde: aquí se invierte */
+.destacada .btn-verde-pill {
+    background: #ffffff;
+    color: var(--verde);
+    box-shadow: 0 8px 20px rgba(7, 28, 16, 0.28);
+}
+
+.destacada .btn-verde-pill:hover {
+    background: #eef5f0;
+    box-shadow: 0 12px 26px rgba(7, 28, 16, 0.34);
+}
+
+.destacada .btn-verde-pill-icono {
+    background: var(--verde);
+    color: #ffffff;
 }
 
 /* ==========================================
-   📱 RESPONSIVE - SECCIÓN 2 (MÓVIL / CELULAR)
-   ========================================== */
+   📱 RESPONSIVE - SECCIÓN 3 (CELULAR)
+   ==========================================
+   Ahora que la sección vive en el flujo y puede scrollear, ya no hace falta
+   esconder textos ni recortar la tarjeta para que todo quepa en un viewport:
+   solo se apila en una columna. */
 @media (max-width: 900px) {
 
-    /* 🔴 SECCIÓN 2 EN CELULAR: COLUMNA EN FLUJO NORMAL
-       ANTES: cada pieza iba en position:absolute con su top en % dentro de
-       una caja de alto fijo (100vh). El título sale de Supabase y la imagen
-       la sube el admin, así que ambos tienen alto VARIABLE: la tarjeta crecía
-       hacia abajo mientras el bloque del botón estaba clavado al piso, y
-       terminaban encimándose (las letras sobre la foto). Pasaba en cualquier
-       pantalla de menos de ~790px de alto, y en TODAS con títulos largos o
-       imágenes verticales.
-       AHORA: columna flex normal. Cada pieza empuja a la siguiente, así que
-       ya no se pueden encimar sin importar el largo del título, la proporción
-       de la imagen ni el alto del teléfono. El orden visual, los tamaños y
-       los espacios quedan EXACTAMENTE iguales (ver márgenes más abajo, que
-       replican los huecos que daban los porcentajes). */
-    .cases-scroll-wrapper {
-        height: auto !important;
-        min-height: 100vh !important;
-        min-height: 100svh !important;
+    .destacada {
+        gap: 1.8rem;
+        padding: clamp(5rem, 13vh, 6.5rem) 1.25rem clamp(2.5rem, 6vh, 3.5rem) 1.25rem;
     }
 
-    .cases-sticky {
-        position: relative !important;
-        height: auto !important;          /* auto: crece si el contenido no cabe */
-        min-height: 100vh !important;
-        min-height: 100svh !important;    /* svh = alto real visible en iPhone */
-        overflow: visible !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        padding: 43px 5vw 33px !important; /* mismos margenes que daba el 5%/4% */
+    .destacada-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.9rem;
     }
 
-    /* La capa de tarjetas dejaba de empujar por ser absolute; ahora forma
-       parte de la columna. El margen replica el hueco etiqueta -> título. */
-    .cases-ui-elements {
-        position: static !important;
-        inset: auto !important;
-        order: 3 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        width: 100% !important;
-        margin-top: 31px !important;
+    .destacada-titulo { font-size: clamp(1.9rem, 9vw, 2.6rem); }
+
+    /* El enlace del encabezado sobra en celular: el CTA del aside, más abajo,
+       lleva al mismo sitio y queda a mano del pulgar. */
+    .destacada-link { display: none; }
+
+    /* Una sola columna: primero la tarjeta, luego el texto y el CTA. */
+    .destacada-cuerpo {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1.8rem;
     }
 
-    /* 1. Ocultar la segunda cuenta en celular */
-    #uiRight {
-        display: none !important;
+    .destacada-aside {
+        max-width: 100%;
+        gap: 0.9rem;
     }
 
-    /* En celular solo se muestra 1 cuenta (#uiRight va oculto arriba), así
-       que la etiqueta va en singular: "CUENTA DESTACADA" */
-    .cases-bg-text-plural { display: none !important; }
-    .cases-bg-text-singular { display: inline !important; }
+    .destacada-aside-texto { font-size: 0.95rem; }
 
-    /* 2. ETIQUETA "CUENTA DESTACADA" -- CHICA Y CENTRADA ARRIBA DEL MODELO 3D
-       (rediseño según assets/maqueta2.png: antes iba oculta por completo;
-       ahora se muestra como etiqueta pequeña en vez del texto gigante de PC) */
-    .cases-bg-text {
-        display: block !important;
-        position: static !important;   /* antes: absolute top 22% */
-        order: 2 !important;
-        transform: none !important;
-        margin-top: 14px !important;   /* mismo hueco que tenia bajo el modelo */
-        text-align: center !important;
-        font-size: 0.95rem !important;
-        letter-spacing: 2px !important;
-        z-index: 12 !important;
+    .destacada-aside-cta {
+        justify-content: space-between;
+        gap: 0.8rem;
+        margin-top: 0;
+        padding-top: 1.2rem;
     }
 
-    /* 3. MODELO 3D DORADO -- ARRIBA Y CENTRADO (rediseño: antes quedaba
-       abajo y medio cortado a la derecha, ahora encabeza la sección) */
-    .cases-model-container {
-        position: static !important;   /* antes: absolute top 5% left 50% */
-        order: 1 !important;
-        width: 130px !important;
-        height: 130px !important;
-        flex: 0 0 auto !important;     /* que no lo aplaste el flex */
-        transform: none !important;
-        z-index: 8 !important;
-        pointer-events: none !important;
-    }
+    .destacada-aside-num { font-size: 1.15rem; }
 
-    /* 4. TARJETA ÚNICA DE CUENTA: título+precio arriba, imagen abajo
-       (rediseño: el orden visual ahora es título -> precio -> imagen) */
-    .ui-card.ui-left {
-        position: static !important;   /* antes: absolute top 28% left 5vw */
-        order: 1 !important;
-        width: 100% !important;
-        max-width: 360px !important;
-        padding-left: 0 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        z-index: 15 !important;
-    }
+    .destacada .btn-verde-pill { padding: 13px 22px; font-size: 0.85rem; }
 
-    /* 🔥 LÍNEA ROJA SUPERIOR -- la maqueta ya no la muestra aquí, la línea
-       divisoria ahora va abajo del todo, ver .ui-bottom-left::before 🔥 */
-    .ui-left .line-left {
-        display: none !important;
-    }
-
-    /* 🖼️ IMAGEN DE LA CUENTA -- ahora va DESPUÉS del título/precio */
-    .ui-left .ui-image-wrapper {
-        order: 2 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        margin-top: 46px !important; /* 👈 Baja la imagen para acercarla a la línea de abajo */
-        margin-bottom: 0 !important;
-    }
-
-    /* 🔴 MARCO DEGRADADO EN MÓVIL */
-    .ui-image-wrapper::before {
-        animation: none !important;
-        background: linear-gradient(to top, #4a0000 0%, #c70707 100%) !important;
-    }
-
-    /* 1. CONTENEDOR DEL TÍTULO Y PRECIO -- CENTRADO Y PRIMERO EN EL ORDEN */
-    .ui-left .ui-title {
-        order: 1 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        text-align: center !important;
-        width: 100% !important;
-        white-space: normal !important;
-        gap: 4px !important;
-        margin-top: 14px !important; /* 👈 Centra el título+precio en el hueco entre la etiqueta y la imagen */
-        position: static !important;
-    }
-
-    /* 2 Y 3. TÍTULO DE LA CUENTA -- centrado, con resplandor rojo (como en
-       la maqueta) además del degradado que ya tenía */
-    .ui-left .ui-title-text {
-        font-family: 'Montserrat', sans-serif !important;
-        font-size: 2.3rem !important;
-        font-weight: 900 !important;
-        text-transform: uppercase !important;
-        letter-spacing: 1px !important;
-        line-height: 0.95 !important;
-        text-align: center !important;
-        max-width: 260px !important; /* 👈 AUMENTADO: Ahora "WILDCAT" cabe completo sin soltar la "T" */
-        margin: 0 auto !important;
-        word-break: break-word !important;
-
-        background: linear-gradient(to top, #4a0000 0%, #ff0000 100%) !important;
-        -webkit-background-clip: text !important;
-        background-clip: text !important;
-        -webkit-text-fill-color: transparent !important;
-        color: transparent !important;
-    }
-
-    /* 2. PRECIO DE LA CUENTA (LETRAS MÁS DELGADAS Y GRIS FUERTE) */
-    .ui-left .ui-price-text {
-        font-family: 'Montserrat', sans-serif !important;
-        font-size: 1.4rem !important;
-        font-weight: 500 !important; /* 👈 Letra más delgada */
-        color: #888888 !important;   /* 👈 Gris fuerte */
-        margin-left: 0 !important;
-        margin-top: 6px !important;
-        letter-spacing: 1px !important;
-        text-align: center !important;
-        text-shadow: none !important;
-    }
-
-    /* 5. Bloque Inferior: línea divisoria + Texto + Botón "Ver catálogo" */
-    .ui-bottom-left {
-        position: static !important;   /* antes: absolute bottom 4% */
-        order: 2 !important;
-        width: 100% !important;
-        max-width: 360px !important;
-        margin-top: 29px !important;   /* mismo hueco que tenia bajo la imagen */
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        text-align: center !important;
-        gap: 1.2rem !important;
-    }
-
-    /* Línea roja divisoria arriba del texto "Revisa nuestro catálogo..."
-       (reemplaza a la línea que antes iba arriba de la imagen) */
-    .ui-bottom-left::before {
-        content: '' !important;
-        display: block !important;
-        width: 100% !important;
-        height: 2px !important;
-        background: #ff0000 !important;
-        box-shadow: 0 0 10px 2px rgba(255, 0, 0, 0.6) !important;
-        margin-bottom: 6px !important; /* 👈 Centra la línea en el hueco entre la imagen y el texto de abajo */
-    }
-
-    .ui-bottom-text {
-        font-size: 1.35rem !important;
-        text-align: center !important;
-        line-height: 1.15 !important;
-        width: 100% !important;
-    }
-
-    .btn-red-solid {
-        align-self: center !important;
-    }
+    .cuenta-card-inner { padding: 14px; gap: 11px; }
+    .cuenta-mxn { font-size: 1.55rem; }
+    .cuenta-titulo { font-size: 1.02rem; }
+    .cuenta-cta { padding: 14px; }
 }
 
 /* ==========================================
-   SECCIÓN 3: POR QUÉ ANXIE & DISCORD
-   ========================================== */
+   📱 RESPONSIVE - SECCIÓN 3 (TABLET)
+   ==========================================
+   Entre 601 y 900px sigue mandando la columna única, pero hay ancho de sobra:
+   la tarjeta y el texto se centran a un ancho cómodo de lectura. */
+@media (min-width: 601px) and (max-width: 900px) {
+
+    .destacada {
+        padding: clamp(5.5rem, 11vh, 7rem) 2.5rem clamp(3rem, 6vh, 4rem) 2.5rem;
+        gap: 2.2rem;
+    }
+
+    .destacada-cuerpo { justify-items: center; }
+    .cuenta-card  { width: 100%; max-width: 560px; }
+    .destacada-aside { width: 100%; max-width: 560px; }
+}
+
+
+/* ==========================================
+   SECCIÓN 4: POR QUÉ ANXIE & DISCORD
+   ==========================================
+   Las clases siguen llamándose .seccion-tres (y el wrapper sigue siendo
+   #features, que es a donde apunta el enlace "Contacto" de la navbar): solo
+   cambió de número al mudarse la cuenta destacada a la sección 3. */
 .seccion-tres-scroll-wrapper {
     position: relative;
     width: 100vw;
@@ -1505,108 +1587,6 @@ model-viewer::part(default-ar-button) {
     }
 }
 
-/* --- BLOQUEO DE SCROLL SOLO DURANTE LA INTRO --- */
-body.bloqueado {
-    overflow: hidden !important;
-}
-
-/* --- CAPA INTRO NEGRA Y CENTRADA --- */
-.intro-layer {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: #000000;
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: opacity 1.2s ease, visibility 1.2s ease;
-}
-
-/* Fondo 3D de Spline (Estrellitas) al fondo */
-.intro-layer spline-viewer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    pointer-events: none;
-}
-
-/* Contenedor del Logo + Puntos al frente */
-.intro-content {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1.8rem;
-    opacity: 0;
-    transform: scale(0.95);
-    transition: opacity 1.2s ease, transform 1.2s ease;
-    pointer-events: none;
-}
-
-.intro-content.revelado {
-    opacity: 1;
-    transform: scale(1);
-}
-
-/* Imagen anxie.png con sombra Neón BLANCA y más grande */
-.intro-logo {
-    width: 100%;
-    max-width: 500px; /* Tamaño mucho más grande bro 💥 */
-    height: auto;
-    object-fit: contain;
-    /* 👈 Eliminamos la línea de filter: drop-shadow(...) que estaba aquí */ 
-}
-
-/* 🔴 3 PUNTITOS DE CARGA ANIMADOS 🔴 */
-.loading-dots {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.loading-dots span {
-    width: 10px;
-    height: 10px;
-    background-color: #ffffff;
-    border-radius: 50%;
-    animation: dotPulse 1.4s infinite ease-in-out both;
-    box-shadow: 0 0 10px rgba(196, 194, 194, 0.8);
-}
-
-.loading-dots span:nth-child(1) {
-    animation-delay: -0.32s;
-}
-
-.loading-dots span:nth-child(2) {
-    animation-delay: -0.16s;
-}
-
-@keyframes dotPulse {
-    0%, 80%, 100% {
-        transform: scale(0.4);
-        opacity: 0.3;
-    }
-    40% {
-        transform: scale(1.2);
-        opacity: 1;
-    }
-}
-
-/* Salida suave de toda la capa */
-.intro-layer.oculto {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-}
-
 /* ==========================================
    FOOTER / BARRA INFERIOR DE REDES SOCIALES
    ========================================== */
@@ -1614,7 +1594,9 @@ body.bloqueado {
     position: relative;
     z-index: 30;
     width: 100%;
-    background-color: #000000;
+    /* Verde oscuro en vez de negro: la página cierra dentro de la paleta
+       del rediseño. Lo comparten index, catalogo y legal. */
+    background-color: var(--verde-oscuro);
     padding: 2rem 1rem 1.5rem 1rem;
     display: flex;
     flex-direction: column;
@@ -1677,9 +1659,36 @@ body.bloqueado {
 .footer-copy {
     font-family: 'Montserrat', sans-serif;
     font-size: 0.8rem;
-    color: #555555;
+    /* Blanco translúcido y no un gris fijo: el footer ya no es negro sino
+       verde oscuro, y un #555 encima se lee embarrado. */
+    color: rgba(255, 255, 255, 0.55);
     text-align: center;
     letter-spacing: 0.5px;
+}
+
+/* ====== ENLACE LEGAL DEL FOOTER ====== */
+.footer-legal-link {
+    color: rgba(255, 255, 255, 0.55);            /* = .footer-copy */
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.footer-legal-link:hover {
+    color: #FF0000;                              /* rojo de la marca */
+    border-bottom-color: #FF0000;
+}
+
+/* ====== LÍNEA DE MARCAS Y NO AFILIACIÓN EN EL FOOTER ====== */
+.footer-marcas {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.42);
+    text-align: center;
+    letter-spacing: 0.3px;
+    line-height: 1.5;
+    max-width: 620px;
+    margin: 0 auto;
 }
 
 /* 📱 RESPONSIVE FOOTER */
@@ -1691,17 +1700,9 @@ body.bloqueado {
     .footer-mobile-social {
         display: flex !important;
     }
-}
 
-/* ==========================================
-   PRECIO EN ROJO AL LADO DEL TÍTULO (SIN CAJA)
-   ========================================== */
-.ui-price-text {
-    display: inline-block;
-    color: #FF0000;
-    font-weight: 800;
-    font-size: 1.05rem;
-    margin-left: 12px;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
+    .footer-marcas {
+        font-size: 0.65rem;
+        padding: 0 0.5rem;
+    }
 }

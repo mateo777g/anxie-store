@@ -14,41 +14,22 @@
     <!-- Google Fonts: Montserrat + Rock Salt -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Rock+Salt&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260831c">
+    <link rel="stylesheet" href="style.css?v=20260915b">
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
     
-    <!-- Visor 3D de Google para archivos .glb (Sección 2) -->
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-
     <!-- CDN de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script src="supabase-config.js?v=20260831c"></script>
     <script src="catalog-cache.js?v=20260831c"></script>
 </head>
-<body class="bloqueado">
-
-    <!-- 🖤 CAPA INTRO CON FONDO 3D Y LOGO 🖤 -->
-    <div class="intro-layer" id="introLayer">
-        <!-- Fondo 3D de Spline (Estrellitas) -->
-        <spline-viewer url="https://prod.spline.design/3Vv30SzKg0wcuP8S/scene.splinecode"></spline-viewer>
-
-        <!-- Logo + Puntitos -->
-        <div class="intro-content" id="introContent">
-            <img src="assets/anxie.png" alt="ANXIE STORE Logo" class="intro-logo">
-            <div class="loading-dots">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-    </div>
+<body>
 
     <!-- 🌟 BARRA DE NAVEGACIÓN SUPERIOR 🌟 -->
-    <nav class="navbar">
+    <nav class="navbar visible navbar-claro">
         <div class="logo-container">
             <img src="assets/logo.jpg" alt="Logo ANXIE STORE" class="logo-img">
             <span class="logo-texto">ANXIE STORE</span>
@@ -86,136 +67,236 @@
         </ul>
     </aside>
 
-    <!-- WRAPPER PARA EL EFECTO SCROLL-JACKING -->
-    <div class="hero-scroll-wrapper" id="home">
-        
-        <!-- SECCIÓN 1: HERO (Partículas Rojas) -->
-        <header class="hero">
+    <!-- ==========================================================
+         SECCIÓN 1: HERO CLARO
+         Sin intro y sin Spline: entra directo a la promesa, la marca y las
+         dos acciones. El scroll-jacking ya no vive aquí, vive en el portal
+         de la corona que va justo debajo.
+         ========================================================== -->
+    <header class="hero" id="home">
 
-            <!-- Fondo 3D: Partículas Rojas (Capa 1: Fondo) -->
-            <div class="contenedor-3d">
-                <spline-viewer url="https://prod.spline.design/t2Ye0Y98VTQQyFyc/scene.splinecode"></spline-viewer>
-            </div>
+        <div class="hero-inner">
 
-            <!-- 📱 Avatar difuminado de fondo (Capa 2, SOLO celular) -->
-            <img src="assets/diseño.png" alt="" class="hero-avatar-mobile" id="heroAvatarMobile" aria-hidden="true">
-
-            <!-- 🎯 MERO CENTRO: MARCA (Capa 5) -->
-            <div class="hero-center-brand" id="heroBrand">
-                <h1 class="brand-title">
-                    <span class="brand-red">ANXIE</span>
-                    <span class="brand-black">STORE</span>
+            <!-- 🟩 PROMESA -->
+            <div class="hero-promesa">
+                <h1 class="hero-headline">
+                    Adquiere ya tus cuentas<br>de <span class="acento-verde">videojuegos.</span>
                 </h1>
-                <span class="brand-sub-red">TIENDA DE CUENTAS</span>
-
-                <!-- 📱 BOTONES "IR A DISCORD" Y "VER CATÁLOGO" SOLO PARA CELULARES -->
-                <div class="hero-mobile-btn">
-                    <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener" class="btn-underline-mobile">
-                        Ir a Discord
-                    </a>
-                    <a href="catalogo.html#cases" class="btn-pill-mobile">
-                        Ver Catálogo
-                    </a>
+                <div class="hero-eyebrow">
+                    <span class="eyebrow-punto"></span>
+                    <span class="eyebrow-linea"></span>
+                    <span class="eyebrow-texto">Tienda de cuentas</span>
                 </div>
             </div>
 
-            <!-- 🔻 ESQUINAS INFERIORES (Capa 10: Botones y sombras por encima) -->
-            <div class="hero-bottom-content" id="heroBottomContent">
-                
-                <div class="hero-left">
-                    <h2 class="hero-title" id="heroTitleMobile">
-                        COMPRA TUS CUENTAS<br>DE VIDEOJUEGOS
-                    </h2>
+            <!-- 👑 MARCA CENTRAL + PRUEBA SOCIAL -->
+            <div class="hero-marca">
+                <div class="hero-wordmark">
+                    <span class="wordmark-verde">Anxie</span>
+                    <span class="wordmark-negro">Store</span>
                 </div>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <span class="hero-stat-num">2 años</span>
+                        <span class="hero-stat-label">Vendiendo</span>
+                    </div>
+                    <span class="hero-stat-sep"></span>
+                    <div class="hero-stat">
+                        <span class="hero-stat-num acento-verde">+700</span>
+                        <span class="hero-stat-label">Referencias</span>
+                    </div>
+                </div>
+            </div>
 
-                <div class="hero-right">
-                    <p class="hero-description">
-                        Revisa nuestro catálogo de cuentas de Fortnite y elige la que más te guste.
+            <!-- 🎯 ACCIONES -->
+            <div class="hero-acciones">
+
+                <div class="hero-acciones-izq">
+                    <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener" class="btn-discord-linea">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M4 5h16v11H8l-4 4Z"></path>
+                            <path d="M9 10.5h.01M15 10.5h.01"></path>
+                        </svg>
+                        Únete al Discord
+                    </a>
+                    <p class="hero-acciones-texto">
+                        Únete a nuestra comunidad de Discord, resuelve dudas y adquiere tu cuenta.
                     </p>
-
-                    <div class="hero-buttons">
-                        <a href="#features" class="btn-animated">
-                            <span class="btn-animated-inner">
-                                Contáctanos
-                            </span>
-                        </a>
-                        <a href="catalogo.html#cases" class="btn-animated">
-                            <span class="btn-animated-inner">
-                                Ver Catálogo
-                                <span class="btn-icon">+</span>
-                            </span>
-                        </a>
-                    </div>
                 </div>
+
+                <div class="hero-acciones-der">
+                    <div class="hero-conteo">
+                        <span class="hero-conteo-label">En el catálogo</span>
+                        <span class="hero-conteo-num"><span class="acento-verde" id="heroConteo">+40</span> cuentas</span>
+                    </div>
+                    <a href="catalogo.html#cases" class="btn-verde-pill">
+                        Ver catálogo
+                        <span class="btn-verde-pill-icono" aria-hidden="true">&rarr;</span>
+                    </a>
+                </div>
+
             </div>
-            
-        </header>
+
+        </div>
+
+        <!-- ⬛ FRANJA DE PLATAFORMAS -->
+        <div class="hero-plataformas">
+            <span>PC</span>
+            <span class="franja-punto"></span>
+            <span>Xbox</span>
+            <span class="franja-punto"></span>
+            <span>PlayStation</span>
+            <span class="franja-punto"></span>
+            <span>Nintendo Switch</span>
+            <span class="franja-punto"></span>
+            <span>Entrega acompañada</span>
+        </div>
+
+    </header>
+
+    <!-- ==========================================================
+         SECCIÓN 2: PORTAL DE LA CORONA
+         Una sola cosa y nada más: la transición. El wrapper mide varias
+         pantallas, la capa de dentro se queda pegada (sticky) y la silueta de
+         assets/corona-silueta.svg se usa como máscara CSS sobre un lienzo verde
+         plano. Al scrollear crece su mask-size hasta tragarse la pantalla y
+         suelta hacia la sección 3.
+
+         AQUÍ DENTRO NO VA CONTENIDO, a propósito. Cuando la cuenta destacada
+         vivía enmascarada había que medir en JS el hueco que dejaba la maqueta
+         para que la corona en reposo no pisara la tarjeta, y eso se rompía con
+         cada cambio de layout y en cada pantalla rara. Ahora la corona reposa
+         centrada y ya está; el contenido vive en la sección 3, en flujo normal.
+         El tamaño lo escribe actualizarCorona() abajo.
+         ========================================================== -->
+    <div class="corona-portal" id="coronaPortal">
+        <div class="corona-pin">
+
+            <!-- Marca de agua del lado blanco. Dice lo mismo y va en la misma
+                 posición que la del lienzo, así que la corona no destapa "otra
+                 cosa": invierte el mismo logotipo de gris sobre blanco a blanco
+                 sobre verde. El lienzo hace zoom y esta no, y ese desfase es el
+                 que da la sensación de profundidad. -->
+            <span class="corona-watermark" aria-hidden="true">Anxie<br>Store</span>
+
+            <!-- Marcas de encuadre, mitad de abajo: van DEBAJO de la capa
+                 enmascarada, así que el verde se las va tragando. -->
+            <span class="corona-esquina corona-esquina-baja esq-si"></span>
+            <span class="corona-esquina corona-esquina-baja esq-sd"></span>
+            <span class="corona-esquina corona-esquina-baja esq-ii"></span>
+            <span class="corona-esquina corona-esquina-baja esq-id"></span>
+
+            <!-- Cierre en verde plano: rellena lo que la silueta deje suelto
+                 en el último tramo del recorrido. -->
+            <div class="corona-cierre" id="coronaCierre"></div>
+
+            <!-- ⬇️ EL LIENZO: es lo único que la corona destapa ⬇️
+                 Verde SÓLIDO, sin texto: la corona tiene que leerse POR ENCIMA
+                 del logotipo de fondo, no con las letras atravesándola. Antes
+                 aquí dentro iba una segunda copia de la marca (en blanco sobre
+                 verde) para que el destapado "invirtiera" el mismo logotipo,
+                 pero al coincidir exactas las dos capas el texto se leía como
+                 una sola línea pasando por delante de la silueta.
+                 Hace zoom de 1 a 1.22 a lo largo del recorrido: ese movimiento
+                 de fondo es lo que convierte el destapado en una zambullida. -->
+            <div class="corona-mask" id="coronaMask">
+
+                <div class="corona-lienzo"></div>
+
+                <!-- Marcas de encuadre, mitad de arriba: van DENTRO de la
+                     máscara, así que cada esquina pasa de negra a blanca justo
+                     cuando la corona la alcanza. Sin JS y sin mix-blend-mode. -->
+                <span class="corona-esquina corona-esquina-alta esq-si"></span>
+                <span class="corona-esquina corona-esquina-alta esq-sd"></span>
+                <span class="corona-esquina corona-esquina-alta esq-ii"></span>
+                <span class="corona-esquina corona-esquina-alta esq-id"></span>
+
+            </div>
+
+            <div class="corona-pista" id="coronaPista">
+                <span>Scroll</span>
+                <span class="corona-pista-flecha"></span>
+            </div>
+
+        </div>
     </div>
 
-    <!-- SECCIÓN 2: CATÁLOGO ANIMADO (SCROLL-JACKING) -->
-    <div class="cases-scroll-wrapper" id="cases-wrapper">
-        <section class="cases-sticky" id="cases">
-            
-            <!-- 1. Texto Gigante de fondo -->
-            <div class="cases-bg-text" id="casesBgText">
-                <!-- 💻 PC: muestra 2 cuentas -> plural -->
-                <span class="cases-bg-text-plural"><span class="text-red">CUENTAS</span> <span class="text-gray">DESTACADAS</span></span>
-                <!-- 📱 Celular: solo muestra 1 cuenta -> singular -->
-                <span class="cases-bg-text-singular"><span class="text-red">CUENTA</span> <span class="text-gray">DESTACADA</span></span>
+    <!-- ==========================================================
+         SECCIÓN 3: CUENTA DESTACADA
+         Antes vivía enmascarada dentro del portal; ahora es una sección normal
+         del flujo, con su verde plano, y aparece cuando la corona ya terminó de
+         destapar. Al estar en flujo puede crecer y hacer scroll si hace falta,
+         así que ya no hay que recortar textos para que quepan en un viewport.
+         ========================================================== -->
+    <section class="destacada" id="cases">
+
+        <div class="destacada-header">
+            <div class="destacada-header-txt">
+                <div class="destacada-eyebrow">
+                    <span class="eyebrow-punto"></span>
+                    <span class="eyebrow-linea"></span>
+                    <span class="eyebrow-texto">Lo más cotizado</span>
+                </div>
+                <h2 class="destacada-titulo">Cuenta<br>destacada</h2>
+            </div>
+            <a href="catalogo.html#cases" class="destacada-link">
+                Ver catálogo completo
+                <span class="destacada-link-flecha" aria-hidden="true">&rarr;</span>
+            </a>
+        </div>
+
+        <div class="destacada-cuerpo">
+
+            <article class="cuenta-card" id="cuentaDestacada">
+                <div class="cuenta-card-inner">
+
+                    <div class="cuenta-card-top">
+                        <span class="cuenta-plataformas" id="destPlataformas">DISPONIBLE</span>
+                        <span class="cuenta-estado">
+                            <span class="cuenta-estado-punto"></span>
+                            Disponible
+                        </span>
+                    </div>
+
+                    <div class="cuenta-img-box">
+                        <img id="destImg" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="">
+                    </div>
+
+                    <div class="cuenta-info">
+                        <span class="cuenta-titulo" id="destTitulo">Cargando...</span>
+                        <div class="cuenta-precios">
+                            <span class="cuenta-mxn" id="destMxn"></span>
+                            <span class="cuenta-usd" id="destUsd"></span>
+                        </div>
+                    </div>
+
+                    <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener" class="cuenta-cta">
+                        Comprar por Discord
+                    </a>
+
+                </div>
+            </article>
+
+            <div class="destacada-aside">
+                <p class="destacada-aside-kicker">La más cotizada ahora mismo</p>
+                <p class="destacada-aside-texto">
+                    Es la cuenta más cara del catálogo en este momento y se actualiza sola cada vez
+                    que entra una cuenta nueva a la tienda. Si buscas algo más a tu medida, el
+                    catálogo completo tiene filtros por precio, plataforma y skin.
+                </p>
+                <div class="destacada-aside-cta">
+                    <span class="destacada-aside-num"><span class="acento-verde-claro" id="destTotal">40</span> cuentas más</span>
+                    <a href="catalogo.html#cases" class="btn-verde-pill">
+                        Ver catálogo
+                        <span class="btn-verde-pill-icono" aria-hidden="true">+</span>
+                    </a>
+                </div>
             </div>
 
-            <!-- 2. Modelo 3D Fijo al centro -->
-            <div class="cases-model-container">
-                <model-viewer 
-                    id="coronaModel"
-                    src="assets/chanti.glb" 
-                    alt="Corona Fortnite 3D Dorada" 
-                    disable-zoom
-                    disable-pan
-                    shadow-intensity="1"
-                    interaction-prompt="none"
-                    camera-orbit="0deg 75deg 105%">
-                </model-viewer>
-            </div>
+        </div>
+    </section>
 
-            <!-- 3. Interfaz (Líneas, Textos, Cuentas y CTA) -->
-            <div class="cases-ui-elements">
-                
-                <!-- Tarjeta Izquierda (Cuenta #1 Más Cara) -->
-                <div class="ui-card ui-left" id="uiLeft">
-                    <h3 class="ui-title">Cargando...</h3>
-                    <div class="ui-line-container line-left">
-                        <div class="ui-dot"></div>
-                        <div class="ui-line"></div>
-                    </div>
-                    <div class="ui-image-wrapper">
-                        <img src="assets/cuenta.png" alt="Cuenta Fortnite 1">
-                    </div>
-                </div>
-
-                <!-- Tarjeta Derecha (Cuenta #2 Más Cara) -->
-                <div class="ui-card ui-right" id="uiRight">
-                    <div class="ui-image-wrapper">
-                        <img src="assets/cuenta2.png" alt="Cuenta Fortnite 2">
-                    </div>
-                    <div class="ui-line-container line-right">
-                        <div class="ui-dot"></div>
-                        <div class="ui-line"></div>
-                    </div>
-                    <h3 class="ui-title">Cargando...</h3>
-                </div>
-
-                <!-- BLOQUE INFERIOR IZQUIERDA -->
-                <div class="ui-bottom-left" id="uiBottomLeft">
-                    <p class="ui-bottom-text">Revisa nuestro catálogo completo de cuentas.</p>
-                    <a href="catalogo.html#cases" class="btn-red-solid">Ver catálogo</a>
-                </div>
-
-            </div>
-        </section>
-    </div>
-
-    <!-- SECCIÓN 3: POR QUÉ ANXIE STORE & DISCORD -->
+    <!-- SECCIÓN 4: POR QUÉ ANXIE STORE & DISCORD -->
     <div class="seccion-tres-scroll-wrapper" id="features">
         <section class="seccion-tres">
             <div class="seccion-tres-container">
@@ -299,7 +380,8 @@
                 </a>
             </div>
             
-            <p class="footer-copy">&copy; 2026 ANXIE STORE. By Matthew.</p>
+            <p class="footer-copy">&copy; 2026 ANXIE STORE. <a href="legal.html" class="footer-legal-link">Aviso Legal</a></p>
+            <p class="footer-marcas">Anxie Store es un vendedor independiente, no afiliado ni patrocinado por Epic Games, Inc. Fortnite y V-Bucks son marcas de sus respectivos titulares.</p>
         </div>
     </footer>
 
@@ -316,14 +398,60 @@
             }[c]));
         }
 
-        // 🟢 REEMPLAZA LA FUNCIÓN cargarCuentasMasCaras() EN TU index.html POR ESTA:
+        // 🎮 BADGES DE PLATAFORMA
+        // Copia de la misma función de catalogo.html: `disponibilidad` es texto
+        // libre y de ahí se sacan los iconos de PC / XBOX / PLAY / NINTENDO.
+        // Si agregas una plataforma, agrégala en LAS DOS páginas.
+        function renderPlataformasHTML(texto) {
+            if (!texto) return 'DISPONIBLE';
+
+            const platforms = [
+                {
+                    regex: /\b(PC|COMPU|DESKTOP)\b/i,
+                    name: 'PC',
+                    svg: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="margin-right: 5px; vertical-align: -2px;"><path fill-rule="evenodd" clip-rule="evenodd" d="M4 4C2.89543 4 2 4.89543 2 6V16C2 17.1046 2.89543 18 4 18H10V20H7C6.44772 20 6 20.4477 6 21C6 21.5523 6.44772 22 7 22H17C17.5523 22 18 21.5523 18 21C18 20.4477 17.5523 20 17 20H14V18H20C21.1046 18 22 17.1046 22 16V6C22 4.89543 21.1046 4 20 4H4ZM4 6H20V16H4V6Z" fill="#00D2FF"/></svg>`
+                },
+                {
+                    regex: /\b(XBOX|XBX|XONE)\b/i,
+                    name: 'XBOX',
+                    svg: `<svg width="15" height="15" viewBox="0 0 100 100" fill="none" style="margin-right: 5px; vertical-align: -2px;"><circle cx="50" cy="50" r="50" fill="#107C10"/><path fill="#FFFFFF" d="M33.7 26.1C38.2 28.5 44.5 33 50 39.4c5.5-6.4 11.8-10.9 16.3-13.3 2.8 3 5 6.6 6.5 10.4-3.5 3.3-9.5 8.8-15.1 16 7 10.6 14.8 20.3 18.2 24.3-2.2 2.7-4.9 5-7.9 6.8-4.5-5.3-11.8-14.8-18-23.8-6.2 9-13.5 18.5-18 23.8-3-1.8-5.7-4.1-7.9-6.8 3.4-4 11.2-13.7 18.2-24.3-5.6-7.2-11.6-12.7-15.1-16 1.5-3.8 3.7-7.4 6.5-10.4z"/></svg>`
+                },
+                {
+                    regex: /\b(PLAY|PS|PS4|PS5|PLAYSTATION)\b/i,
+                    name: 'PLAY',
+                    svg: `<svg width="15" height="15" viewBox="0 0 100 100" fill="none" style="margin-right: 5px; vertical-align: -2px;"><circle cx="50" cy="50" r="50" fill="#003791"/><path fill="#FFFFFF" d="M56.8 30.6v27.2c3.5-.8 6.2-2.3 6.2-4.4 0-2.8-4.2-3.8-9.4-4.6v-8.8c8.3.8 16.8 2.8 16.8 9.5 0 6.1-7.1 9.4-13.6 10.7v9.4l-6.9 2.3V25l6.9 5.6zm-13.7 13c-4.8 0-9 1.1-11.8 2.6l2.3 5.4c2.5-1.1 5.8-1.9 9.5-1.9 3.2 0 4.6.8 4.6 2.1 0 1.2-1.1 1.8-4.6 2.4-7.4 1.2-12.7 3.2-12.7 8.3 0 5.1 5.3 7.6 12.3 7.6 5.5 0 10.3-1.3 13.5-3l-2.3-5.5c-2.7 1.3-6.5 2.2-10.8 2.2-3.8 0-5.8-.8-5.8-2.2 0-1.4 1.5-2 5.1-2.6 7.6-1.2 12.4-3.4 12.4-8.1 0-5.8-5.5-7.3-11.7-7.3z"/></svg>`
+                },
+                {
+                    regex: /\b(NINTENDO|SWITCH|SWUICH|NSW)\b/i,
+                    name: 'NINTENDO',
+                    svg: `<svg width="15" height="15" viewBox="0 0 100 100" fill="none" style="margin-right: 5px; vertical-align: -2px;"><rect width="100" height="100" rx="20" fill="#E60012"/><path fill="#FFFFFF" d="M28 20h18v60H28a12 12 0 0 1-12-12V32a12 12 0 0 1 12-12zm6 12a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 24a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm20-36h18a12 12 0 0 1 12 12v36a12 12 0 0 1-12 12H54V20zm14 20a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg>`
+                }
+            ];
+
+            let found = [];
+            platforms.forEach(p => {
+                if (p.regex.test(texto)) {
+                    found.push(`<span class="platform-item" style="display:inline-flex; align-items:center; margin-right:10px;">${p.svg}<span>${p.name}</span></span>`);
+                }
+            });
+
+            if (found.length === 0) {
+                let limpio = texto.replace(/:\w+:/g, '').trim();
+                return escapeHTML(limpio || texto);
+            }
+
+            return found.join('');
+        }
+
+        // 👑 CUENTA DESTACADA (la más cara del catálogo)
         // forceRefresh=true salta el caché -- lo usa la suscripción Realtime para
         // que un cambio en Supabase se refleje al instante en vez de esperar a que
         // expire el caché de 5 minutos (que puede seguir "fresco" aunque los datos
         // ya hayan cambiado en la base).
-        async function cargarCuentasMasCaras(forceRefresh = false) {
+        async function cargarCuentaDestacada(forceRefresh = false) {
             try {
-                let cuentas = null;
+                let cuenta = null;
+                let total = null;
 
                 // Intentar usar el caché si el usuario ya visitó el catálogo
                 if (!forceRefresh) {
@@ -332,58 +460,64 @@
                         if (cachedStr) {
                             const cached = JSON.parse(cachedStr);
                             if (Date.now() - cached.timestamp < 5 * 60 * 1000) {
-                                cuentas = [...cached.data]
-                                    .sort((a, b) => Number(b.preciomxn) - Number(a.preciomxn))
-                                    .slice(0, 2);
+                                const ordenadas = [...cached.data]
+                                    .sort((a, b) => Number(b.preciomxn) - Number(a.preciomxn));
+                                cuenta = ordenadas[0] || null;
+                                total = cached.data.length;
                             }
                         }
                     } catch (e) {}
                 }
 
-                // Si no hay caché, query mínima: solo 2 filas y solo lo que necesitas
-                if (!cuentas || cuentas.length === 0) {
-                    const { data, error } = await _supabase
+                // Sin caché: una sola fila, y el conteo total viaja en la MISMA
+                // petición gracias a count:'exact', así que no cuesta una query extra.
+                if (!cuenta) {
+                    const { data, count, error } = await _supabase
                         .from('Cuentas')
-                        .select('titulo, preciomxn, image_url')
+                        .select('titulo, preciomxn, preciousd, image_url, disponibilidad', { count: 'exact' })
                         .order('preciomxn', { ascending: false })
-                        .limit(2);
+                        .limit(1);
 
                     if (error) throw error;
-                    cuentas = data || [];
+                    cuenta = (data || [])[0] || null;
+                    total = count;
                 }
 
-                if (!cuentas || cuentas.length === 0) return;
-
-                // 1ª MÁS CARA -> Tarjeta Izquierda (uiLeft)
-                if (cuentas[0]) {
-                    const leftTitle = document.querySelector('#uiLeft .ui-title');
-                    const leftImg = document.querySelector('#uiLeft .ui-image-wrapper img');
-                    
-                    if (leftTitle) {
-                        leftTitle.innerHTML = `<span class="ui-title-text">${escapeHTML(cuentas[0].titulo)}</span> <span class="ui-price-text">$${cuentas[0].preciomxn} MXN</span>`;
-                    }
-                    if (leftImg && cuentas[0].image_url) {
-                        leftImg.src = cuentas[0].image_url;
-                        leftImg.alt = cuentas[0].titulo;
-                    }
-                }
-
-                // 2ª MÁS CARA -> Tarjeta Derecha (uiRight)
-                if (cuentas[1]) {
-                    const rightTitle = document.querySelector('#uiRight .ui-title');
-                    const rightImg = document.querySelector('#uiRight .ui-image-wrapper img');
-                    
-                    if (rightTitle) {
-                        rightTitle.innerHTML = `<span class="ui-title-text">${escapeHTML(cuentas[1].titulo)}</span> <span class="ui-price-text">$${cuentas[1].preciomxn} MXN</span>`;
-                    }
-                    if (rightImg && cuentas[1].image_url) {
-                        rightImg.src = cuentas[1].image_url;
-                        rightImg.alt = cuentas[1].titulo;
-                    }
-                }
+                if (!cuenta) return;
+                pintarCuentaDestacada(cuenta, total);
 
             } catch (err) {
-                console.error("Error al cargar cuentas destacadas de Supabase:", err);
+                console.error("Error al cargar la cuenta destacada de Supabase:", err);
+            }
+        }
+
+        function pintarCuentaDestacada(cuenta, total) {
+            const titulo = document.getElementById('destTitulo');
+            const mxn = document.getElementById('destMxn');
+            const usd = document.getElementById('destUsd');
+            const img = document.getElementById('destImg');
+            const plataformas = document.getElementById('destPlataformas');
+
+            // textContent no interpreta HTML, así que aquí no hace falta escapar.
+            if (titulo) titulo.textContent = cuenta.titulo || 'Cuenta destacada';
+            if (mxn) mxn.textContent = (cuenta.preciomxn !== null && cuenta.preciomxn !== undefined)
+                ? `$${cuenta.preciomxn} MXN` : '';
+            if (usd) usd.textContent = cuenta.preciousd ? `≈ $${cuenta.preciousd} USD` : '';
+
+            // renderPlataformasHTML ya pasa el texto suelto por escapeHTML()
+            if (plataformas) plataformas.innerHTML = renderPlataformasHTML(cuenta.disponibilidad);
+
+            if (img && cuenta.image_url) {
+                img.src = cuenta.image_url;
+                img.alt = cuenta.titulo || 'Cuenta destacada de Anxie Store';
+            }
+
+            // Conteo real de cuentas (hero y sección 3)
+            if (typeof total === 'number' && total > 0) {
+                const heroConteo = document.getElementById('heroConteo');
+                const destTotal = document.getElementById('destTotal');
+                if (heroConteo) heroConteo.textContent = `+${total}`;
+                if (destTotal) destTotal.textContent = String(Math.max(total - 1, 0));
             }
         }
 
@@ -400,7 +534,7 @@
                         // también recargue de Supabase en su próxima visita, y forzar
                         // que esta página lea directo de la base ahora mismo.
                         try { sessionStorage.removeItem('anxie_catalog_v1'); } catch (e) {}
-                        cargarCuentasMasCaras(true);
+                        cargarCuentaDestacada(true);
                     }
                 )
                 .subscribe();
@@ -408,96 +542,40 @@
 
         // Iniciar carga de datos de Supabase
         window.addEventListener('DOMContentLoaded', () => {
-            cargarCuentasMasCaras();
+            cargarCuentaDestacada();
             suscribirCambiosTiempoReal();
         });
 
-        // 🛑 0. BLOQUEO DE ZOOM EN SPLINE
+        // 🛑 BLOQUEO DE ZOOM EN SPLINE (secciones 3 y footer)
         window.addEventListener('DOMContentLoaded', () => {
             const splineViewers = document.querySelectorAll('spline-viewer');
-            
+
             splineViewers.forEach(viewer => {
                 viewer.addEventListener('wheel', (e) => {
-                    e.stopPropagation(); 
+                    e.stopPropagation();
                 }, { capture: true });
             });
         });
 
-        // 🎬 1. TRANSICIÓN: INTRO -> TIENDA
+        // 🎯 NAVEGACIÓN INTELIGENTE DE NAVBAR Y SCROLL
         window.addEventListener('DOMContentLoaded', () => {
-            const intro = document.getElementById('introLayer');
-            const introContent = document.getElementById('introContent');
-            const navbar = document.querySelector('.navbar');
-            const heroBrand = document.getElementById('heroBrand');
-            const heroBottom = document.getElementById('heroBottomContent');
-            const heroAvatar = document.getElementById('heroAvatarMobile');
-            const heroTitle = document.getElementById('heroTitleMobile');
+            const navLinks = document.querySelectorAll('.nav-links a[href^="#"], .sidebar-links a[href^="#"]');
 
-            // 📱 CELULAR: Saltear intro al instante sin demoras
-            if (window.innerWidth <= 900) {
-                if (intro) intro.style.display = 'none';
-                document.body.classList.remove('bloqueado');
-                if (navbar) navbar.classList.add('visible');
-                if (heroBrand) heroBrand.classList.add('visible');
-                if (heroAvatar) heroAvatar.classList.add('visible');
-                if (heroTitle) heroTitle.classList.add('visible');
-                if (heroBottom) {
-                    heroBottom.style.opacity = '1';
-                    heroBottom.style.transform = 'translateY(0)';
-                }
-                return;
-            }
-
-            // 💻 COMPUTADORA: Mantiene la intro animada de 2 segundos intacta
-            setTimeout(() => {
-                if (introContent) introContent.classList.add('revelado');
-            }, 500);
-
-            setTimeout(() => {
-                if (intro) intro.classList.add('oculto');
-
-                if (navbar) navbar.classList.add('visible');
-                if (heroBrand) heroBrand.classList.add('visible');
-                if (heroAvatar) heroAvatar.classList.add('visible');
-                if (heroTitle) heroTitle.classList.add('visible');
-                if (heroBottom) {
-                    heroBottom.style.opacity = '1';
-                    heroBottom.style.transform = 'translateY(0)';
-                }
-
-                document.body.classList.remove('bloqueado');
-            }, 2000);
-        });
-
-        // 🎯 2. NAVEGACIÓN INTELIGENTE DE NAVBAR Y SCROLL
-        window.addEventListener('DOMContentLoaded', () => {
-            const navLinks = document.querySelectorAll('.nav-links a, .hero-buttons a[href^="#"]');
-            
             navLinks.forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
                     const targetId = this.getAttribute('href');
                     if (!targetId || targetId === '#') return;
-                    
+
                     const targetElement = document.querySelector(targetId);
                     if (targetElement) {
                         e.preventDefault();
-                        
-                        if (targetId === '#cases') {
-                            const wrapper = document.getElementById('cases-wrapper');
-                            if (wrapper) {
-                                const targetPosition = wrapper.offsetTop + (window.innerHeight * 0.8);
-                                window.scrollTo({ top: targetPosition, behavior: 'smooth' });
-                                return;
-                            }
-                        }
-                        
                         targetElement.scrollIntoView({ behavior: 'smooth' });
                     }
                 });
             });
         });
 
-        // 📱 2.5. NAVBAR: se oculta al bajar y reaparece al subir (SOLO CELULAR)
+        // 📱 NAVBAR: se oculta al bajar y reaparece al subir (SOLO CELULAR)
         (() => {
             const navbar = document.querySelector('.navbar');
             if (!navbar) return;
@@ -541,9 +619,9 @@
         // En iOS, window.innerHeight NO es constante: crece ~130px solo cuando
         // Safari colapsa su barra al scrollear. Como las animaciones de abajo
         // dividen entre ese valor, el progreso brincaba hacia atrás a media
-        // scroll (la opacidad subía de golpe y el texto se movía al revés).
-        // Lo cacheamos y solo lo recalculamos cuando cambia el ANCHO, que es
-        // lo único que significa un cambio real de viewport (girar el celular).
+        // scroll. Lo cacheamos y solo lo recalculamos cuando cambia el ANCHO,
+        // que es lo único que significa un cambio real de viewport (girar el
+        // celular).
         let _vpAlto = window.innerHeight;
         let _vpAncho = window.innerWidth;
         window.addEventListener('resize', () => {
@@ -560,154 +638,224 @@
             return window.innerWidth > 900 ? window.innerHeight : _vpAlto;
         }
 
-        // 🎮 3. LÓGICA DE ANIMACIONES Y SCROLL
+        // 👑 PORTAL DE LA CORONA: la máscara crece con el scroll
+        // Mismo recorrido que la maqueta de referencia:
+        //   1. la silueta arranca a un tamaño fijo según el ancho de pantalla,
+        //   2. crece con progreso^2.3 -- lentísimo al principio (da tiempo a
+        //      leerla como corona) y se dispara al final,
+        //   3. y por detrás el lienzo hace zoom de 1 a 1.22. Ese zoom es lo que
+        //      convierte el destapado en una zambullida: sin él la pantalla solo
+        //      se pone verde y la animación se siente muerta.
+        // El seguimiento va con retardo, como el scrub de la referencia: el
+        // tamaño pintado persigue al que pide el scroll dentro de un bucle de
+        // rAF, en vez de saltar de golpe en cada evento.
+
+        // Tamaño de arranque, los mismos tres escalones de la referencia.
+        function tamanioReposoCorona() {
+            const ancho = window.innerWidth;
+            if (ancho < 640) return 260;
+            if (ancho < 1024) return 340;
+            return 420;
+        }
+
+        // Tamaño al que la corona ya no deja ver nada del blanco. mask-size fija
+        // el ANCHO de la silueta (viewBox 1000x874) y entre las puntas hay
+        // muescas profundas, así que tapar una pantalla cuesta bastante más que
+        // su propio ancho. Con la corona centrada basta con escalar el ancho más
+        // el alto del viewport; el 1.55 sale de medir la silueta contra una
+        // veintena de viewports, con ~5% de margen.
+        //
+        // La referencia suma 4500px a pelo, que es un número atado a su pantalla:
+        // en un monitor ancho se queda corto (nunca llega a tapar) y en un
+        // celular se pasa de largo. Aquí se calcula, así que la curva es la misma
+        // pero cae clavada en cualquier pantalla.
+        function tamanioCoberturaCorona() {
+            return 1.55 * (window.innerWidth + altoViewport());
+        }
+
+        // Alto aproximado de la franja que ocupa la navbar, para saber qué
+        // sección le queda debajo.
+        const ALTO_NAVBAR = 90;
+
+        // Cuánto crece la silueta a lo largo del recorrido. 4500px es el número
+        // literal de la maqueta de referencia. Lo único que se le añade es un
+        // suelo: en un monitor muy ancho 4500px no alcanzan a tapar la pantalla
+        // y la maqueta se queda a medias (allí el recorrido termina con un
+        // trozo de blanco en las esquinas). Con el Math.max, en cualquier
+        // pantalla normal manda el 4500 de la maqueta y solo en las enormes se
+        // estira lo justo para que termine de cerrar.
+        const CORONA_CRECIMIENTO = 4500;
+
+        // El lienzo va de escala 1 a 1.22, igual que la referencia.
+        const CORONA_ZOOM = 0.22;
+
+        // Cuánto se acerca el valor pintado al objetivo en cada fotograma.
+        // Estaba en 0.045, que a 60fps son ~1.7s hasta alcanzar al scroll: la
+        // corona iba tan por detrás del dedo que parecía ir en cámara lenta y
+        // no se sentía "agarrada" al scroll. 0.14 da ~0.5s de arrastre: sigue
+        // habiendo inercia (la corona termina de crecer un pelín después de que
+        // sueltas la rueda, que es el carácter del `scrub` de la maqueta) pero
+        // el tamaño ya responde al scroll en vez de perseguirlo.
+        const CORONA_RETARDO = 0.14;
+
+        // Cuánto llevas del portal, de 0 a 1. null si todavía no se puede medir.
+        function progresoCorona() {
+            const portal = document.getElementById('coronaPortal');
+            if (!portal) return null;
+
+            const rect = portal.getBoundingClientRect();
+            const recorrido = rect.height - altoViewport();
+            if (recorrido <= 0) return null;
+
+            return Math.min(1, Math.max(0, -rect.top / recorrido));
+        }
+
+        // Este cuerpo está partido a propósito en dos mitades: PRIMERO todo lo
+        // que MIDE (getBoundingClientRect, innerWidth...) y DESPUÉS todo lo que
+        // ESCRIBE estilos. Antes iba mezclado -- se escribía mask-size y acto
+        // seguido actualizarNavbar() pedía rects -- y eso obliga al navegador a
+        // recalcular el layout a mitad de cada fotograma. Ese "layout thrashing"
+        // es lo que hacía vibrar la corona: no era la animación, eran fotogramas
+        // que no llegaban a tiempo.
+        function pintarCorona(progreso) {
+            // ---- 1. MEDIR ----
+            const mask = document.getElementById('coronaMask');
+            const lienzo = document.querySelector('.corona-lienzo');
+            const cierre = document.getElementById('coronaCierre');
+            const pista = document.getElementById('coronaPista');
+
+            const anchoVentana = window.innerWidth;
+            const altoVentana = altoViewport();
+
+            // La curva de la maqueta, tal cual: arranque + progreso^2.3 * 4500.
+            // El exponente es lo que hace que casi no se mueva al principio (da
+            // tiempo a leerla como corona) y se dispare al final.
+            const reposo = tamanioReposoCorona();
+            const crecimiento = Math.max(CORONA_CRECIMIENTO,
+                                         tamanioCoberturaCorona() - reposo);
+            // Redondeado a píxel entero. Con decimales el navegador re-rasteriza
+            // la máscara SVG a un tamaño distinto en CADA fotograma y los bordes
+            // de las puntas hierven; a píxel entero se queda quieta.
+            const tam = Math.round(reposo + Math.pow(progreso, 2.3) * crecimiento);
+
+            const pantalla = Math.max(anchoVentana, altoVentana);
+            // Red de seguridad, no parte de la animación: en la maqueta no existe
+            // nada así. Solo entra cuando la corona ya es más grande que la
+            // pantalla, para tapar una esquina suelta si la proporción del
+            // monitor es rara. Si todo va bien no se ve nunca.
+            const cerrando = Math.min(1, Math.max(0, (tam - pantalla * 1.6) / (pantalla * 0.5)));
+
+            // Lee rects de navbar/secciones -- va aquí, ANTES de escribir nada.
+            actualizarNavbar(tam);
+
+            // ---- 2. ESCRIBIR ----
+            if (mask) {
+                mask.style.setProperty('--corona-tam', `${tam}px`);
+            }
+
+            // El zoom del fondo corre el recorrido ENTERO, también el respiro
+            // final: es lo que mantiene viva la última parte.
+            if (lienzo) {
+                lienzo.style.setProperty('--corona-zoom', (1 + progreso * CORONA_ZOOM).toFixed(4));
+            }
+
+            if (cierre) cierre.style.opacity = cerrando.toFixed(3);
+
+            // La pista de "scroll" se va en cuanto la corona empieza a crecer
+            if (pista) pista.style.opacity = Math.max(0, 1 - progreso * 6).toFixed(3);
+        }
+
+        // 🔽 COLOR DE LA NAVBAR
+        // La página alterna claro y oscuro varias veces (hero blanco -> portal
+        // que pasa de blanco a verde -> sección 3 verde -> sección 4 blanca ->
+        // footer verde oscuro), así que hay que mirar qué sección queda debajo
+        // de la barra y no en qué punto del scroll vamos.
+        // .navbar-claro = la barra va en tinta oscura, para fondos claros.
+        function actualizarNavbar(tamCorona) {
+            const navbar = document.querySelector('.navbar');
+            if (!navbar) return;
+
+            // Por defecto claro: el hero y la sección 4 son blancos.
+            let claro = true;
+
+            // ¿Qué elemento pasa ahora mismo por debajo de la barra?
+            const bajoLaBarra = (el) => {
+                if (!el) return false;
+                const r = el.getBoundingClientRect();
+                return r.top <= ALTO_NAVBAR && r.bottom > ALTO_NAVBAR;
+            };
+
+            // Portal: blanco hasta que el verde le llega por detrás. Se mide
+            // contra el tamaño real de la corona y no contra un porcentaje fijo
+            // de scroll, así el cambio cae en el mismo momento visual en
+            // cualquier pantalla.
+            if (bajoLaBarra(document.getElementById('coronaPortal'))) {
+                claro = tamCorona < altoViewport() * 1.6;
+            }
+
+            // Secciones de fondo verde: la cuenta destacada y el footer.
+            if (bajoLaBarra(document.getElementById('cases'))) claro = false;
+            if (bajoLaBarra(document.querySelector('.footer-social'))) claro = false;
+
+            navbar.classList.toggle('navbar-claro', claro);
+        }
+
+        // 🎞️ SEGUIMIENTO CON RETARDO (el "scrub" de la referencia)
+        // El scroll solo mueve el objetivo; quien pinta es el bucle, que se va
+        // acercando a él un poco por fotograma. Además de dar el arrastre, esto
+        // hace de acelerador: por muchos eventos de scroll que lleguen, nunca se
+        // escribe mask-size más de una vez por fotograma.
+        let _coronaObjetivo = 0;
+        let _coronaActual = 0;
+        let _coronaRAF = 0;
+
+        function bucleCorona() {
+            const dif = _coronaObjetivo - _coronaActual;
+
+            if (Math.abs(dif) < 0.0002) {
+                _coronaActual = _coronaObjetivo;
+                pintarCorona(_coronaActual);
+                _coronaRAF = 0;
+                return;
+            }
+
+            _coronaActual += dif * CORONA_RETARDO;
+            pintarCorona(_coronaActual);
+            _coronaRAF = requestAnimationFrame(bucleCorona);
+        }
+
+        // inmediato = sin arrastre. Para el primer pintado y para los resize, que
+        // si no dejan la corona persiguiendo un tamaño de la medida anterior.
+        function actualizarCorona(inmediato) {
+            const progreso = progresoCorona();
+            if (progreso === null) return;
+
+            _coronaObjetivo = progreso;
+
+            if (inmediato) {
+                if (_coronaRAF) { cancelAnimationFrame(_coronaRAF); _coronaRAF = 0; }
+                _coronaActual = progreso;
+                pintarCorona(progreso);
+                return;
+            }
+
+            if (!_coronaRAF) _coronaRAF = requestAnimationFrame(bucleCorona);
+        }
+
+        // 🎮 LÓGICA DE ANIMACIONES Y SCROLL
         window.addEventListener('scroll', () => {
-            const scrollY = window.scrollY;
+            actualizarCorona();
+
             const windowHeight = altoViewport();
 
-            // --- ANIMACIÓN SECCIÓN 1 (HERO) ---
-            const bottomContent = document.getElementById('heroBottomContent');
-            if (bottomContent) {
-                if (window.innerWidth <= 900) {
-                    // 📱 CELULAR: El texto "COMPRA TUS CUENTAS DE VIDEOJUEGOS" sube y desaparece suavemente al hacer scroll
-                    const progress = Math.min(1, Math.max(0, scrollY / (windowHeight * 0.6)));
-                    bottomContent.style.opacity = (1 - progress).toString();
-                    bottomContent.style.transform = `translateY(-${progress * 70}px)`;
-                } else {
-                    // 💻 PC: Comportamiento intacto para computadora
-                    const opacidad = Math.max(0, 1 - (scrollY / windowHeight));
-                    const movimiento = scrollY * 0.15; 
-                    bottomContent.style.opacity = opacidad.toString();
-                    bottomContent.style.transform = `translateY(-${movimiento}px)`;
-                }
-            }
-
-            // --- ANIMACIÓN SECCIÓN 2 ---
-            const casesWrapper = document.getElementById('cases-wrapper');
-            if (casesWrapper) {
-                const rect = casesWrapper.getBoundingClientRect();
-
-                if (window.innerWidth <= 900) {
-                    // 📱 CELULAR: Animación fluida en scroll natural (reemplaza el scroll-jacking)
-                    let progreso = Math.max(0, Math.min(1, (windowHeight - rect.top) / (windowHeight * 0.85)));
-
-                    const coronaModel = document.getElementById('coronaModel');
-                    if (coronaModel) {
-                        let rotation = progreso * 360;
-                        coronaModel.setAttribute('camera-orbit', `${rotation}deg 75deg 105%`);
-                    }
-
-                    // Fases exactas de aparición réplica del scroll-jacking
-                    let lineProgress = Math.max(0, Math.min(1, (progreso - 0.05) / 0.35));
-                    let lineWidth = lineProgress * 100;
-                    let titleProgress = Math.max(0, Math.min(1, (progreso - 0.28) / 0.30));
-                    let contentProgress = Math.max(0, Math.min(1, (progreso - 0.48) / 0.35));
-
-                    const uiLeft = document.getElementById('uiLeft');
-                    if (uiLeft) {
-                        const line = uiLeft.querySelector('.ui-line');
-                        const dot = uiLeft.querySelector('.ui-dot');
-                        const title = uiLeft.querySelector('.ui-title');
-                        const img = uiLeft.querySelector('.ui-image-wrapper');
-
-                        uiLeft.style.opacity = lineProgress > 0 ? '1' : '0';
-
-                        if (line) line.style.width = `${lineWidth}%`;
-                        if (dot) dot.style.opacity = lineProgress > 0 ? '1' : '0';
-
-                        if (title) {
-                            let titleY = (1 - titleProgress) * 35;
-                            title.style.opacity = titleProgress.toString();
-                            title.style.transform = `translateY(${titleY}px)`;
-                        }
-
-                        if (img) {
-                            let imgY = (1 - contentProgress) * 60;
-                            img.style.opacity = contentProgress.toString();
-                            img.style.transform = `translateY(${imgY}px)`;
-                        }
-                    }
-
-                    const uiBottomLeft = document.getElementById('uiBottomLeft');
-                    if (uiBottomLeft) {
-                        let bY = (1 - contentProgress) * 40;
-                        uiBottomLeft.style.opacity = contentProgress.toString();
-                        uiBottomLeft.style.transform = `translateY(${bY}px)`;
-                    }
-                } else {
-                    // 💻 PC: Comportamiento de Scroll-Jacking (400vh) completamente intacto
-                    const startScroll = rect.top; 
-                    const totalScroll = rect.height - windowHeight; 
-
-                    if (startScroll <= 0 && startScroll >= -totalScroll) {
-                        let progreso = Math.abs(startScroll) / totalScroll; 
-
-                        const coronaModel = document.getElementById('coronaModel');
-                        if (coronaModel) {
-                            let rotation = progreso * 360; 
-                            coronaModel.setAttribute('camera-orbit', `${rotation}deg 75deg 105%`);
-                        }
-
-                        const bgText = document.getElementById('casesBgText');
-                        if (bgText) {
-                            let textMove = 100 - (progreso * 260);
-                            bgText.style.transform = `translateX(${textMove}vw)`;
-                            bgText.style.opacity = '1'; 
-                        }
-
-                        let lineProgress = Math.max(0, Math.min(1, (progreso - 0.1) / 0.35));
-                        let lineWidth = lineProgress * 100;
-                        let titleProgress = Math.max(0, Math.min(1, (progreso - 0.42) / 0.20));
-                        let contentProgress = Math.max(0, Math.min(1, (progreso - 0.62) / 0.26));
-
-                        const cards = [
-                            { card: document.getElementById('uiLeft'), side: 'left' },
-                            { card: document.getElementById('uiRight'), side: 'right' }
-                        ];
-
-                        cards.forEach(({ card }) => {
-                            if (!card) return;
-                            const line = card.querySelector('.ui-line');
-                            const dot = card.querySelector('.ui-dot');
-                            const title = card.querySelector('.ui-title');
-                            const img = card.querySelector('.ui-image-wrapper');
-
-                            card.style.opacity = lineProgress > 0 ? '1' : '0';
-
-                            if (line) line.style.width = `${lineWidth}%`;
-                            if (dot) dot.style.opacity = lineProgress > 0 ? '1' : '0'; 
-
-                            if (title) {
-                                let titleY = (1 - titleProgress) * 35;
-                                title.style.opacity = titleProgress.toString();
-                                title.style.transform = `translateY(${titleY}px)`;
-                            }
-
-                            if (img) {
-                                let imgY = (1 - contentProgress) * 60;
-                                img.style.opacity = contentProgress.toString();
-                                img.style.transform = `translateY(${imgY}px)`;
-                            }
-                        });
-
-                        const uiBottomLeft = document.getElementById('uiBottomLeft');
-                        if (uiBottomLeft) {
-                            let bY = (1 - contentProgress) * 40;
-                            uiBottomLeft.style.opacity = contentProgress.toString();
-                            uiBottomLeft.style.transform = `translateY(${bY}px)`;
-                        }
-                    }
-                }
-            }
-
-            // --- ANIMACIÓN SECCIÓN 3 ---
+            // --- ANIMACIÓN SECCIÓN 4 ---
             const s3Wrapper = document.getElementById('features');
             const s3Left = document.getElementById('s3Left');
             const s3Right = document.getElementById('s3Right');
 
             if (s3Wrapper && s3Left && s3Right) {
                 const rect3 = s3Wrapper.getBoundingClientRect();
-                
+
                 if (rect3.top <= windowHeight * 0.75 && rect3.bottom >= 0) {
                     s3Left.style.transform = 'translateX(0px)';
                     s3Left.style.opacity = '1';
@@ -720,7 +868,17 @@
                     s3Right.style.opacity = '0';
                 }
             }
-        });
+        }, { passive: true });
+
+        function refrescarCorona() {
+            actualizarCorona(true);
+        }
+
+        window.addEventListener('DOMContentLoaded', refrescarCorona);
+        window.addEventListener('resize', refrescarCorona, { passive: true });
+        window.addEventListener('load', refrescarCorona);
+
+        refrescarCorona();
 
         // 🛑 ELIMINACIÓN AGRESIVA DE MARCA DE AGUA DE SPLINE
         function limpiarSplineViewer(viewer) {
