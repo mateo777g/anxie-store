@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Aviso Legal | ANXIE STORE</title>
+
+    <!-- 🟢 LOGO DE LA PESTAÑA (FAVICON) -->
+    <link rel="icon" href="assets/logo.jpg" type="assets/logo.jpg">
+
+    <!-- Google Fonts: Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- CSS: esta página no necesita Supabase, spline-viewer ni model-viewer,
+         así que carga solo lo indispensable (instantáneo). catalogo.css
+         tampoco hace falta: el chrome de aquí es el navbar/sidebar oscuro
+         de index.html, que style.css ya resuelve por completo. -->
+    <link rel="stylesheet" href="style.css?v=20260915b">
+    <link rel="stylesheet" href="legal.css?v=20260901">
+</head>
+<body>
+
+    <!-- 🌟 BARRA DE NAVEGACIÓN SUPERIOR (igual que index.html, visible desde el inicio) 🌟 -->
+    <nav class="navbar visible">
+        <div class="logo-container">
+            <img src="assets/logo.jpg" alt="Logo ANXIE STORE" class="logo-img">
+            <span class="logo-texto">ANXIE STORE</span>
+        </div>
+
+        <!-- 💻 LINKS PARA COMPUTADORA (Se ocultan en cel) -->
+        <ul class="nav-links">
+            <li><a href="index.html#home">Inicio</a></li>
+            <li><a href="catalogo.html#cases">Catálogo</a></li>
+            <li><a href="index.html#features">Contacto</a></li>
+        </ul>
+
+        <!-- 📱 BOTÓN HAMBURGUESA (Solo visible en cel) -->
+        <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Abrir Menú">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
+    </nav>
+
+    <!-- 🚪 BARRA LATERAL (SIDEBAR) & OVERLAY PARA MÓVIL -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+        <button class="sidebar-close-btn" id="sidebarClose">&times;</button>
+
+        <div class="sidebar-header">
+            <img src="assets/logo.jpg" alt="Logo ANXIE STORE" class="sidebar-logo">
+            <span class="sidebar-title">ANXIE STORE</span>
+        </div>
+
+        <ul class="sidebar-links">
+            <li><a href="index.html#home">Inicio</a></li>
+            <li><a href="catalogo.html#cases">Catálogo</a></li>
+            <li><a href="index.html#features">Contacto</a></li>
+        </ul>
+    </aside>
+
+    <!-- 📄 CONTENIDO LEGAL 📄 -->
+    <main class="legal-main">
+        <div class="legal-container">
+            <h1 class="legal-title">Aviso Legal</h1>
+            <p class="legal-intro">
+                Este documento reúne los cuatro avisos legales de <strong>Anxie Store</strong>.
+                Aplican a quien navega anxiestore.com y a quien nos contacta para comprar.
+            </p>
+
+            <nav class="legal-index" aria-label="Índice de avisos legales">
+                <a href="#privacidad">Aviso de Privacidad</a>
+                <a href="#terminos">Términos y Condiciones</a>
+                <a href="#cookies">Cookies</a>
+                <a href="#marcas">Marcas</a>
+            </nav>
+
+            <!-- ============================================================ -->
+            <!-- DOCUMENTO 1: AVISO DE PRIVACIDAD (simplificado + integral)    -->
+            <!-- ============================================================ -->
+            <section class="legal-section" id="privacidad">
+                <h2 class="legal-section-title">Aviso de Privacidad</h2>
+
+                <div class="legal-simplificado">
+                    <h3 class="legal-subtitle">Versión simplificada</h3>
+
+                    <p>
+                        Miguel Ángel, conocido comercialmente como Anxie Store y ubicado en México,
+                        es el responsable del tratamiento de tus datos personales.
+                    </p>
+
+                    <p>
+                        Tus datos se usan para las siguientes finalidades primarias, necesarias para
+                        el servicio: atender tus mensajes y dudas, procesar y confirmar tu compra,
+                        entregar la cuenta adquirida, brindar soporte y garantía, y llevar el control
+                        interno de las operaciones.
+                    </p>
+
+                    <p>
+                        De manera adicional, y solo si no te opones, podemos usar tus datos para
+                        finalidades secundarias: enviarte novedades del catálogo, promociones y
+                        encuestas de satisfacción. Puedes negarte a estas finalidades ahora o en
+                        cualquier momento escribiéndonos por Instagram
+                        (<a href="https://www.instagram.com/anxieofficial/" target="_blank" rel="noopener noreferrer">@anxieofficial</a>)
+                        o abriendo un ticket en nuestro
+                        <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener noreferrer">servidor de Discord</a>.
+                        Negarte no afecta tu compra ni tu garantía.
+                    </p>
+
+                    <p>No vendemos, rentamos ni comercializamos tus datos personales con terceros.</p>
+
+                    <p>
+                        Puedes consultar el <a href="#privacidad-integral">aviso de privacidad integral</a>,
+                        conocer las transferencias que realizamos y ejercer tus derechos ARCO más abajo,
+                        en esta misma sección.
+                    </p>
+                </div>
+
+                <div class="legal-doc" id="privacidad-integral">
+                    <h3 class="legal-subtitle">Versión integral</h3>
+                    <p class="legal-fecha">Última actualización: 1 de septiembre de 2026</p>
+
+                    <h4>1. Responsable de tus datos personales</h4>
+                    <p>
+                        Miguel Ángel, que opera comercialmente bajo el nombre Anxie Store desde México,
+                        es el responsable del uso y protección de tus datos personales, conforme a la
+                        Ley Federal de Protección de Datos Personales en Posesión de los Particulares y
+                        su normativa aplicable.
+                    </p>
+                    <p>
+                        Anxie Store es un negocio digital operado por un creador de contenido. Nuestros
+                        canales oficiales de atención, y los mismos por los que puedes ejercer tus
+                        derechos sobre tus datos, son:
+                    </p>
+                    <ul>
+                        <li>Instagram: <a href="https://www.instagram.com/anxieofficial/" target="_blank" rel="noopener noreferrer">@anxieofficial</a></li>
+                        <li>Discord: <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener noreferrer">discord.gg/YuTzCPu3tS</a></li>
+                    </ul>
+                    <p>Cualquier cuenta distinta a esas no nos representa.</p>
+
+                    <h4>2. Qué datos recabamos</h4>
+                    <p>
+                        Navegar por anxiestore.com no requiere que nos des ningún dato personal. El
+                        sitio no tiene formularios de registro, contacto ni pago: es únicamente un
+                        catálogo.
+                    </p>
+                    <p>
+                        Recabamos datos personales solo cuando tú decides contactarnos para comprar, a
+                        través de Instagram o de un ticket en nuestro servidor de Discord. En ese caso
+                        podemos tratar:
+                    </p>
+                    <ul>
+                        <li>Datos de identificación: tu nombre o el nombre de usuario con el que te presentas.</li>
+                        <li>Datos de contacto: tu usuario de Instagram o de Discord.</li>
+                        <li>Datos de la operación: producto elegido, precio, fecha y método de pago, y el comprobante de pago que nos compartas.</li>
+                        <li>Datos técnicos de la cuenta vendida: el correo electrónico que designes para vincular la cuenta adquirida, cuando aplique.</li>
+                    </ul>
+                    <p>
+                        NO recabamos datos personales sensibles. NO solicitamos ni almacenamos números
+                        completos de tarjetas bancarias, NIP, CVV ni contraseñas de tu banco. Si algún
+                        método de pago requiere esos datos, se procesan directamente en la plataforma
+                        del proveedor de pago, no con nosotros.
+                    </p>
+                    <p>
+                        Menores de edad: no establecemos una edad mínima fija para comprar, pero si eres
+                        menor de edad necesitas la autorización y supervisión de tu padre, madre o tutor,
+                        quien debe realizar o supervisar directamente la operación. No recabamos datos de
+                        menores sin esa autorización, y si detectamos que un dato pertenece a un menor
+                        sin el consentimiento de su padre, madre o tutor, lo eliminamos.
+                    </p>
+
+                    <h4>3. Para qué usamos tus datos</h4>
+                    <p>Finalidades primarias (necesarias para darte el servicio):</p>
+                    <ul>
+                        <li>Responder tus mensajes, dudas y solicitudes.</li>
+                        <li>Cotizar, procesar y confirmar tu compra.</li>
+                        <li>Entregarte la cuenta adquirida y las credenciales correspondientes.</li>
+                        <li>Prestarte soporte técnico y atender la garantía.</li>
+                        <li>Llevar el registro y control interno de ventas.</li>
+                        <li>Cumplir obligaciones legales, fiscales o requerimientos de autoridad.</li>
+                    </ul>
+                    <p>Finalidades secundarias (no necesarias, requieren tu no oposición):</p>
+                    <ul>
+                        <li>Informarte sobre nuevo catálogo, promociones y descuentos.</li>
+                        <li>Realizar encuestas de satisfacción y mejorar el servicio.</li>
+                    </ul>
+                    <p>
+                        Si no quieres que usemos tus datos para las finalidades secundarias, mándanos un
+                        mensaje por Instagram o abre un ticket en Discord indicando "Negativa
+                        finalidades secundarias". Tu negativa no será motivo para negarte los servicios
+                        que contrataste.
+                    </p>
+
+                    <h4>4. Datos que se recopilan automáticamente al navegar</h4>
+                    <p>
+                        Como cualquier sitio en internet, al cargar anxiestore.com tu navegador
+                        transmite automáticamente tu dirección IP, tipo de navegador y sistema operativo
+                        a los proveedores de infraestructura que hacen funcionar el sitio. Esta
+                        información no se usa para identificarte ni para crear perfiles publicitarios, y
+                        nosotros no la consultamos ni la almacenamos. El detalle está en la sección
+                        <a href="#cookies">Cookies y almacenamiento local</a>.
+                    </p>
+
+                    <h4>5. Transferencias y encargados</h4>
+                    <p>
+                        No vendemos, rentamos ni compartimos tus datos personales con terceros para sus
+                        propios fines comerciales.
+                    </p>
+                    <p>
+                        Utilizamos proveedores tecnológicos que actúan como encargados del tratamiento y
+                        que, por la naturaleza de su servicio, procesan datos técnicos de conexión:
+                    </p>
+                    <ul>
+                        <li>Hostinger - alojamiento del sitio web.</li>
+                        <li>Supabase - base de datos del catálogo.</li>
+                        <li>Cloudflare (R2 y Workers) - almacenamiento y entrega de imágenes.</li>
+                        <li>Google (Fonts y Hosted Libraries) - tipografías y librerías del sitio.</li>
+                        <li>jsDelivr y unpkg - librerías JavaScript del sitio.</li>
+                        <li>Spline - escenas 3D del sitio.</li>
+                        <li>
+                            Meta Platforms (Instagram) y Discord - canales por los que nos contactas.
+                            Al escribirnos por esas vías, tu información también queda sujeta a las
+                            políticas de privacidad de dichas plataformas, que te recomendamos leer.
+                        </li>
+                    </ul>
+                    <p>
+                        Algunos de estos proveedores almacenan información en servidores fuera de
+                        México. Estas transferencias son necesarias para la prestación del servicio y no
+                        requieren tu consentimiento conforme a la ley.
+                    </p>
+                    <p>
+                        Solo transferiremos tus datos a autoridades competentes cuando exista un
+                        requerimiento fundado y motivado.
+                    </p>
+
+                    <h4>6. Tus derechos ARCO</h4>
+                    <p>
+                        Tienes derecho a Acceder a tus datos personales, Rectificarlos cuando sean
+                        inexactos, Cancelarlos cuando consideres que no son necesarios, y Oponerte a su
+                        tratamiento para fines específicos. También puedes revocar en cualquier momento
+                        el consentimiento que nos hayas otorgado.
+                    </p>
+                    <p>
+                        Para ejercer cualquiera de estos derechos, escríbenos por mensaje directo a
+                        <a href="https://www.instagram.com/anxieofficial/" target="_blank" rel="noopener noreferrer">@anxieofficial</a>
+                        en Instagram, o abre un ticket en nuestro
+                        <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener noreferrer">servidor de Discord</a>,
+                        indicando "Derechos ARCO" e incluyendo:
+                    </p>
+                    <ul>
+                        <li>Tu nombre y el medio por el que quieres recibir la respuesta.</li>
+                        <li>Una forma de acreditar tu identidad. Normalmente basta con que escribas desde la misma cuenta de Instagram o Discord con la que realizaste la compra. Si no es posible, podemos pedirte otro comprobante de la operación.</li>
+                        <li>La descripción clara del derecho que deseas ejercer y de los datos involucrados.</li>
+                        <li>Cualquier dato que facilite localizar tu información, como la fecha de la compra o la cuenta adquirida.</li>
+                    </ul>
+                    <p>
+                        Responderemos tu solicitud en un plazo máximo de 20 días hábiles. Si procede, se
+                        hará efectiva dentro de los 15 días hábiles siguientes. El ejercicio de estos
+                        derechos es gratuito.
+                    </p>
+                    <p>
+                        Ten en cuenta que la cancelación u oposición puede no proceder cuando debamos
+                        conservar datos por obligaciones legales o fiscales.
+                    </p>
+
+                    <h4>7. Limitación del uso o divulgación</h4>
+                    <p>
+                        Puedes pedirnos en cualquier momento, por los mismos canales, que dejemos de
+                        enviarte comunicaciones promocionales o que limitemos el uso de tus datos, sin
+                        necesidad de ejercer un derecho ARCO formal.
+                    </p>
+
+                    <h4>8. Conservación de los datos</h4>
+                    <p>
+                        Conservamos tus datos durante el tiempo necesario para cumplir las finalidades
+                        descritas, mientras dure la garantía de tu compra, y después únicamente durante
+                        los plazos que exijan las obligaciones legales y fiscales aplicables. Cumplidos
+                        esos plazos, se eliminan.
+                    </p>
+
+                    <h4>9. Seguridad</h4>
+                    <p>
+                        Aplicamos medidas de seguridad administrativas, técnicas y físicas razonables
+                        para proteger tus datos contra pérdida, uso indebido, acceso no autorizado o
+                        alteración. El panel de administración está protegido con autenticación y solo
+                        el responsable tiene acceso. Ningún sistema es infalible, por lo que no podemos
+                        garantizar seguridad absoluta.
+                    </p>
+
+                    <h4>10. Cambios a este aviso</h4>
+                    <p>
+                        Este aviso puede modificarse para reflejar cambios en nuestros servicios o en la
+                        legislación. Cualquier modificación se publicará en esta misma página, con la
+                        fecha de última actualización arriba. Te recomendamos revisarla periódicamente.
+                    </p>
+
+                    <h4>11. Autoridad</h4>
+                    <p>
+                        Si consideras que tu derecho a la protección de datos personales fue vulnerado,
+                        puedes acudir ante la autoridad competente en materia de protección de datos
+                        personales en México. Antes de eso, te agradeceremos que nos escribas por
+                        Instagram o Discord para intentar resolverlo directamente.
+                    </p>
+                </div>
+            </section>
+
+            <!-- ============================================================ -->
+            <!-- DOCUMENTO 2: TÉRMINOS Y CONDICIONES DE USO Y VENTA           -->
+            <!-- ============================================================ -->
+            <section class="legal-section" id="terminos">
+                <h2 class="legal-section-title">Términos y Condiciones</h2>
+                <p class="legal-fecha">Última actualización: 1 de septiembre de 2026</p>
+
+                <h4>1. Quiénes somos</h4>
+                <p>
+                    Anxie Store es un negocio digital operado por Miguel Ángel desde México, dedicado a
+                    la venta de cuentas de videojuegos entre particulares.
+                </p>
+                <p>Toda la atención, venta y soporte se realiza exclusivamente por nuestros canales oficiales:</p>
+                <ul>
+                    <li>Instagram: <a href="https://www.instagram.com/anxieofficial/" target="_blank" rel="noopener noreferrer">@anxieofficial</a></li>
+                    <li>Discord: <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener noreferrer">discord.gg/YuTzCPu3tS</a></li>
+                </ul>
+                <p>
+                    No operamos por ningún otro medio. Si alguien te contacta desde otra cuenta diciendo
+                    representar a Anxie Store, no somos nosotros.
+                </p>
+                <p>
+                    Al navegar en anxiestore.com o al contactarnos para comprar, aceptas estos términos.
+                    Si no estás de acuerdo, te pedimos no utilizar el sitio ni realizar compras.
+                </p>
+
+                <h4>2. Edad mínima</h4>
+                <p>
+                    No establecemos una edad mínima fija para comprar. Si eres menor de edad, necesitas
+                    la autorización y supervisión de tu padre, madre o tutor, quien debe realizar o
+                    supervisar directamente la compra y asume la responsabilidad de la operación.
+                </p>
+
+                <h4>3. El catálogo y los precios</h4>
+                <ul>
+                    <li>Las cuentas publicadas son únicas: cada una se vende una sola vez, y al venderse se retira del catálogo.</li>
+                    <li>Los precios se muestran en pesos mexicanos (MXN) y en dólares estadounidenses (USD). El precio en USD es una referencia aproximada; el cobro se realiza en MXN salvo acuerdo distinto.</li>
+                    <li>Los precios pueden cambiar sin previo aviso. El precio aplicable es el vigente al momento de confirmar la operación por Instagram o Discord.</li>
+                    <li>Las imágenes y descripciones son ilustrativas del contenido real de cada cuenta. Hacemos nuestro mejor esfuerzo por que sean exactas; si detectas una diferencia, avísanos antes de pagar.</li>
+                    <li>El sitio no procesa pagos. Ninguna compra se cierra en anxiestore.com.</li>
+                </ul>
+
+                <h4>4. Cómo se compra</h4>
+                <ul>
+                    <li>Eliges una cuenta en el catálogo y nos contactas por Instagram (@anxieofficial) o creando un ticket en nuestro servidor de Discord.</li>
+                    <li>Confirmamos disponibilidad, precio final y método de pago.</li>
+                    <li>Realizas el pago por alguno de los medios aceptados: transferencia bancaria a cualquier banco mexicano o depósito en OXXO para compradores nacionales, y Remitly o Western Union para compradores internacionales.</li>
+                    <li>Una vez confirmado el pago, entregamos las credenciales de la cuenta en un plazo de 24 horas hábiles.</li>
+                    <li>Cualquier trato cerrado fuera de nuestras cuentas oficiales de Instagram y Discord no es responsabilidad de Anxie Store. Verifica siempre que estés hablando con las cuentas enlazadas desde este sitio.</li>
+                </ul>
+
+                <h4>5. Entrega</h4>
+                <p>
+                    La entrega es digital. Consiste en las credenciales de acceso y, cuando aplique, el
+                    acompañamiento para cambiar el correo y la contraseña de la cuenta a tus propios
+                    datos.
+                </p>
+                <p>Es tu responsabilidad, inmediatamente después de recibir la cuenta:</p>
+                <ul>
+                    <li>Cambiar la contraseña.</li>
+                    <li>Cambiar el correo vinculado por uno tuyo.</li>
+                    <li>Activar la autenticación en dos pasos.</li>
+                </ul>
+                <p>Te recomendamos hacerlo dentro de las primeras horas. La garantía depende de ello, como se explica abajo.</p>
+
+                <h4>6. Garantía</h4>
+                <p>
+                    Ofrecemos garantía sobre cada cuenta vendida, sin fecha de caducidad ni límite de
+                    tiempo tras la entrega, que cubre:
+                </p>
+                <ul>
+                    <li>Que las credenciales entregadas funcionen y den acceso a la cuenta.</li>
+                    <li>Que el contenido de la cuenta corresponda a lo descrito y mostrado en el catálogo al momento de la compra.</li>
+                    <li>Que la cuenta no sea recuperada por un tercero, siempre que hayas realizado los cambios de seguridad del punto 5.</li>
+                </ul>
+                <p>La garantía NO cubre:</p>
+                <ul>
+                    <li>Que no hayas cambiado la contraseña, el correo vinculado o activado la autenticación en dos pasos tras la entrega.</li>
+                    <li>Que hayas compartido, revendido o prestado las credenciales a terceros.</li>
+                    <li>Suspensiones, bloqueos o cierres aplicados por el desarrollador o la plataforma del videojuego por conducta posterior a la entrega, incluyendo trampas, lenguaje abusivo o incumplimiento de sus reglas.</li>
+                    <li>Cambios que el desarrollador realice a su servicio, a su catálogo o a sus políticas.</li>
+                    <li>Pérdida de acceso por descuido, phishing o filtración de tus propios datos.</li>
+                </ul>
+                <p>
+                    Si algo cubierto por la garantía falla, escríbenos en cualquier momento por el mismo
+                    canal donde compraste, con evidencia. Repondremos la cuenta por otra de valor
+                    equivalente o, si no fuera posible, reembolsaremos el monto pagado.
+                </p>
+
+                <h4>7. Riesgo de plataforma — léelo antes de comprar</h4>
+                <p>
+                    Los términos de uso de los desarrolladores de videojuegos, incluido Epic Games,
+                    generalmente establecen que las cuentas son personales e intransferibles, y les
+                    reservan la facultad de suspenderlas o cancelarlas. Al comprar, reconoces que conoces
+                    ese riesgo y que lo asumes. Nuestra garantía es un compromiso comercial de Anxie
+                    Store frente a ti y opera en los términos del punto 6; no constituye ninguna
+                    autorización, aval ni respaldo del desarrollador del videojuego, ni podemos evitar
+                    decisiones que este tome sobre la cuenta después del plazo de garantía.
+                </p>
+
+                <h4>8. Cancelaciones y reembolsos</h4>
+                <ul>
+                    <li>Antes de la entrega: puedes cancelar y te reembolsamos el 100%.</li>
+                    <li>Después de la entrega: por tratarse de un producto digital que se entrega de forma inmediata y única, no aplican devoluciones por arrepentimiento. Sí aplican los supuestos de la garantía del punto 6.</li>
+                    <li>Los reembolsos se realizan por el mismo medio de pago, dentro de los 10 días hábiles siguientes a que se autorice la solicitud.</li>
+                </ul>
+
+                <h4>9. Uso del sitio</h4>
+                <p>
+                    Te comprometes a no intentar vulnerar, sobrecargar o acceder sin autorización a la
+                    infraestructura del sitio, ni a extraer masivamente su contenido. El diseño, los
+                    textos, el código y los elementos gráficos originales de anxiestore.com son propiedad
+                    de Anxie Store.
+                </p>
+
+                <h4>10. Limitación de responsabilidad</h4>
+                <p>
+                    El sitio se ofrece "tal cual". No garantizamos disponibilidad ininterrumpida ni
+                    ausencia de errores. Nuestra responsabilidad máxima frente a ti, por cualquier
+                    concepto relacionado con una compra, se limita al monto que efectivamente pagaste por
+                    ella.
+                </p>
+
+                <h4>11. Modificaciones</h4>
+                <p>
+                    Podemos actualizar estos términos en cualquier momento. La versión aplicable a tu
+                    compra es la publicada en esta página al momento de realizarla.
+                </p>
+
+                <h4>12. Ley aplicable</h4>
+                <p>
+                    Estos términos se rigen por las leyes de los Estados Unidos Mexicanos y se someten a
+                    la jurisdicción de los tribunales competentes en México, sin perjuicio de los
+                    derechos que la Ley Federal de Protección al Consumidor otorga al consumidor,
+                    incluida la posibilidad de acudir a la Procuraduría Federal del Consumidor (PROFECO).
+                </p>
+            </section>
+
+            <!-- ============================================================ -->
+            <!-- DOCUMENTO 3: COOKIES Y ALMACENAMIENTO LOCAL                  -->
+            <!-- ============================================================ -->
+            <section class="legal-section" id="cookies">
+                <h2 class="legal-section-title">Cookies y Almacenamiento Local</h2>
+                <p class="legal-fecha">Última actualización: 1 de septiembre de 2026</p>
+
+                <p>
+                    Anxie Store NO utiliza cookies publicitarias, ni de rastreo, ni de análisis. No
+                    tenemos Google Analytics, ni píxeles de redes sociales, ni herramientas de perfilado.
+                    No creamos perfiles de navegación ni vendemos información a nadie.
+                </p>
+
+                <p>Qué sí usamos:</p>
+
+                <h4>Almacenamiento técnico (sessionStorage)</h4>
+                <p>
+                    Guardamos temporalmente el catálogo en la memoria de tu navegador, bajo la clave
+                    "anxie_catalog_v1", durante 5 minutos. Sirve únicamente para que el sitio cargue más
+                    rápido al moverte entre la página principal y el catálogo, y para consultar la base
+                    de datos menos veces. No contiene datos personales tuyos: solo títulos, precios e
+                    imágenes de las cuentas publicadas. Se borra solo al cerrar la pestaña, y puedes
+                    borrarlo cuando quieras desde las opciones de tu navegador. El sitio funciona igual
+                    si lo bloqueas.
+                </p>
+
+                <h4>Servicios de terceros necesarios para mostrar la página</h4>
+                <p>
+                    Al cargar el sitio, tu navegador se conecta automáticamente a los siguientes
+                    proveedores, que por ese hecho reciben tu dirección IP y datos técnicos de tu
+                    navegador:
+                </p>
+                <ul>
+                    <li>Hostinger - alojamiento del sitio.</li>
+                    <li>Supabase - base de datos del catálogo.</li>
+                    <li>Cloudflare - imágenes de las cuentas.</li>
+                    <li>Google Fonts y Google Hosted Libraries - tipografías y librerías.</li>
+                    <li>jsDelivr y unpkg - librerías JavaScript.</li>
+                    <li>Spline - escenas y modelos 3D.</li>
+                </ul>
+                <p>
+                    Estas conexiones son indispensables para que la página se muestre. Cada proveedor
+                    trata esos datos conforme a su propia política de privacidad.
+                </p>
+
+                <p>
+                    Como no utilizamos cookies de rastreo ni de publicidad, este sitio no muestra un
+                    banner de consentimiento de cookies.
+                </p>
+            </section>
+
+            <!-- ============================================================ -->
+            <!-- DOCUMENTO 4: AVISO DE MARCAS Y NO AFILIACIÓN                 -->
+            <!-- ============================================================ -->
+            <section class="legal-section" id="marcas">
+                <h2 class="legal-section-title">Aviso de Marcas y No Afiliación</h2>
+
+                <p>
+                    Anxie Store es un vendedor independiente. No estamos afiliados, asociados,
+                    autorizados, patrocinados ni respaldados de ninguna forma por Epic Games, Inc.,
+                    Microsoft Corporation, Sony Interactive Entertainment, Nintendo Co., Ltd. ni por
+                    ninguna otra empresa desarrolladora o distribuidora de videojuegos o consolas.
+                </p>
+
+                <p>
+                    "Fortnite", "V-Bucks", "Epic Games", "Xbox", "PlayStation", "Nintendo Switch" y los
+                    logotipos correspondientes son marcas registradas de sus respectivos titulares. Se
+                    utilizan en este sitio únicamente con fines descriptivos e informativos, para
+                    identificar el contenido y la plataforma de las cuentas ofrecidas. Su uso no implica
+                    ninguna relación comercial con dichos titulares ni pretende generar confusión sobre
+                    el origen de nuestros productos.
+                </p>
+
+                <p>
+                    Todas las imágenes de contenido dentro del juego pertenecen a sus respectivos
+                    titulares. Si eres titular de derechos y consideras que algún contenido de este sitio
+                    los infringe, escríbenos por Instagram
+                    (<a href="https://www.instagram.com/anxieofficial/" target="_blank" rel="noopener noreferrer">@anxieofficial</a>)
+                    o por nuestro
+                    <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener noreferrer">servidor de Discord</a>
+                    y lo atenderemos a la brevedad.
+                </p>
+            </section>
+        </div>
+    </main>
+
+    <!-- 🌐 FOOTER OSCURO 🌐 -->
+    <footer class="footer-social">
+        <div class="footer-container">
+            <!-- Píldora de íconos 2D (legal.css la fuerza visible también en PC:
+                 esta página no carga spline-viewer para mantenerse liviana) -->
+            <div class="footer-mobile-social">
+                <a href="https://x.com/anxiebb?s=11" target="_blank" rel="noopener noreferrer" class="footer-social-link" aria-label="X (Twitter)">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                </a>
+                <a href="https://www.instagram.com/anxieofficial/" target="_blank" rel="noopener noreferrer" class="footer-social-link" aria-label="Instagram">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                </a>
+                <a href="https://www.youtube.com/@Anxieofficial" target="_blank" rel="noopener noreferrer" class="footer-social-link" aria-label="YouTube">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                </a>
+            </div>
+
+            <p class="footer-copy">&copy; 2026 ANXIE STORE.</p>
+        </div>
+    </footer>
+
+    <script>
+        // 📱 LÓGICA DE MENÚ LATERAL (SIDEBAR MÓVIL) — igual que index.html/catalogo.html
+        window.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('sidebarToggle');
+            const closeBtn = document.getElementById('sidebarClose');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const sidebarLinks = document.querySelectorAll('.sidebar-links a');
+
+            function openSidebar() {
+                if (sidebar && overlay) {
+                    sidebar.classList.add('active');
+                    overlay.classList.add('active');
+                }
+            }
+
+            function closeSidebar() {
+                if (sidebar && overlay) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                }
+            }
+
+            if (toggleBtn) toggleBtn.addEventListener('click', openSidebar);
+            if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+            if (overlay) overlay.addEventListener('click', closeSidebar);
+
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', closeSidebar);
+            });
+        });
+    </script>
+
+</body>
+</html>

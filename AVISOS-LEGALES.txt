@@ -1,0 +1,819 @@
+================================================================================
+ANXIE STORE - AVISOS LEGALES (BORRADOR LISTO PARA IMPLEMENTAR)
+Generado: 2026-09-01
+================================================================================
+
+PARTE 0 - COMO USAR ESTE ARCHIVO
+--------------------------------------------------------------------------------
+Este archivo contiene TODO lo necesario para publicar los avisos legales del
+sitio sin volver a analizar el proyecto. En el siguiente prompt basta con decir:
+
+    "Implementa los avisos del archivo AVISOS-LEGALES.txt"
+
+La PARTE 3 tiene las instrucciones tecnicas y la PARTE 4 los textos completos,
+listos para pegar. El responsable (Miguel Angel) y el pais (Mexico) YA estan
+puestos en los textos. Solo faltan 5 marcadores [[PLACEHOLDER]], listados en la
+PARTE 2, y todos son datos que el dueno ya tiene en la cabeza.
+
+IMPORTANTE: no hay correo ni telefono en ningun texto. Todo el contacto va por
+Instagram (@anxieofficial) y Discord (discord.gg/YuTzCPu3tS), que son los
+canales reales del negocio.
+
+AVISO: esto es un borrador redactado por un asistente, no asesoria legal. Para un
+negocio que factura, conviene que un abogado en Mexico le de una revisada antes
+de publicarlo, sobre todo la seccion de garantia y la de marcas.
+
+
+PARTE 1 - DIAGNOSTICO: QUE NECESITA EL SITIO Y POR QUE
+--------------------------------------------------------------------------------
+
+Que hace hoy el sitio (verificado en el codigo):
+
+  * Es un catalogo estatico. NO tiene formularios de contacto, registro,
+    newsletter ni pagos en linea. El unico <input> publico es el buscador, que
+    filtra en el cliente y no se envia a ningun lado.
+  * NO hay analytics, ni pixel de Meta, ni Google Analytics, ni cookies propias.
+  * Usa sessionStorage solo para cachear el catalogo 5 minutos
+    (clave anxie_catalog_v1). Es almacenamiento tecnico, no rastrea a nadie.
+  * La venta ocurre FUERA del sitio: el modal manda a Instagram (@anxieofficial)
+    o a un ticket de Discord (discord.gg/YuTzCPu3tS).
+  * lilshop.html es panel de admin con Supabase Auth (solo el dueno).
+
+Terceros que reciben la IP y el user-agent del visitante solo por cargar la
+pagina (esto si hay que declararlo):
+
+  - Hostinger (hosting de anxiestore.com)
+  - Supabase (jayxntvpiduxvgvluaky.supabase.co) - consulta del catalogo
+  - Cloudflare R2 (pub-221a2b6aa265453ea4b027de0d0c4ed4.r2.dev) - imagenes
+  - Cloudflare Workers (anxie-store-uploads...workers.dev) - solo admin
+  - Google Fonts (fonts.googleapis.com, fonts.gstatic.com)
+  - Google Hosted Libraries (ajax.googleapis.com)
+  - jsDelivr (cdn.jsdelivr.net) y unpkg (unpkg.com) - librerias JS
+  - Spline (prod.spline.design) - escenas 3D
+
+VEREDICTO: SI hace falta, y son pocos. Cuatro documentos, todos cortos:
+
+  1. AVISO DE PRIVACIDAD (simplificado + integral) - OBLIGATORIO
+     La LFPDPPP obliga a todo particular que trate datos personales a tener
+     aviso de privacidad. Aunque el sitio no tenga formularios, el negocio SI
+     recolecta datos personales al vender: nombre o usuario, contacto de
+     Instagram/Discord, comprobantes de pago, a veces el correo de la cuenta de
+     juego. Ese tratamiento es lo que dispara la obligacion, no el formulario.
+     Nota: la LFPDPPP vigente se publico en el DOF el 20 de marzo de 2025 y
+     sustituyo a la de 2010; la autoridad ya no es el INAI sino la Secretaria
+     Anticorrupcion y Buen Gobierno. Conviene confirmar el nombre exacto de la
+     autoridad antes de publicar, porque es un cambio reciente.
+
+  2. TERMINOS Y CONDICIONES DE VENTA - MUY RECOMENDADO
+     El art. 76 bis de la Ley Federal de Proteccion al Consumidor pide que quien
+     vende en linea publique sus medios de contacto, describa el producto con
+     veracidad y confirme la operacion antes de cerrarla. Ademas protege al
+     vendedor: define que se entrega, en cuanto tiempo, que pasa si la cuenta se
+     recupera, y que NO cubre la garantia.
+
+  3. AVISO DE COOKIES Y ALMACENAMIENTO LOCAL - RECOMENDADO
+     Mexico no tiene ley de cookies como la europea, y el sessionStorage que se
+     usa es puramente tecnico (exento de consentimiento incluso bajo el RGPD).
+     Pero los CDN de arriba si transfieren la IP a terceros, y eso se declara.
+     NO hace falta banner de cookies. Basta la seccion informativa.
+
+  4. AVISO DE MARCAS Y NO AFILIACION - IMPORTANTE
+     El sitio usa "Fortnite", "V-Bucks" y los logos de PC/Xbox/PlayStation/
+     Nintendo. Son marcas de terceros. Sin un deslinde explicito, un visitante
+     puede creer que la tienda es oficial o esta autorizada por Epic Games.
+
+SOBRE EL CONTACTO (decision tomada): no se publica correo, telefono ni domicilio.
+Instagram y Discord son los canales oficiales y por ahi se ejercen tambien los
+derechos ARCO. Es lo normal en un negocio llevado por un creador y funciona en la
+practica. El unico punto flojo es que la ley da por hecho que hay un domicilio
+del responsable; si algun dia PROFECO o un cliente lo pide formalmente, se
+resuelve dando el dato en privado, no publicandolo en el sitio.
+
+RIESGO QUE CONVIENE SABER (dato, no sermon): el EULA de Epic Games prohibe
+transferir, vender o compartir cuentas, y Epic puede suspenderlas. Eso no vuelve
+ilegales estos avisos, pero si explica por que los Terminos deben decir con
+claridad que el comprador asume ese riesgo y que cubre exactamente la garantia.
+Un texto vago ahi es justo donde se arman los pleitos con clientes.
+
+
+PARTE 2 - DATOS QUE FALTAN (RELLENAR ANTES DE PUBLICAR)
+--------------------------------------------------------------------------------
+YA RESUELTOS (no tocar, ya vienen escritos en los textos de la PARTE 4):
+
+  Responsable: Miguel Angel        -> aparece como "Miguel Angel" en los textos.
+  Pais:        Mexico              -> aparece como "Mexico" en los textos.
+
+  Nota: si algun dia se factura o se da de alta en el SAT, habria que cambiar
+  "Miguel Angel" por el nombre fiscal completo en los tres lugares donde sale
+  (Doc 1-A, Doc 1-B punto 1, y Doc 2 punto 1).
+
+FALTAN POR RELLENAR. Los textos de la PARTE 4 traen estos marcadores:
+
+  [[DIAS_GARANTIA]]       Dias de garantia tras la entrega. Sugerido: 7 o 15.
+  [[HORAS_ENTREGA]]       Plazo de entrega tras confirmar el pago.
+                          Sugerido: 24 o 48 horas habiles.
+  [[METODOS_PAGO]]        Ej: "transferencia bancaria (SPEI), deposito en OXXO
+                          y PayPal". Poner solo los que de verdad se aceptan.
+  [[EDAD_MINIMA]]         Sugerido: 18. Si se aceptan menores con permiso de
+                          un tutor, decirlo asi explicitamente.
+  [[FECHA_ACTUALIZACION]] Fecha de publicacion. Ej: "1 de septiembre de 2026".
+
+
+PARTE 3 - INSTRUCCIONES DE IMPLEMENTACION
+--------------------------------------------------------------------------------
+
+ESTRUCTURA SUGERIDA: una sola pagina nueva, legal.html, con las cuatro secciones
+y anclas (#privacidad, #terminos, #cookies, #marcas). Una pagina sola evita
+triplicar el nav, el sidebar y el footer, que hoy estan duplicados a mano en
+cada HTML.
+
+PASOS:
+
+ 1. Crear legal.html copiando el <head>, el navbar, el sidebar movil
+    (#sidebar + #sidebarOverlay) y el footer de catalogo.html. Es la pagina
+    mas simple de las tres y ya carga style.css + catalogo.css.
+
+ 2. Crear legal.css para el contenido (tipografia de lectura larga, ancho
+    maximo ~800px, titulos, listas). NO tocar style.css: lo comparten las tres
+    paginas y cualquier cambio ahi afecta el diseno ya terminado.
+    Los colores exactos estan en la PARTE 3-B: la pagina va en gris oscuro,
+    el mismo tono de la barra lateral movil de index.html.
+
+ 3. Cargar en este orden:
+        style.css  ->  catalogo.css  ->  legal.css
+    (catalogo.css tiene los overrides del nav que legal.html hereda).
+
+ 4. FOOTER: reemplazar el texto "By Matthew." por el enlace legal.
+
+    COMO SE LLAMA EL ENLACE: "Aviso Legal".
+    El razonamiento esta en la PARTE 3-C. Resumen: la pagina tiene cuatro
+    documentos, no uno. Si el enlace dijera "Terminos y Condiciones" o "Aviso
+    de Privacidad" estaria nombrando solo una parte de lo que hay adentro.
+    "Aviso Legal" es el paraguas que los cubre todos y es el termino estandar
+    en webs en espanol.
+
+    Estado actual (verificado):
+      index.html linea 302:
+        <p class="footer-copy">&copy; 2026 ANXIE STORE. By Matthew.</p>
+      catalogo.html linea 232:
+        <p class="footer-copy" style="color: #666; font-family: 'Montserrat', sans-serif; font-size: 0.8rem;">&copy; 2026 ANXIE STORE. By Matthew.</p>
+
+    Queda asi en las DOS paginas (en catalogo.html se conserva su style inline):
+      <p class="footer-copy">&copy; 2026 ANXIE STORE. <a href="legal.html" class="footer-legal-link">Aviso Legal</a></p>
+
+    En legal.html el footer va igual, pero sin el enlace (ya estas ahi):
+      <p class="footer-copy">&copy; 2026 ANXIE STORE.</p>
+
+ 4-B. CSS DEL ENLACE DEL FOOTER.
+
+    index.html y catalogo.html NO cargan legal.css, asi que este estilo tiene
+    que vivir en style.css, que es el unico que comparten. Se AGREGA una regla
+    nueva al final, junto a .footer-copy (linea 1677). Agregar reglas nuevas
+    esta bien; lo prohibido es modificar las que ya existen.
+
+        /* ====== ENLACE LEGAL DEL FOOTER ====== */
+        .footer-legal-link {
+            color: #555555;                              /* = .footer-copy */
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            transition: color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .footer-legal-link:hover {
+            color: #FF0000;                              /* rojo de la marca */
+            border-bottom-color: #FF0000;
+        }
+
+    Se usa el mismo #555555 de .footer-copy para que el renglon se lea como una
+    sola linea y no como un boton pegado. El subrayado tenue es lo unico que
+    delata que es clicable, y en hover se pone rojo como el resto del sitio.
+
+    NO alterar el layout ni las animaciones existentes del footer. El cambio es
+    solo de texto y un enlace: la pildora de redes sociales, el spline del
+    footer en PC y los iconos 2D en movil se quedan exactamente igual.
+
+ 5. Anadir el aviso simplificado (PARTE 4, doc 1-A) como bloque corto arriba de
+    la seccion integral en legal.html. La ley pide que el simplificado sea lo
+    primero visible y que enlace al integral.
+
+ 6. Anadir el deslinde de marcas (PARTE 4, doc 4) como una linea de una sola
+    frase en el footer de index.html y catalogo.html, ademas de la seccion
+    completa en legal.html. Ese renglon es el que evita confusion al visitante
+    que nunca abre la pagina legal.
+
+ 7. Los enlaces a Instagram y Discord dentro de los textos legales deben ser
+    <a> reales con target="_blank" rel="noopener noreferrer", igual que los del
+    resto del sitio. Son el unico canal de contacto, asi que tienen que ser
+    clicables y no solo texto.
+
+ 8. CACHE BUSTING (critico, ver CLAUDE.md): al crear legal.css y al tocar el
+    footer, bumpear el token ?v= de TODOS los .css y .js locales en las tres
+    paginas. Usar la fecha del dia, ej. ?v=20260901. Si no, los visitantes que
+    regresen ven el HTML nuevo con el CSS viejo hasta por 7 dias.
+
+ 9. Convenciones del proyecto que hay que respetar:
+    - Todo en espanol (UI, comentarios, nombres de variables).
+    - Banners de seccion en CSS con el estilo /* ====== TITULO ====== */.
+    - Responsive con @media (max-width: 900px).
+    - Sin build step: HTML/CSS plano, scripts inline al final si hacen falta.
+    - legal.html no necesita Supabase, ni spline-viewer, ni model-viewer.
+      Dejarlos fuera hace que cargue instantaneo.
+
+10. Revisar en movil despues de tocar el footer: es chrome compartido y varios
+    commits del historial son arreglos moviles.
+
+
+PARTE 3-B - DISENO Y COLORES DE LA PAGINA LEGAL
+--------------------------------------------------------------------------------
+
+DECISION: la ventana legal va en GRIS OSCURO, el mismo tono de la barra lateral
+movil de index.html (la clase .sidebar en style.css, que hoy usa
+rgba(10, 10, 10, 0.98)). Es un gris casi negro, elegante, y ya es parte del
+lenguaje visual del sitio, asi que no se inventa nada nuevo.
+
+OJO: la barra lateral de catalogo.html (.sidebar-catalog en catalogo.css) es
+BLANCA (#ffffff). Esa NO es la referencia. La buena es la de index.html.
+
+PALETA A USAR EN legal.css (definirla como variables CSS al inicio del archivo):
+
+    :root {
+        --legal-bg:      #0a0a0a;            /* fondo de la pagina, = .sidebar */
+        --legal-panel:   #141414;            /* bloques de texto, un tono arriba */
+        --legal-borde:   rgba(255,255,255,0.1); /* separadores, = .sidebar-header */
+        --legal-titulo:  #ffffff;            /* titulos, = .sidebar-title */
+        --legal-texto:   #dddddd;            /* cuerpo, = .sidebar-links a */
+        --legal-tenue:   #888888;            /* fechas y notas secundarias */
+        --legal-acento:  #FF0000;            /* enlaces y hover, rojo de la marca */
+    }
+
+Por que --legal-panel es #141414 y no el mismo #0a0a0a: si todo va del mismo
+tono, la pagina se ve negra plana y un muro de texto legal en negro puro cansa
+la vista. Subiendo un pelin los bloques de contenido se lee como gris oscuro de
+verdad y se separan visualmente las secciones. Si se prefiere todo parejo, basta
+con poner --legal-panel igual a --legal-bg.
+
+REGLAS DE ESTILO:
+
+  - Fuente Montserrat, la misma del resto del sitio.
+  - Cuerpo de texto ~0.95rem con line-height 1.7 (es lectura larga, necesita
+    aire). Ancho maximo del contenido ~800px y centrado.
+  - Titulos de seccion en blanco, peso 800, mayusculas, con un borde inferior
+    de 1px en --legal-borde. Es el mismo tratamiento que .sidebar-header.
+  - Enlaces en --legal-acento, y en hover subrayado. Nada de azul de navegador.
+  - Si la pagina se hace en modo "ventana" o modal en vez de pagina completa,
+    aplica exactamente la misma paleta, con border-radius ~16px y la sombra que
+    ya usa .sidebar: box-shadow: -10px 0 30px rgba(0, 0, 0, 0.8).
+
+BARRA LATERAL DE legal.html:
+
+  El paso 1 dice copiar el chrome de catalogo.html porque su markup es el mas
+  simple, pero su sidebar es blanco y chocaria con el fondo oscuro. En legal.css
+  hay que sobrescribir ese sidebar con la version oscura, copiando los valores
+  de .sidebar en style.css (fondo rgba(10,10,10,0.98), titulo #ffffff, enlaces
+  #dddddd, hover #FF0000). NO editar style.css ni catalogo.css para lograrlo:
+  todo el override va en legal.css, que es el ultimo en cargar.
+
+  Alternativa igual de valida: copiar el navbar y el sidebar de index.html en
+  vez de los de catalogo.html, y ahorrarse el override. Lo unico que hay que
+  quitar en ese caso son los spline-viewer y el model-viewer, que legal.html no
+  necesita.
+
+RESPONSIVE - LA VENTANA DEBE SERVIR EN PC Y EN CELULAR:
+
+  El sitio ya es responsive con @media (max-width: 900px) en todas partes.
+  legal.html sigue ese mismo corte, sin inventar breakpoints nuevos.
+
+  EN PC (por defecto, sin media query):
+    - Contenido centrado, max-width 800px, margin: 0 auto.
+    - Padding: 4rem 2rem. Aire arriba para que el nav fijo no tape el titulo.
+    - Titulo principal ~2.5rem, titulos de seccion ~1.3rem.
+    - Cuerpo 0.95rem, line-height 1.7.
+    - Indice de las 4 secciones arriba, en fila horizontal.
+
+  EN CELULAR (@media max-width: 900px):
+    - Padding lateral a 1.25rem. Con 2rem el texto queda muy angosto en
+      pantallas de 360px.
+    - Titulo principal baja a ~1.8rem, titulos de seccion a ~1.1rem.
+    - Cuerpo 0.9rem, line-height 1.65.
+    - El indice de secciones se apila en columna, no en fila.
+    - Los enlaces necesitan area tocable comoda: padding vertical de ~10px o
+      min-height 44px. Con solo el texto son muy dificiles de atinar con el
+      dedo.
+
+  TRES DETALLES QUE ROMPEN EN MOVIL SI NO SE CUIDAN:
+
+    1. URLs LARGAS. Los textos legales llevan enlaces largos
+       (https://anxiestore.com/legal.html#privacidad-integral,
+       https://www.instagram.com/anxieofficial/, discord.gg/...). En pantallas
+       angostas desbordan y provocan scroll horizontal en toda la pagina. Hay
+       que poner en el contenedor de texto:
+           overflow-wrap: break-word;
+           word-break: break-word;
+
+    2. ALTURA. Usar 100svh y NO 100vh, igual que ya se hizo en .sidebar. Con
+       100vh el ultimo tramo queda debajo de la barra de Safari en iPhone. Ese
+       arreglo ya esta en el historial de commits, no repetir el error.
+
+    3. LAS LISTAS. Varias secciones tienen listas con sangria (los puntos de la
+       garantia, los proveedores). En movil reducir el padding-left a ~1.2rem
+       o se comen media pantalla.
+
+  COMPROBAR AL TERMINAR, EN NAVEGADOR DE VERDAD: no basta con leer el CSS y
+  suponer que quedo bien. Levantar el servidor local
+  (python -m http.server 8000) y abrir legal.html con Playwright + WebKit,
+  midiendo a 1440px, 768px y 375px. Verificar en cada uno:
+    - Que NO haya scroll horizontal.
+    - Que el texto se lea sin hacer zoom.
+    - Que el sidebar movil abra y cierre bien.
+    - Que el footer con el enlace "Aviso Legal" no se parta en dos renglones
+      feos en 375px.
+
+
+LO QUE NO SE TOCA:
+
+  El resto del sitio se queda exactamente igual. Este gris oscuro es solo para
+  legal.html. No cambiar colores, animaciones ni layout de index.html ni de
+  catalogo.html: lo unico que se les hace es cambiar "By Matthew." por el
+  enlace "Aviso Legal" en el footer (paso 4), agregar la regla nueva
+  .footer-legal-link a style.css (paso 4-B), y poner la linea de marcas
+  (paso 6).
+
+
+PARTE 3-C - COMO SE LLAMA EL ENLACE (DECIDIDO: "AVISO LEGAL")
+--------------------------------------------------------------------------------
+
+La pregunta era si el enlace del footer debia decir "Terminos y Condiciones" o
+"Aviso de Privacidad". La respuesta es ninguno de los dos, y la razon es simple:
+la pagina contiene CUATRO documentos, no uno.
+
+  - "Terminos y Condiciones" nombra solo el Documento 2.
+  - "Aviso de Privacidad" nombra solo el Documento 1.
+
+Cualquiera de los dos deja fuera a los otros tres, y el visitante que busca la
+politica de cookies o el deslinde de marcas no sabria que estan ahi adentro.
+
+"AVISO LEGAL" es el termino paraguas estandar en webs en espanol y cubre los
+cuatro. Ademas es corto, que importa aqui: sustituye a "By Matthew." en un
+renglon de 0.8rem, y algo como "Terminos y Condiciones" se ve apretado en el
+footer de un celular.
+
+Queda: "© 2026 ANXIE STORE. Aviso Legal"
+
+DENTRO DE legal.html, en cambio, cada documento SI lleva su nombre completo y
+formal, porque ahi ya hay espacio y porque la ley se refiere a ellos por su
+nombre. Poner arriba un indice con las cuatro secciones:
+
+    Aviso de Privacidad  ·  Terminos y Condiciones  ·  Cookies  ·  Marcas
+
+apuntando a #privacidad, #terminos, #cookies y #marcas.
+
+ORDEN DE LAS SECCIONES: el Aviso de Privacidad va PRIMERO. La LFPDPPP espera
+que sea facil de encontrar, y ponerlo al inicio de la pagina a la que apunta el
+footer es la forma mas limpia de cumplirlo sin llenar el footer de enlaces.
+
+
+PARTE 4 - TEXTOS LISTOS PARA PEGAR
+================================================================================
+
+
+================================================================================
+DOCUMENTO 1-A - AVISO DE PRIVACIDAD SIMPLIFICADO
+(bloque corto; va arriba de todo en legal.html#privacidad)
+================================================================================
+
+AVISO DE PRIVACIDAD SIMPLIFICADO
+
+Miguel Ángel, conocido comercialmente como Anxie Store y ubicado en México, es
+el responsable del tratamiento de tus datos personales.
+
+Tus datos se usan para las siguientes finalidades primarias, necesarias para el
+servicio: atender tus mensajes y dudas, procesar y confirmar tu compra, entregar
+la cuenta adquirida, brindar soporte y garantía, y llevar el control interno de
+las operaciones.
+
+De manera adicional, y solo si no te opones, podemos usar tus datos para
+finalidades secundarias: enviarte novedades del catálogo, promociones y encuestas
+de satisfacción. Puedes negarte a estas finalidades ahora o en cualquier momento
+escribiéndonos por Instagram (@anxieofficial) o abriendo un ticket en nuestro
+servidor de Discord. Negarte no afecta tu compra ni tu garantía.
+
+No vendemos, rentamos ni comercializamos tus datos personales con terceros.
+
+Puedes consultar el aviso de privacidad integral, conocer las transferencias que
+realizamos y ejercer tus derechos ARCO en:
+https://anxiestore.com/legal.html#privacidad-integral
+
+
+================================================================================
+DOCUMENTO 1-B - AVISO DE PRIVACIDAD INTEGRAL
+(legal.html#privacidad-integral)
+================================================================================
+
+AVISO DE PRIVACIDAD INTEGRAL
+Última actualización: [[FECHA_ACTUALIZACION]]
+
+1. RESPONSABLE DE TUS DATOS PERSONALES
+
+Miguel Ángel, que opera comercialmente bajo el nombre Anxie Store desde México,
+es el responsable del uso y protección de tus datos personales, conforme a la Ley
+Federal de Protección de Datos Personales en Posesión de los Particulares y su
+normativa aplicable.
+
+Anxie Store es un negocio digital operado por un creador de contenido. Nuestros
+canales oficiales de atención, y los mismos por los que puedes ejercer tus
+derechos sobre tus datos, son:
+
+  - Instagram: @anxieofficial (https://www.instagram.com/anxieofficial/)
+  - Discord: https://discord.gg/YuTzCPu3tS
+
+Cualquier cuenta distinta a esas no nos representa.
+
+
+2. QUÉ DATOS RECABAMOS
+
+Navegar por anxiestore.com no requiere que nos des ningún dato personal. El sitio
+no tiene formularios de registro, contacto ni pago: es únicamente un catálogo.
+
+Recabamos datos personales solo cuando tú decides contactarnos para comprar, a
+través de Instagram o de un ticket en nuestro servidor de Discord. En ese caso
+podemos tratar:
+
+  - Datos de identificación: tu nombre o el nombre de usuario con el que te
+    presentas.
+  - Datos de contacto: tu usuario de Instagram o de Discord.
+  - Datos de la operación: producto elegido, precio, fecha y método de pago,
+    y el comprobante de pago que nos compartas.
+  - Datos técnicos de la cuenta vendida: el correo electrónico que designes
+    para vincular la cuenta adquirida, cuando aplique.
+
+NO recabamos datos personales sensibles. NO solicitamos ni almacenamos números
+completos de tarjetas bancarias, NIP, CVV ni contraseñas de tu banco. Si algún
+método de pago requiere esos datos, se procesan directamente en la plataforma
+del proveedor de pago, no con nosotros.
+
+Menores de edad: nuestros productos están dirigidos a personas de
+[[EDAD_MINIMA]] años o más. No recabamos datos de menores de forma consciente.
+Si detectamos que un dato pertenece a un menor sin autorización de su padre,
+madre o tutor, lo eliminamos.
+
+
+3. PARA QUÉ USAMOS TUS DATOS
+
+Finalidades primarias (necesarias para darte el servicio):
+  a) Responder tus mensajes, dudas y solicitudes.
+  b) Cotizar, procesar y confirmar tu compra.
+  c) Entregarte la cuenta adquirida y las credenciales correspondientes.
+  d) Prestarte soporte técnico y atender la garantía.
+  e) Llevar el registro y control interno de ventas.
+  f) Cumplir obligaciones legales, fiscales o requerimientos de autoridad.
+
+Finalidades secundarias (no necesarias, requieren tu no oposición):
+  g) Informarte sobre nuevo catálogo, promociones y descuentos.
+  h) Realizar encuestas de satisfacción y mejorar el servicio.
+
+Si no quieres que usemos tus datos para las finalidades secundarias, mándanos un
+mensaje por Instagram o abre un ticket en Discord indicando "Negativa
+finalidades secundarias". Tu negativa no será motivo para negarte los servicios
+que contrataste.
+
+
+4. DATOS QUE SE RECOPILAN AUTOMÁTICAMENTE AL NAVEGAR
+
+Como cualquier sitio en internet, al cargar anxiestore.com tu navegador
+transmite automáticamente tu dirección IP, tipo de navegador y sistema operativo
+a los proveedores de infraestructura que hacen funcionar el sitio. Esta
+información no se usa para identificarte ni para crear perfiles publicitarios, y
+nosotros no la consultamos ni la almacenamos. El detalle está en la sección
+"Cookies y almacenamiento local".
+
+
+5. TRANSFERENCIAS Y ENCARGADOS
+
+No vendemos, rentamos ni compartimos tus datos personales con terceros para sus
+propios fines comerciales.
+
+Utilizamos proveedores tecnológicos que actúan como encargados del tratamiento y
+que, por la naturaleza de su servicio, procesan datos técnicos de conexión:
+
+  - Hostinger - alojamiento del sitio web.
+  - Supabase - base de datos del catálogo.
+  - Cloudflare (R2 y Workers) - almacenamiento y entrega de imágenes.
+  - Google (Fonts y Hosted Libraries) - tipografías y librerías del sitio.
+  - jsDelivr y unpkg - librerías JavaScript del sitio.
+  - Spline - escenas 3D del sitio.
+  - Meta Platforms (Instagram) y Discord - canales por los que nos contactas.
+    Al escribirnos por esas vías, tu información también queda sujeta a las
+    políticas de privacidad de dichas plataformas, que te recomendamos leer.
+
+Algunos de estos proveedores almacenan información en servidores fuera de
+México. Estas transferencias son necesarias para la prestación del servicio y no
+requieren tu consentimiento conforme a la ley.
+
+Solo transferiremos tus datos a autoridades competentes cuando exista un
+requerimiento fundado y motivado.
+
+
+6. TUS DERECHOS ARCO
+
+Tienes derecho a Acceder a tus datos personales, Rectificarlos cuando sean
+inexactos, Cancelarlos cuando consideres que no son necesarios, y Oponerte a su
+tratamiento para fines específicos. También puedes revocar en cualquier momento
+el consentimiento que nos hayas otorgado.
+
+Para ejercer cualquiera de estos derechos, escríbenos por mensaje directo a
+@anxieofficial en Instagram, o abre un ticket en nuestro servidor de Discord,
+indicando "Derechos ARCO" e incluyendo:
+
+  1. Tu nombre y el medio por el que quieres recibir la respuesta.
+  2. Una forma de acreditar tu identidad. Normalmente basta con que escribas
+     desde la misma cuenta de Instagram o Discord con la que realizaste la
+     compra. Si no es posible, podemos pedirte otro comprobante de la
+     operación.
+  3. La descripción clara del derecho que deseas ejercer y de los datos
+     involucrados.
+  4. Cualquier dato que facilite localizar tu información, como la fecha de la
+     compra o la cuenta adquirida.
+
+Responderemos tu solicitud en un plazo máximo de 20 días hábiles. Si procede, se
+hará efectiva dentro de los 15 días hábiles siguientes. El ejercicio de estos
+derechos es gratuito.
+
+Ten en cuenta que la cancelación u oposición puede no proceder cuando debamos
+conservar datos por obligaciones legales o fiscales.
+
+
+7. LIMITACIÓN DEL USO O DIVULGACIÓN
+
+Puedes pedirnos en cualquier momento, por los mismos canales, que dejemos de
+enviarte comunicaciones promocionales o que limitemos el uso de tus datos, sin
+necesidad de ejercer un derecho ARCO formal.
+
+
+8. CONSERVACIÓN DE LOS DATOS
+
+Conservamos tus datos durante el tiempo necesario para cumplir las finalidades
+descritas, mientras dure la garantía de tu compra, y después únicamente durante
+los plazos que exijan las obligaciones legales y fiscales aplicables. Cumplidos
+esos plazos, se eliminan.
+
+
+9. SEGURIDAD
+
+Aplicamos medidas de seguridad administrativas, técnicas y físicas razonables
+para proteger tus datos contra pérdida, uso indebido, acceso no autorizado o
+alteración. El panel de administración está protegido con autenticación y solo
+el responsable tiene acceso. Ningún sistema es infalible, por lo que no podemos
+garantizar seguridad absoluta.
+
+
+10. CAMBIOS A ESTE AVISO
+
+Este aviso puede modificarse para reflejar cambios en nuestros servicios o en la
+legislación. Cualquier modificación se publicará en esta misma página, con la
+fecha de última actualización arriba. Te recomendamos revisarla periódicamente.
+
+
+11. AUTORIDAD
+
+Si consideras que tu derecho a la protección de datos personales fue vulnerado,
+puedes acudir ante la autoridad competente en materia de protección de datos
+personales en México. Antes de eso, te agradeceremos que nos escribas por
+Instagram o Discord para intentar resolverlo directamente.
+
+
+================================================================================
+DOCUMENTO 2 - TÉRMINOS Y CONDICIONES
+(legal.html#terminos)
+================================================================================
+
+TÉRMINOS Y CONDICIONES DE USO Y VENTA
+Última actualización: [[FECHA_ACTUALIZACION]]
+
+1. QUIÉNES SOMOS
+
+Anxie Store es un negocio digital operado por Miguel Ángel desde México,
+dedicado a la venta de cuentas de videojuegos entre particulares.
+
+Toda la atención, venta y soporte se realiza exclusivamente por nuestros canales
+oficiales:
+
+  - Instagram: @anxieofficial (https://www.instagram.com/anxieofficial/)
+  - Discord: https://discord.gg/YuTzCPu3tS
+
+No operamos por ningún otro medio. Si alguien te contacta desde otra cuenta
+diciendo representar a Anxie Store, no somos nosotros.
+
+Al navegar en anxiestore.com o al contactarnos para comprar, aceptas estos
+términos. Si no estás de acuerdo, te pedimos no utilizar el sitio ni realizar
+compras.
+
+
+2. EDAD MÍNIMA
+
+Para comprar debes tener al menos [[EDAD_MINIMA]] años y capacidad legal para
+contratar. Si eres menor de edad, necesitas la autorización y supervisión de tu
+padre, madre o tutor, quien asume la responsabilidad de la operación.
+
+
+3. EL CATÁLOGO Y LOS PRECIOS
+
+  - Las cuentas publicadas son únicas: cada una se vende una sola vez, y al
+    venderse se retira del catálogo.
+  - Los precios se muestran en pesos mexicanos (MXN) y en dólares
+    estadounidenses (USD). El precio en USD es una referencia aproximada; el
+    cobro se realiza en MXN salvo acuerdo distinto.
+  - Los precios pueden cambiar sin previo aviso. El precio aplicable es el
+    vigente al momento de confirmar la operación por Instagram o Discord.
+  - Las imágenes y descripciones son ilustrativas del contenido real de cada
+    cuenta. Hacemos nuestro mejor esfuerzo por que sean exactas; si detectas
+    una diferencia, avísanos antes de pagar.
+  - El sitio no procesa pagos. Ninguna compra se cierra en anxiestore.com.
+
+
+4. CÓMO SE COMPRA
+
+  a) Eliges una cuenta en el catálogo y nos contactas por Instagram
+     (@anxieofficial) o creando un ticket en nuestro servidor de Discord.
+  b) Confirmamos disponibilidad, precio final y método de pago.
+  c) Realizas el pago por alguno de los medios aceptados: [[METODOS_PAGO]].
+  d) Una vez confirmado el pago, entregamos las credenciales de la cuenta en un
+     plazo de [[HORAS_ENTREGA]].
+  e) Cualquier trato cerrado fuera de nuestras cuentas oficiales de Instagram y
+     Discord no es responsabilidad de Anxie Store. Verifica siempre que estés
+     hablando con las cuentas enlazadas desde este sitio.
+
+
+5. ENTREGA
+
+La entrega es digital. Consiste en las credenciales de acceso y, cuando aplique,
+el acompañamiento para cambiar el correo y la contraseña de la cuenta a tus
+propios datos.
+
+Es tu responsabilidad, inmediatamente después de recibir la cuenta:
+  - Cambiar la contraseña.
+  - Cambiar el correo vinculado por uno tuyo.
+  - Activar la autenticación en dos pasos.
+
+Te recomendamos hacerlo dentro de las primeras horas. La garantía depende de
+ello, como se explica abajo.
+
+
+6. GARANTÍA
+
+Ofrecemos una garantía de [[DIAS_GARANTIA]] días naturales contados a partir de
+la entrega, que cubre:
+
+  - Que las credenciales entregadas funcionen y den acceso a la cuenta.
+  - Que el contenido de la cuenta corresponda a lo descrito y mostrado en el
+    catálogo al momento de la compra.
+  - Que la cuenta no sea recuperada por un tercero durante ese periodo, siempre
+    que hayas realizado los cambios de seguridad del punto 5.
+
+La garantía NO cubre:
+
+  - Que no hayas cambiado la contraseña, el correo vinculado o activado la
+    autenticación en dos pasos tras la entrega.
+  - Que hayas compartido, revendido o prestado las credenciales a terceros.
+  - Suspensiones, bloqueos o cierres aplicados por el desarrollador o la
+    plataforma del videojuego por conducta posterior a la entrega, incluyendo
+    trampas, lenguaje abusivo o incumplimiento de sus reglas.
+  - Cambios que el desarrollador realice a su servicio, a su catálogo o a sus
+    políticas.
+  - Pérdida de acceso por descuido, phishing o filtración de tus propios datos.
+
+Si algo cubierto por la garantía falla, escríbenos dentro del plazo por el mismo
+canal donde compraste, con evidencia. Repondremos la cuenta por otra de valor
+equivalente o, si no fuera posible, reembolsaremos el monto pagado.
+
+
+7. RIESGO DE PLATAFORMA - LÉELO ANTES DE COMPRAR
+
+Los términos de uso de los desarrolladores de videojuegos, incluido Epic Games,
+generalmente establecen que las cuentas son personales e intransferibles, y les
+reservan la facultad de suspenderlas o cancelarlas. Al comprar, reconoces que
+conoces ese riesgo y que lo asumes. Nuestra garantía es un compromiso comercial
+de Anxie Store frente a ti y opera en los términos del punto 6; no constituye
+ninguna autorización, aval ni respaldo del desarrollador del videojuego, ni
+podemos evitar decisiones que este tome sobre la cuenta después del plazo de
+garantía.
+
+
+8. CANCELACIONES Y REEMBOLSOS
+
+  - Antes de la entrega: puedes cancelar y te reembolsamos el 100%.
+  - Después de la entrega: por tratarse de un producto digital que se entrega de
+    forma inmediata y única, no aplican devoluciones por arrepentimiento. Sí
+    aplican los supuestos de la garantía del punto 6.
+  - Los reembolsos se realizan por el mismo medio de pago, dentro de los 10 días
+    hábiles siguientes a que se autorice la solicitud.
+
+
+9. USO DEL SITIO
+
+Te comprometes a no intentar vulnerar, sobrecargar o acceder sin autorización a
+la infraestructura del sitio, ni a extraer masivamente su contenido. El diseño,
+los textos, el código y los elementos gráficos originales de anxiestore.com son
+propiedad de Anxie Store.
+
+
+10. LIMITACIÓN DE RESPONSABILIDAD
+
+El sitio se ofrece "tal cual". No garantizamos disponibilidad ininterrumpida ni
+ausencia de errores. Nuestra responsabilidad máxima frente a ti, por cualquier
+concepto relacionado con una compra, se limita al monto que efectivamente
+pagaste por ella.
+
+
+11. MODIFICACIONES
+
+Podemos actualizar estos términos en cualquier momento. La versión aplicable a
+tu compra es la publicada en esta página al momento de realizarla.
+
+
+12. LEY APLICABLE
+
+Estos términos se rigen por las leyes de los Estados Unidos Mexicanos y se
+someten a la jurisdicción de los tribunales competentes en México, sin perjuicio
+de los derechos que la Ley Federal de Protección al Consumidor otorga al
+consumidor, incluida la posibilidad de acudir a la Procuraduría Federal del
+Consumidor (PROFECO).
+
+
+================================================================================
+DOCUMENTO 3 - AVISO DE COOKIES Y ALMACENAMIENTO LOCAL
+(legal.html#cookies)
+================================================================================
+
+COOKIES Y ALMACENAMIENTO LOCAL
+Última actualización: [[FECHA_ACTUALIZACION]]
+
+Anxie Store NO utiliza cookies publicitarias, ni de rastreo, ni de análisis. No
+tenemos Google Analytics, ni píxeles de redes sociales, ni herramientas de
+perfilado. No creamos perfiles de navegación ni vendemos información a nadie.
+
+Qué sí usamos:
+
+  ALMACENAMIENTO TÉCNICO (sessionStorage)
+  Guardamos temporalmente el catálogo en la memoria de tu navegador, bajo la
+  clave "anxie_catalog_v1", durante 5 minutos. Sirve únicamente para que el
+  sitio cargue más rápido al moverte entre la página principal y el catálogo, y
+  para consultar la base de datos menos veces. No contiene datos personales
+  tuyos: solo títulos, precios e imágenes de las cuentas publicadas. Se borra
+  solo al cerrar la pestaña, y puedes borrarlo cuando quieras desde las opciones
+  de tu navegador. El sitio funciona igual si lo bloqueas.
+
+  SERVICIOS DE TERCEROS NECESARIOS PARA MOSTRAR LA PÁGINA
+  Al cargar el sitio, tu navegador se conecta automáticamente a los siguientes
+  proveedores, que por ese hecho reciben tu dirección IP y datos técnicos de tu
+  navegador:
+
+    - Hostinger - alojamiento del sitio.
+    - Supabase - base de datos del catálogo.
+    - Cloudflare - imágenes de las cuentas.
+    - Google Fonts y Google Hosted Libraries - tipografías y librerías.
+    - jsDelivr y unpkg - librerías JavaScript.
+    - Spline - escenas y modelos 3D.
+
+  Estas conexiones son indispensables para que la página se muestre. Cada
+  proveedor trata esos datos conforme a su propia política de privacidad.
+
+Como no utilizamos cookies de rastreo ni de publicidad, este sitio no muestra un
+banner de consentimiento de cookies.
+
+
+================================================================================
+DOCUMENTO 4 - AVISO DE MARCAS Y NO AFILIACIÓN
+(legal.html#marcas, y versión corta en el footer)
+================================================================================
+
+VERSIÓN COMPLETA (legal.html#marcas):
+
+AVISO DE MARCAS Y NO AFILIACIÓN
+
+Anxie Store es un vendedor independiente. No estamos afiliados, asociados,
+autorizados, patrocinados ni respaldados de ninguna forma por Epic Games, Inc.,
+Microsoft Corporation, Sony Interactive Entertainment, Nintendo Co., Ltd. ni por
+ninguna otra empresa desarrolladora o distribuidora de videojuegos o consolas.
+
+"Fortnite", "V-Bucks", "Epic Games", "Xbox", "PlayStation", "Nintendo Switch" y
+los logotipos correspondientes son marcas registradas de sus respectivos
+titulares. Se utilizan en este sitio únicamente con fines descriptivos e
+informativos, para identificar el contenido y la plataforma de las cuentas
+ofrecidas. Su uso no implica ninguna relación comercial con dichos titulares ni
+pretende generar confusión sobre el origen de nuestros productos.
+
+Todas las imágenes de contenido dentro del juego pertenecen a sus respectivos
+titulares. Si eres titular de derechos y consideras que algún contenido de este
+sitio los infringe, escríbenos por Instagram (@anxieofficial) o por nuestro
+servidor de Discord y lo atenderemos a la brevedad.
+
+
+VERSIÓN CORTA (una línea en el footer de index.html y catalogo.html):
+
+Anxie Store es un vendedor independiente, no afiliado ni patrocinado por Epic
+Games, Inc. Fortnite y V-Bucks son marcas de sus respectivos titulares.
+
+
+================================================================================
+FIN DEL ARCHIVO
+================================================================================

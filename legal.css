@@ -1,0 +1,238 @@
+/* ==========================================
+   AVISO LEGAL — PALETA Y TIPOGRAFÍA
+   Gris oscuro casi negro, el mismo lenguaje visual
+   que .sidebar en style.css. Ver AVISOS-LEGALES.txt Parte 3-B.
+   ========================================== */
+:root {
+    --legal-bg:      #0a0a0a;                 /* fondo de la página, = .sidebar */
+    --legal-panel:   #141414;                 /* bloques de texto, un tono arriba */
+    --legal-borde:   rgba(255, 255, 255, 0.1); /* separadores, = .sidebar-header */
+    --legal-titulo:  #ffffff;                 /* títulos, = .sidebar-title */
+    --legal-texto:   #dddddd;                 /* cuerpo, = .sidebar-links a */
+    --legal-tenue:   #888888;                 /* fechas y notas secundarias */
+    --legal-acento:  #FF0000;                 /* enlaces y hover, rojo de la marca */
+}
+
+/* ====== BASE DE LA PÁGINA ====== */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--legal-bg);
+    color: var(--legal-texto);
+}
+
+/* Forzamos la píldora de íconos 2D siempre visible (PC y celular): esta
+   página no carga spline-viewer para mantenerse liviana, así que no hay
+   alternativa 3D de escritorio que mostrar en su lugar. */
+.footer-mobile-social {
+    display: flex !important;
+}
+
+/* ====== CONTENIDO PRINCIPAL ====== */
+.legal-main {
+    display: flex;
+    justify-content: center;
+    background-color: var(--legal-bg);
+}
+
+.legal-container {
+    width: 100%;
+    max-width: 800px;
+    /* padding-top de sobra (no el 4rem "estándar"): el navbar de index.html
+       es position:fixed y su fila de logo/links por sí sola ya ocupa ~85px
+       en escritorio -- con menos aire el título quedaba tapado. Medido y
+       ajustado en navegador real, no a ojo (ver notas de verificación). */
+    padding: 8rem 2rem 3rem 2rem;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.legal-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 2.5rem;
+    color: var(--legal-titulo);
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+}
+
+.legal-intro {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--legal-texto);
+    margin-bottom: 2rem;
+}
+
+.legal-intro strong {
+    color: var(--legal-titulo);
+}
+
+/* ====== ÍNDICE DE LOS 4 AVISOS ====== */
+.legal-index {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 1.75rem;
+    padding-bottom: 1.75rem;
+    margin-bottom: 2.5rem;
+    border-bottom: 1px solid var(--legal-borde);
+}
+
+.legal-index a {
+    display: inline-flex;
+    align-items: center;
+    color: var(--legal-acento);
+    text-decoration: none;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 10px 2px;
+    transition: opacity 0.2s ease;
+}
+
+.legal-index a:hover {
+    text-decoration: underline;
+}
+
+/* ====== SECCIONES / DOCUMENTOS ====== */
+.legal-section {
+    background: var(--legal-panel);
+    border-radius: 14px;
+    padding: 2rem 2rem 2.25rem 2rem;
+    margin-bottom: 2.5rem;
+    scroll-margin-top: 110px;
+}
+
+.legal-section-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    text-transform: uppercase;
+    color: var(--legal-titulo);
+    letter-spacing: 0.5px;
+    padding-bottom: 0.9rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--legal-borde);
+}
+
+.legal-subtitle {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--legal-acento);
+    margin: 1.75rem 0 0.75rem 0;
+}
+
+.legal-simplificado .legal-subtitle:first-child,
+.legal-section > .legal-subtitle:first-of-type {
+    margin-top: 0;
+}
+
+.legal-doc {
+    padding-top: 1.5rem;
+    margin-top: 0.5rem;
+    border-top: 1px dashed var(--legal-borde);
+}
+
+.legal-fecha {
+    font-size: 0.8rem;
+    color: var(--legal-tenue);
+    margin-bottom: 1.25rem;
+}
+
+.legal-section h4 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--legal-titulo);
+    margin: 1.5rem 0 0.6rem 0;
+}
+
+.legal-section p {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--legal-texto);
+    margin-bottom: 0.9rem;
+}
+
+.legal-section ul {
+    padding-left: 1.4rem;
+    margin-bottom: 0.9rem;
+}
+
+.legal-section li {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--legal-texto);
+    margin-bottom: 0.4rem;
+}
+
+.legal-section a {
+    color: var(--legal-acento);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 0, 0, 0.35);
+    transition: border-color 0.2s ease;
+}
+
+.legal-section a:hover {
+    border-bottom-color: var(--legal-acento);
+}
+
+/* ====== RESPONSIVE (mismo corte que el resto del sitio) ====== */
+@media (max-width: 900px) {
+    .legal-container {
+        padding: 6.5rem 1.25rem 2.5rem 1.25rem;
+    }
+
+    .legal-title {
+        font-size: 1.8rem;
+    }
+
+    .legal-intro {
+        font-size: 0.9rem;
+        line-height: 1.65;
+    }
+
+    .legal-index {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.25rem;
+    }
+
+    .legal-index a {
+        min-height: 44px;
+        padding: 10px 4px;
+        border-bottom: 1px solid var(--legal-borde);
+    }
+
+    .legal-index a:last-child {
+        border-bottom: none;
+    }
+
+    .legal-section {
+        padding: 1.5rem 1.25rem 1.75rem 1.25rem;
+        border-radius: 10px;
+        scroll-margin-top: 90px;
+    }
+
+    .legal-section-title {
+        font-size: 1.1rem;
+    }
+
+    .legal-section p,
+    .legal-section li {
+        font-size: 0.9rem;
+        line-height: 1.65;
+    }
+
+    .legal-section ul {
+        padding-left: 1.15rem;
+    }
+}
