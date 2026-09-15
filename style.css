@@ -46,254 +46,476 @@ body {
     z-index: 10;
 }
 
-/* 🌟 NAVBAR EN MODO CLARO
-   El hero ahora es blanco, así que la navbar necesita tinta oscura mientras
-   flota encima de él. legal.html y el resto del sitio siguen con la navbar
-   oscura de siempre, por eso esto vive en una clase aparte que solo pone el
-   JS de index.html. La regla de transition lleva `body` delante a propósito:
-   el bloque .navbar original está MÁS ABAJO en este archivo y, con la misma
-   especificidad, ganaría él y mataría el fundido de color. */
-body .navbar {
-    transition: opacity 1.2s ease 0.3s, background 0.45s ease;
-}
+/* =========================================================================
+   🟢 MENÚ PÍLDORA (.menu) — reemplaza a la navbar vieja
+   =========================================================================
+   Píldora fija arriba al centro. Cerrada muestra "Menú" + hamburguesa; al
+   abrirse se estira y un círculo baja desde arriba pintando el panel con los
+   links. Todo es CSS: el JS solo pone/quita .is-open, el alto abierto y el
+   tema de color.
 
-body .navbar .logo-texto,
-body .navbar .nav-links a,
-body .navbar .sidebar-toggle-btn .bar {
-    transition: color 0.45s ease, background-color 0.45s ease, opacity 0.3s ease;
-}
+   Los 4 colores viven en variables y cambian según la sección que quede
+   debajo de la píldora (data-theme, lo escribe el JS de cada página). Cambiar
+   el tema no anima la custom property en sí, pero SÍ anima el
+   background-color / color que la usa, que es lo que se ve.
 
-.navbar.navbar-claro {
-    background: linear-gradient(to bottom,
-        rgba(255, 255, 255, 0.92) 0%,
-        rgba(255, 255, 255, 0.65) 55%,
-        rgba(255, 255, 255, 0) 100%);
-}
+     --menu-bg        fondo de la píldora cerrada
+     --menu-fg        texto y hamburguesa sobre esa píldora
+     --menu-panel     color del círculo que entra al abrir
+     --menu-panel-fg  texto sobre el panel abierto
 
-.navbar.navbar-claro .logo-texto,
-.navbar.navbar-claro .nav-links a { color: var(--tinta); }
-.navbar.navbar-claro .nav-links li::after { background: var(--verde); }
-.navbar.navbar-claro .sidebar-toggle-btn .bar { background-color: var(--tinta); }
-.navbar.navbar-claro .sidebar-toggle-btn:hover .bar { background-color: var(--verde); }
+   Cada tema usa para el panel un color que NO usa su píldora, así el morph se
+   nota. Los tres contrastan contra el fondo de su sección:
+     claro  -> hero blanco y sección 4 blanca
+     verde  -> cuenta destacada y footer, los dos de fondo verde
+     oscuro -> el portal ya destapado (que es humo NEGRO, no verde) y legal.html
 
-
-/* 🌟 BARRA DE NAVEGACIÓN SUPERIOR (AHORA GLOBAL) 🌟 */
-.navbar {
-    position: fixed; /* 👈 ¡AQUÍ ESTÁ LA MAGIA! Cambiamos absolute por fixed */
-    top: 0;
-    left: 0;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2rem 3.5rem 4.5rem 3.5rem;
-    z-index: 9000; /* Z-index altísimo para que nada la tape */
-    pointer-events: none;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.2) 55%, rgba(0, 0, 0, 0) 100%);
-
-    /* 🎬 Entra junto con el resto del contenido del hero (el JS le agrega
-       .visible al mismo tiempo que a la marca central / avatar / título) */
-    opacity: 0;
-    transition: opacity 1.2s ease 0.3s;
-}
-
-.navbar.visible {
-    opacity: 1;
-}
-
-.logo-container {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    pointer-events: auto;
-}
-
-.logo-img {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.logo-texto {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: #ffffff;
-    letter-spacing: 1px;
-}
-
-.nav-links {
-    display: flex;
-    gap: 2.5rem;
-    list-style: none;
-    pointer-events: auto;
-}
-
-.nav-links li {
-    position: relative;
-    padding-bottom: 4px;
-}
-
-.nav-links a {
-    text-decoration: none;
-    color: #ffffff;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 400; 
-    font-size: 1rem;
-    opacity: 0.75; 
-    transition: opacity 0.3s ease;
-}
-
-.nav-links a:hover { opacity: 1; }
-
-.nav-links li::after {
-    content: '';
-    width: 0%;
-    height: 2px;
-    background: #FF0000;
-    display: block;
-    margin: 4px auto 0 auto;
-    transition: width 0.4s ease-in-out;
-    border-radius: 2px;
-}
-
-.nav-links li:hover::after { width: 100%; }
-
-/* ==========================================
-   🚪 BARRA LATERAL (SIDEBAR MÓVIL) Y BOTÓN HAMBURGUESA
-   ========================================== */
-
-/* Botón Hamburguesa: Oculto en PC por defecto */
-.sidebar-toggle-btn {
-    display: none;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    flex-direction: column;
-    gap: 6px;
-    padding: 8px;
-    z-index: 9001;
-    pointer-events: auto;
-}
-
-.sidebar-toggle-btn .bar {
-    width: 28px;
-    height: 3px;
-    background-color: #ffffff;
-    border-radius: 2px;
-    transition: transform 0.3s ease, background-color 0.3s ease;
-}
-
-.sidebar-toggle-btn:hover .bar {
-    background-color: #FF0000;
-}
-
-/* Fondo Oscuro del Menú */
-.sidebar-overlay {
+   La tipografía es Arial y no la Montserrat del resto del sitio: es la del
+   diseño original de la píldora y la letra por letra del roll se lee mejor
+   así. Va solo aquí dentro, el resto de la página no se toca.
+   ========================================================================= */
+.menu {
+    --menu-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --menu-bg: var(--tinta);
+    --menu-fg: #ffffff;
+    --menu-panel: var(--verde);
+    --menu-panel-fg: #ffffff;
+    /* Alto de la barra cerrada. Lo usan la píldora y el propio botón. */
+    --menu-bar: 48px;
+    font-family: Arial, Helvetica, sans-serif;
     position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(5px);
-    z-index: 9990;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.4s ease, visibility 0.4s ease;
-}
-
-.sidebar-overlay.active {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Menú Lateral */
-.sidebar {
-    position: fixed;
-    top: 0;
-    right: -320px;
-    width: 300px;
-    /* svh: con 100vh el cajon medía la pantalla completa y su último tramo
-       quedaba debajo de la barra de Safari en iPhone. */
-    height: 100vh;
-    height: 100svh;
-    background: rgba(10, 10, 10, 0.98);
-    /* 👇 Borramos el border-left que estaba aquí 👇 */
-    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.8);
+    top: 20px;
+    left: 50%;
+    /* Por encima de todo: el sidebar del catálogo llega a 9999. */
     z-index: 9999;
-    padding: 3rem 2rem;
+    /* El contenedor no debe tapar clics de la página: solo la píldora los recibe. */
+    pointer-events: none;
+    animation: menu-in 520ms var(--menu-ease) both;
+}
+
+/* Entrada: baja desenfocada, como el resto del contenido del hero. Va como
+   animation y no como transition porque no depende del JS. */
+@keyframes menu-in {
+    from {
+        opacity: 0;
+        filter: blur(10px);
+        transform: translate(-50%, -20px);
+    }
+    to {
+        opacity: 1;
+        filter: none;
+        transform: translate(-50%, 0);
+    }
+}
+
+.menu[data-theme="claro"] {
+    --menu-bg: var(--tinta);
+    --menu-fg: #ffffff;
+    --menu-panel: var(--verde);
+    --menu-panel-fg: #ffffff;
+}
+
+.menu[data-theme="verde"] {
+    --menu-bg: #ffffff;
+    --menu-fg: var(--verde);
+    --menu-panel: var(--tinta);
+    --menu-panel-fg: #ffffff;
+}
+
+/* El único tema que NO invierte píldora y panel: sobre negro, un panel negro
+   desaparecería contra el fondo. Va píldora verde de marca con letras blancas,
+   y al abrir el panel entra en blanco. */
+.menu[data-theme="oscuro"] {
+    --menu-bg: var(--verde);
+    --menu-fg: #ffffff;
+    --menu-panel: #ffffff;
+    --menu-panel-fg: var(--tinta);
+}
+
+.menu__shell {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
-    transition: right 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    width: 156px;
+    height: var(--menu-bar);
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--menu-bg);
+    box-shadow: 0 10px 30px rgba(3, 12, 6, 0.22);
+    pointer-events: auto;
+    transition:
+        width 800ms var(--menu-ease),
+        height 800ms var(--menu-ease),
+        border-radius 800ms var(--menu-ease),
+        transform 250ms var(--menu-ease),
+        background-color 400ms ease;
 }
 
-.sidebar.active {
-    right: 0;
+.menu:not(.is-open) .menu__shell:hover {
+    transform: scale(1.05);
 }
 
-.sidebar-close-btn {
+.menu.is-open .menu__shell {
+    width: 280px;
+    border-radius: 30px;
+}
+
+/* El círculo mide 200% del alto de la píldora y cae desde arriba. Cerrado su
+   borde inferior queda justo en el tope (top: -200% = invisible); abierto baja
+   hasta -20% y cubre todo el panel. */
+.menu__circle {
     position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-    background: transparent;
-    border: none;
-    color: #ffffff;
-    font-size: 2rem;
-    cursor: pointer;
+    top: -200%;
+    left: 50%;
+    z-index: 0;
+    width: 200%;
+    height: 200%;
+    border-radius: 50%;
+    background: var(--menu-panel);
+    transform: translateX(-50%);
+    transition: top 800ms var(--menu-ease), background-color 400ms ease;
+}
+
+.menu.is-open .menu__circle {
+    top: -20%;
+    transition-delay: 100ms, 0ms;
+}
+
+.menu__bar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    width: 100%;
+    height: var(--menu-bar);
+    padding: 0 20px;
+    border: 0;
+    /* Hereda el radio de la píldora para que el anillo de foco salga redondo
+       y no un rectángulo asomando por los costados. */
+    border-radius: inherit;
+    background: none;
+    color: var(--menu-fg);
+    /* Los <button> no heredan la fuente: hay que pedírsela a .menu a mano. */
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
     line-height: 1;
-    transition: color 0.3s ease;
+    cursor: pointer;
+    transition: color 300ms ease, padding 800ms var(--menu-ease);
 }
 
-.sidebar-close-btn:hover {
-    color: #FF0000;
+.menu.is-open .menu__bar {
+    padding: 0 24px;
+    color: var(--menu-panel-fg);
 }
 
-.sidebar-header {
+.menu__bar:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: -5px;
+}
+
+.menu__icon {
+    position: relative;
+    display: grid;
+    width: 24px;
+    height: 24px;
+    place-items: center;
+}
+
+.menu__icon i {
+    position: absolute;
+    width: 18px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+    transition: transform 400ms var(--menu-ease), background-color 300ms ease;
+}
+
+.menu__icon i:first-child { transform: translateY(-3px); }
+.menu__icon i:last-child  { transform: translateY(3px); }
+
+.menu.is-open .menu__icon i:first-child { transform: rotate(45deg); }
+.menu.is-open .menu__icon i:last-child  { transform: rotate(-45deg); }
+
+/* Grid de una sola columna en vez de flex: así la columna mide lo que el ítem
+   más ancho ("Catálogo") y TODOS los links quedan del mismo ancho. Con eso los
+   iconos caen alineados en una misma vertical, y el bloque entero sigue
+   centrado dentro del panel. */
+.menu__items {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    justify-content: center;
+    justify-items: start;
+    flex-shrink: 0;
+    gap: 16px;
+    margin: 0;
+    padding: 4px 24px 26px;
+    list-style: none;
+    visibility: hidden;
+    transition: visibility 0s linear 400ms;
+}
+
+.menu.is-open .menu__items {
+    visibility: visible;
+    transition-delay: 0s;
+}
+
+/* Cada link entra escalonado detrás del círculo (--i lo pone el JS). */
+.menu__item {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-top: 1rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--menu-panel-fg);
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    line-height: 1;
+    text-transform: uppercase;
+    text-decoration: none;
+    opacity: 0;
+    transition: opacity 400ms ease, color 300ms ease;
 }
 
-.sidebar-logo {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
+/* Icono a la izquierda del texto. Ancho fijo (no 1em) para que no cambie de
+   tamaño si algún día se toca el font-size del link, y para que los tres
+   ocupen exactamente lo mismo.
+
+   La caja es el equivalente de un .menu__char: recorta la columna de dos
+   copias del SVG que arma el JS, y el roll la sube en el hover. El --c lo pone
+   el JS en 0, así el icono abre la ola. */
+.menu__ico {
+    display: block;
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    overflow: hidden;
 }
 
-.sidebar-title {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 800;
-    font-size: 1.1rem;
-    color: #ffffff;
-    letter-spacing: 1px;
+/* Cada copia ocupa la celda entera: la columna mide 44px y el -50% del roll
+   deja la segunda copia exactamente donde estaba la primera. */
+.menu__ico .menu__roll > span {
+    display: grid;
+    height: 22px;
+    place-items: center;
 }
 
-.sidebar-links {
-    list-style: none;
+.menu__ico svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* El recorte del roll vive acá, no en el link: si estuviera en el link, el
+   height: 1em cortaría el icono. */
+.menu__text {
+    display: flex;
+    height: 1em;
+    overflow: hidden;
+}
+
+.menu.is-open .menu__item {
+    opacity: 1;
+    transition-delay: calc(360ms + var(--i, 0) * 80ms), 0s;
+}
+
+/* Roll del hover: cada letra es una columna con la letra duplicada, y al pasar
+   el mouse la columna sube 50% con un retardo por letra. Al salir vuelve de
+   golpe (transition 0ms) en vez de desandar la animación; el JS retiene la
+   salida hasta que el roll termina para que no corte a mitad. */
+.menu__char {
+    display: block;
+    height: 1em;
+    overflow: hidden;
+}
+
+.menu__roll {
     display: flex;
     flex-direction: column;
-    gap: 1.8rem;
+    transform: translateY(0);
+    transition: transform 0ms;
 }
 
-.sidebar-links a {
-    text-decoration: none;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: 1.2rem;
-    color: #dddddd;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: color 0.3s ease, padding-left 0.3s ease;
-    display: inline-block;
+.menu__roll span {
+    display: block;
+    height: 1em;
+    line-height: 1em;
 }
 
-.sidebar-links a:hover {
-    color: #FF0000;
-    padding-left: 8px;
+.menu__item.is-rolling .menu__roll {
+    transform: translateY(-50%);
+    transition: transform 800ms var(--menu-ease);
+    transition-delay: calc(var(--c, 0) * 30ms);
+}
+
+.menu__space {
+    display: block;
+    width: 0.3em;
+}
+
+/* Velo del panel lateral. En escritorio no existe: el menú de PC es la píldora
+   que se estira sobre la página, sin panel de alto completo detrás. Se
+   enciende en el @media de 640px de aquí abajo. */
+.menu-scrim {
+    display: none;
+}
+
+/* -------------------------------------------------------------------------
+   📱 MENÚ EN CELULAR (hasta 640px)
+   -------------------------------------------------------------------------
+   El corte va en 640 y no en los 900 del resto del archivo a propósito: la
+   píldora que se estira sigue viéndose bien en tablet, y el panel de alto
+   completo solo hace falta cuando la pantalla es angosta de verdad.
+
+   Dos cambios respecto a PC:
+     1. Cerrada, la píldora deja el centro (ahí cae la isla dinámica del
+        iPhone), se ancla a la derecha y se acorta.
+     2. Abierta no se estira en su sitio: se convierte en un panel de alto
+        completo pegado al borde derecho, con velo detrás.
+
+   El truco para que la píldora MORFE al panel (y no pegue un salto) es que
+   .menu pasa a ocupar la pantalla entera como caja de posicionamiento: la
+   píldora se acomoda arriba a la derecha con un margen, y al abrir solo
+   cambian ancho, alto, margen y radio, que sí transicionan. .menu sigue con
+   pointer-events: none, así que aunque cubra todo no tapa clics.
+   ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+    .menu {
+        --menu-bar: 44px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-end;
+        top: 0;
+        left: auto;
+        right: 0;
+        width: 100%;
+        /* svh por lo mismo que el resto del sitio: con 100vh el panel se metía
+           debajo de la barra de Safari en iPhone. */
+        height: 100vh;
+        height: 100svh;
+        animation-name: menu-in-movil;
+    }
+
+    /* Igual que menu-in pero sin el -50%: acá la píldora ya no está centrada. */
+    @keyframes menu-in-movil {
+        from {
+            opacity: 0;
+            filter: blur(10px);
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            filter: none;
+            transform: none;
+        }
+    }
+
+    /* El margen es lo que separa la píldora del borde; al abrir se va a 0 y el
+       panel queda pegado. Por eso hay que sumarlo a la transición heredada. */
+    .menu__shell {
+        width: 108px;
+        margin: 16px 16px 0 0;
+        transition:
+            width 800ms var(--menu-ease),
+            height 800ms var(--menu-ease),
+            margin 800ms var(--menu-ease),
+            border-radius 800ms var(--menu-ease),
+            transform 250ms var(--menu-ease),
+            background-color 400ms ease;
+    }
+
+    /* El alto lo manda el CSS (100% de .menu = pantalla), no el JS: en celular
+       abrirMenu() no escribe style.height. */
+    .menu.is-open .menu__shell {
+        width: min(82vw, 380px);
+        height: 100%;
+        margin: 0;
+        border-radius: 26px 0 0 26px;
+    }
+
+    .menu__bar {
+        justify-content: center;
+        gap: 8px;
+        padding: 0 14px;
+        font-size: 0.88rem;
+    }
+
+    .menu.is-open .menu__bar {
+        justify-content: space-between;
+        gap: 0;
+        padding: 0 22px;
+    }
+
+    /* En el panel los links van alineados a la izquierda y ocupan el alto que
+       sobra. El scroll propio es lo que lo hace escalable: si algún día hay
+       diez links, la lista scrollea sola en vez de desbordar el panel. */
+    .menu.is-open .menu__items {
+        flex: 1 1 auto;
+        /* Es un grid: sin align-content las filas se reparten el alto sobrante
+           del panel y los links quedan desparramados. */
+        align-content: start;
+        justify-content: start;
+        gap: 22px;
+        min-height: 0;
+        padding: 30px 26px 34px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    .menu__item {
+        font-size: 1.25rem;
+    }
+
+    /* Velo: deja ver la página detrás y, al ser hermano de .menu, el click en
+       él lo recoge el listener de "click afuera" y cierra el panel. */
+    .menu-scrim {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 9990;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(4px);
+        opacity: 0;
+        pointer-events: none;
+        /* La curva va escrita a mano: --menu-ease vive en .menu y el velo es
+           hermano, así que no la hereda. */
+        transition: opacity 500ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    body.menu-abierto .menu-scrim {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* Con el panel abierto la página de atrás no scrollea. */
+    body.menu-abierto {
+        overflow: hidden;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .menu {
+        animation: none;
+    }
+
+    .menu__shell,
+    .menu__circle,
+    .menu__bar,
+    .menu__icon i,
+    .menu__item {
+        transition-duration: 1ms;
+    }
+
+    .menu.is-open .menu__item {
+        transition-delay: 0s;
+    }
+
+    .menu__item.is-rolling .menu__roll {
+        transition: none;
+        transform: none;
+    }
 }
 
 /* --- Rejilla interna: promesa arriba, marca al centro, acciones abajo --- */
@@ -825,59 +1047,6 @@ body .navbar .sidebar-toggle-btn .bar {
 
 @media (max-width: 900px) {
 
-    /* 🔴 1. FIX DE BARRA, LOGO Y HAMBURGUESA (MÁS ABAJO Y SOMBRA SUAVE) */
-    .navbar {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        height: 85px !important;
-        padding: 0 1.5rem !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        box-sizing: border-box !important;
-        z-index: 9000 !important;
-        /* Degradado difuminado suave sin corte brusco */
-        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.18) 65%, rgba(0, 0, 0, 0) 100%) !important;
-        /* 🔽 Se oculta al bajar / reaparece al subir (JS agrega/quita .nav-hidden),
-           y además entra con fundido junto al resto del hero (.visible) */
-        transition: transform 0.35s ease, opacity 1.2s ease 0.3s !important;
-    }
-
-    .navbar.nav-hidden {
-        transform: translateY(-100%) !important;
-    }
-
-    .nav-links, .logo-texto { 
-        display: none !important; 
-    }
-
-    /* Logo circular a la izquierda, simétrico con la hamburguesa a la derecha */
-    .logo-container {
-        position: static !important;
-        transform: none !important;
-        margin: 0 !important;
-        z-index: 9002 !important;
-    }
-
-    .logo-img {
-        width: 52px !important;
-        height: 52px !important;
-        border-radius: 50% !important;
-        object-fit: cover !important;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5) !important;
-    }
-
-    /* Hamburguesa alineada a la altura del logo */
-    .sidebar-toggle-btn { 
-        display: flex !important; 
-        margin-left: auto !important; 
-        position: relative !important;
-        transform: translateY(-1px) !important; /* 👈 Cambiado de translateY(10px) a translateY(-2px) para subirlo */
-        z-index: 9003 !important;
-    }
-
     /* 🟩 1.5. SECCIÓN 1 EN CELULAR (hero claro) */
     .hero-inner {
         padding: 5.5rem 1.25rem 0 1.25rem;
@@ -1029,7 +1198,7 @@ body .navbar .sidebar-toggle-btn .bar {
     flex-direction: column;
     justify-content: center;
     gap: 2.6rem;
-    /* El padding de arriba deja libre la navbar, que es fixed. */
+    /* El padding de arriba deja libre el menú píldora, que es fixed. */
     padding: clamp(6rem, 11vh, 8rem) 3.5rem clamp(3.5rem, 8vh, 6rem) 3.5rem;
 }
 
@@ -1357,7 +1526,7 @@ body .navbar .sidebar-toggle-btn .bar {
    SECCIÓN 4: POR QUÉ ANXIE & DISCORD
    ==========================================
    Las clases siguen llamándose .seccion-tres (y el wrapper sigue siendo
-   #features, que es a donde apunta el enlace "Contacto" de la navbar): solo
+   #features, que es a donde apunta el enlace "Contacto" del menú): solo
    cambió de número al mudarse la cuenta destacada a la sección 3. */
 .seccion-tres-scroll-wrapper {
     position: relative;

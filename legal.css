@@ -1,14 +1,13 @@
 /* ==========================================
    AVISO LEGAL — PALETA Y TIPOGRAFÍA
-   Gris oscuro casi negro, el mismo lenguaje visual
-   que .sidebar en style.css. Ver AVISOS-LEGALES.txt Parte 3-B.
+   Gris oscuro casi negro. Ver AVISOS-LEGALES.txt Parte 3-B.
    ========================================== */
 :root {
-    --legal-bg:      #0a0a0a;                 /* fondo de la página, = .sidebar */
+    --legal-bg:      #0a0a0a;                 /* fondo de la página */
     --legal-panel:   #141414;                 /* bloques de texto, un tono arriba */
-    --legal-borde:   rgba(255, 255, 255, 0.1); /* separadores, = .sidebar-header */
-    --legal-titulo:  #ffffff;                 /* títulos, = .sidebar-title */
-    --legal-texto:   #dddddd;                 /* cuerpo, = .sidebar-links a */
+    --legal-borde:   rgba(255, 255, 255, 0.1); /* separadores */
+    --legal-titulo:  #ffffff;                 /* títulos */
+    --legal-texto:   #dddddd;                 /* cuerpo */
     --legal-tenue:   #888888;                 /* fechas y notas secundarias */
     --legal-acento:  #FF0000;                 /* enlaces y hover, rojo de la marca */
 }
@@ -40,10 +39,10 @@ body {
 .legal-container {
     width: 100%;
     max-width: 800px;
-    /* padding-top de sobra (no el 4rem "estándar"): el navbar de index.html
-       es position:fixed y su fila de logo/links por sí sola ya ocupa ~85px
-       en escritorio -- con menos aire el título quedaba tapado. Medido y
-       ajustado en navegador real, no a ojo (ver notas de verificación). */
+    /* padding-top de sobra (no el 4rem "estándar"): el menú píldora es
+       position:fixed y la franja que ocupa arriba llega a ~90px -- con menos
+       aire el título quedaba tapado. Medido y ajustado en navegador real, no
+       a ojo (ver notas de verificación). */
     padding: 8rem 2rem 3rem 2rem;
     box-sizing: border-box;
     overflow-wrap: break-word;

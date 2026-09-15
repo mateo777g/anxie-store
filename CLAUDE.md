@@ -49,7 +49,43 @@ for browsers that already cached the file; changing the URL is what actually fix
 | `catalogo.html` + `style.css` + `catalogo.css` | Full catalog grid, sort, search modal, contact modal | shared anon (`supabase-config.js`) |
 | `lilshop.html` + `lilshop.css` | Admin panel: login, create/edit/delete accounts, image upload via Worker/R2, stats | **its own** client, created inline |
 
-`catalogo.html` loads `style.css` *before* `catalogo.css` — `style.css` owns the shared nav/sidebar/footer, `catalogo.css` owns catalog-only styles and overrides. Changing shared chrome means checking both pages.
+`catalogo.html` loads `style.css` *before* `catalogo.css` — `style.css` owns the shared pill menu/footer, `catalogo.css` owns catalog-only styles and overrides (including its own full set of `.sidebar-*` rules). Changing shared chrome means checking both pages.
+
+### The pill menu (`.menu` + `menu.js`)
+
+`index.html` and `legal.html` share one floating pill menu, which replaced the old
+`.navbar` + `.sidebar` chrome in September 2026. Styles live in the `MENÚ PÍLDORA` block at
+the top of `style.css`; behaviour (open/close, the per-letter hover roll, the mobile drawer)
+lives in `menu.js`, the only piece of page chrome that is not inline — the markup is
+duplicated across both pages, and duplicating the ~150 lines of logic too was not worth it.
+
+Its four colours are CSS variables driven by `data-theme` on `.menu`:
+
+| theme | pill | open panel | used on |
+|---|---|---|---|
+| `claro` | black, white text | green | index hero and section 4 (white) |
+| `verde` | white, green text | black | `#cases` and the footer (green) |
+| `oscuro` | green, white text | white | the uncovered crown portal, and `legal.html` (black) |
+
+`oscuro` is the only theme that does not swap pill and panel colours — over black, a black
+panel would vanish into the background. Note the portal reveals the **black** smoke shader,
+not the flat green it used to; a theme picked from the old green assumption will be wrong.
+
+The pill is set in `Arial` on `.menu` itself, deliberately not the site's Montserrat /
+Plus Jakarta Sans — it is the original design's face and the per-letter roll reads better in
+it. Keep that override scoped to `.menu`.
+
+`index.html` is the only page that switches theme: `actualizarMenu(tamCorona)` runs inside
+the crown-portal rAF loop, measures which section sits under the pill, and calls
+`window.anxieMenu.setTema(...)`. `menu.js` exposes nothing else.
+
+Below 640px the pill becomes a full-height right-side drawer with a scrim (`.menu-scrim`,
+deliberately a *sibling* of `.menu` so the existing click-outside listener closes it). That
+640px breakpoint is intentionally **not** the project's usual 900px — the stretching pill
+still reads fine on a tablet.
+
+`catalogo.html` still uses its own sticky header and white `.sidebar-catalog` drawer, both
+defined entirely in `catalogo.css`; it has no pill menu.
 
 ## Data layer
 
@@ -87,11 +123,11 @@ Both pages also stop `wheel` events on `spline-viewer` at capture phase so 3D sc
 
 ## Conventions worth matching
 
-- Scripts are inline `<script>` blocks at the bottom of each HTML file; only `supabase-config.js` and `catalog-cache.js` are extracted, and they must load in that order (the cache module references `_supabase`).
+- Scripts are inline `<script>` blocks at the bottom of each HTML file; only `supabase-config.js`, `catalog-cache.js` and `menu.js` are extracted. The first two must load in that order (the cache module references `_supabase`); `menu.js` goes last, after the markup.
 - Rendering is string-template `innerHTML` assignment. All user-facing values (`titulo`, `disponibilidad`, `image_url`, etc.) are passed through `escapeHTML()` before insertion — each page has its own copy of this function. Maintain this when adding new `innerHTML` writes.
 - Section headers use the `/* ====== TITLE ====== */` banner style in CSS and emoji-prefixed comments in JS.
 - Status messages in `lilshop.html` use a single floating toast (`#toast`, via `mostrarMensaje(texto, tipo)`). Don't mix `alert()` back in.
-- Mobile is handled with `@media (max-width: 900px)` blocks throughout, plus a separate hamburger sidebar (`#sidebar`, `#sidebarOverlay`). Several commits in the history are mobile-only fixes; check phone layout after touching shared chrome.
+- Mobile is handled with `@media (max-width: 900px)` blocks throughout, plus the pill menu's own 640px drawer (and, on the catalog, the `.sidebar-catalog` hamburger). Several commits in the history are mobile-only fixes; check phone layout after touching shared chrome.
 
 ## Worker (`worker/`)
 
