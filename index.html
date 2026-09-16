@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260916i">
+    <link rel="stylesheet" href="style.css?v=20260916k">
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -30,15 +30,16 @@
 
     <!--
         🟢 MENÚ PÍLDORA (reemplazó a la navbar vieja).
-        Píldora fija arriba al centro. Cerrada muestra "Menú" + hamburguesa;
-        al abrirse se estira y un círculo baja desde arriba pintando el panel.
-        En celular se convierte en un panel lateral de alto completo.
+        Píldora fija arriba a la DERECHA (.menu--derecha; legal.html la sigue
+        teniendo al centro). Cerrada muestra "Menú" + hamburguesa; al abrirse
+        se estira hacia la izquierda y un círculo baja desde arriba pintando el
+        panel. En celular se convierte en un panel lateral de alto completo.
 
         El color lo cambia el JS según la sección que tenga debajo
         (data-theme = claro | verde). Arranca en "claro" porque el hero es
         blanco. Ver el bloque MENÚ PÍLDORA de style.css y menu.js.
     -->
-    <nav class="menu" data-theme="claro" aria-label="Menú principal">
+    <nav class="menu menu--derecha" data-theme="claro" aria-label="Menú principal">
         <div class="menu__shell">
             <!-- El círculo que "moja" el panel al abrir. Va detrás del texto. -->
             <span class="menu__circle" aria-hidden="true"></span>
@@ -94,9 +95,9 @@
 
     <!-- ==========================================================
          SECCIÓN 1: HERO CLARO
-         Una sola columna centrada: marca, una frase y las dos acciones.
-         Ni titular de esquina ni estadísticas ni franja de plataformas: eso
-         se quitó a propósito, el hero dice una cosa y ofrece dos caminos.
+         La marca al centro de la tarjeta con dos datos de confianza debajo
+         (años vendiendo y referencias), y abajo a la izquierda la frase y el
+         botón al catálogo. El Discord ya no va aquí: lo lleva la sección 3.
          El scroll-jacking no vive aquí, vive en el portal de la corona que
          va justo debajo.
          ========================================================== -->
@@ -112,31 +113,47 @@
 
                 <div class="hero-dots" aria-hidden="true"></div>
 
-                <!-- 👑 MARCA + FRASE + ACCIONES, todo en una columna centrada -->
+                <!-- 👑 MARCA + DATOS DE CONFIANZA, al centro de la tarjeta -->
                 <div class="hero-marca">
 
+                    <!-- Las letras van rellenas con el humo del portal: el
+                         canvas dibuja el humo y .hero-wordmark-texto lo recorta
+                         con su forma (ver style.css). El texto sigue siendo
+                         texto para buscadores y lectores de pantalla. -->
                     <h1 class="hero-wordmark" data-reveal style="--n: 1;">
-                        <span>Anxie</span>
-                        <span>Store</span>
+                        <canvas class="hero-wordmark-humo" id="wordmarkHumo" aria-hidden="true"></canvas>
+                        <span class="hero-wordmark-texto">
+                            <span>Anxie</span>
+                            <span>Store</span>
+                        </span>
                     </h1>
 
-                    <p class="hero-texto" data-reveal style="--n: 2;">
+                    <ul class="hero-datos" data-reveal style="--n: 2;">
+                        <li class="hero-dato">
+                            <span class="hero-dato-valor">2 años</span>
+                            <span class="hero-dato-etiqueta">Vendiendo</span>
+                        </li>
+                        <li class="hero-dato">
+                            <span class="hero-dato-valor">+700</span>
+                            <span class="hero-dato-etiqueta">Referencias</span>
+                        </li>
+                    </ul>
+
+                </div>
+
+                <!-- 📝 FRASE + ACCIÓN, abajo a la izquierda de la tarjeta -->
+                <div class="hero-pie">
+
+                    <p class="hero-texto" data-reveal style="--n: 3;">
                         Cuentas de videojuegos con <span class="acento-verde">entrega acompañada</span>.
                         Elige la tuya en el <span class="acento-verde">catálogo</span>, escríbenos y te
                         guiamos <span class="acento-verde">paso a paso</span> hasta que esté en tus manos.
                     </p>
 
-                    <div class="hero-botones" data-reveal style="--n: 3;">
+                    <div class="hero-botones" data-reveal style="--n: 4;">
                         <a href="catalogo.html#cases" class="btn-verde-pill">
                             Ver catálogo
                             <span class="btn-verde-pill-icono" aria-hidden="true">&rarr;</span>
-                        </a>
-                        <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener" class="btn-discord-linea">
-                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M4 5h16v11H8l-4 4Z"></path>
-                                <path d="M9 10.5h.01M15 10.5h.01"></path>
-                            </svg>
-                            Únete al Discord
                         </a>
                     </div>
 
@@ -1208,22 +1225,32 @@
          original es un componente de React; aquí va portado a JS plano porque
          este proyecto no tiene build step. Cero dependencias.
 
+         El MISMO humo rellena las letras de "ANXIE STORE" en el hero: un
+         segundo <canvas> (#wordmarkHumo) con su propio contexto, creado por la
+         misma función crearHumo(). Ese canvas solo mide lo que mide la marca,
+         pero dibuja como si ocupara la tarjeta entera (el "marco"): así las
+         letras son ventanas a un anillo de humo del tamaño de la tarjeta, igual
+         que la corona es una ventana al del portal. El recorte con la forma de
+         las letras lo hace el CSS (ver .hero-wordmark en style.css).
+
          Cuidado si lo tocas:
            - El canvas vive DENTRO de un elemento con transform: scale(). Para
              medirlo se usa clientWidth/clientHeight y NO getBoundingClientRect:
              el rect llega ya escalado, y el canvas se estaría redimensionando
              en cada fotograma del zoom, que es lo más caro que hay.
            - Si no hay WebGL, si el contexto se pierde, o si el sistema pide
-             menos animación, el canvas se esconde y queda el verde plano de
-             .corona-lienzo, que sigue ahí de fondo.
-           - Solo dibuja con el portal en pantalla y la pestaña visible.
+             menos animación, el canvas se esconde: en el portal queda el verde
+             plano de .corona-lienzo, y en la marca las letras vuelven a negro.
+           - Cada canvas solo dibuja estando en pantalla y con la pestaña
+             visible.
          ========================================================== -->
     <script>
     (function () {
         'use strict';
 
-        const canvas = document.getElementById('coronaShader');
-        if (!canvas) return;
+        const canvasCorona = document.getElementById('coronaShader');
+        const canvasLetras = document.getElementById('wordmarkHumo');
+        if (!canvasCorona && !canvasLetras) return;
 
         // 🎨 PALETA: los 4 colores del preset, en RGB de 0 a 1 (NO de 0 a 255).
         //    El [0] es el fondo oscuro y el [1] el filo brillante del anillo.
@@ -1262,24 +1289,13 @@
         // baja a la mitad: se nota en la batería y no se nota en pantalla.
         const MAX_PIXELES = window.innerWidth > 900 ? 2000000 : 1000000;
 
-        const esconder = function () { canvas.style.display = 'none'; };
-
         // Si el sistema pide menos animación, ni encendemos WebGL.
         if (window.matchMedia &&
             window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            esconder();
+            if (canvasCorona) canvasCorona.style.display = 'none';
+            if (canvasLetras) canvasLetras.style.display = 'none';
             return;
         }
-
-        let gl = null;
-        try {
-            const opciones = { antialias: false, alpha: false };
-            gl = canvas.getContext('webgl', opciones) ||
-                 canvas.getContext('experimental-webgl', opciones);
-        } catch (e) {
-            gl = null;
-        }
-        if (!gl) { esconder(); return; }
 
         const VERT = `attribute vec2 a_position;
 void main() {
@@ -1299,6 +1315,8 @@ uniform vec4 u_surface;    // detail, contrast, brightness, saturation
 uniform vec4 u_finish;     // hue, vignette, blur, grain
 uniform vec4 u_transform;  // seed, rotate, drift, OKLab
 uniform vec4 u_space;      // offset.xy, puntero.xy
+uniform vec4 u_marco;      // dónde cae el canvas dentro del marco que se dibuja:
+                           // desplazamiento.xy y tamaño.zw, en px del canvas
 
 #define u_resolution u_scene.xy
 #define u_time u_scene.z
@@ -1449,10 +1467,13 @@ vec3 shade(vec2 uv, vec2 p, float t) {
 }
 
 void main() {
-  vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+  // El pixel se ubica dentro del marco, no del canvas: en el portal los dos
+  // coinciden, en la marca del hero el canvas es solo un trozo del marco.
+  vec2 frag = gl_FragCoord.xy + u_marco.xy;
+  vec2 uv = frag / u_marco.zw;
   vec2 screenUv = uv;
-  vec2 p = (gl_FragCoord.xy - 0.5 * u_resolution.xy)
-    / min(u_resolution.x, u_resolution.y);
+  vec2 p = (frag - 0.5 * u_marco.zw)
+    / min(u_marco.z, u_marco.w);
 
   p *= u_scale;
   if (abs(u_rotate) > 0.0001) {
@@ -1473,7 +1494,7 @@ void main() {
   if (u_blur > 0.0) {
     float e = u_blur;
     float pe = e * u_scale;
-    vec2 uvE = vec2(e) * min(u_resolution.x, u_resolution.y) / u_resolution.xy;
+    vec2 uvE = vec2(e) * min(u_marco.z, u_marco.w) / u_marco.zw;
     col  = shade(uv, p, u_time) * 0.36;
     col += shade(uv + vec2(uvE.x, 0.0), p + vec2(pe, 0.0), u_time) * 0.16;
     col += shade(uv - vec2(uvE.x, 0.0), p - vec2(pe, 0.0), u_time) * 0.16;
@@ -1505,151 +1526,236 @@ void main() {
 }
 `;
 
-        function compilar(tipo, fuente) {
-            const s = gl.createShader(tipo);
-            gl.shaderSource(s, fuente);
-            gl.compileShader(s);
-            if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-                console.warn('Shader de la corona:', gl.getShaderInfoLog(s));
+        // 🏭 FÁBRICA DEL HUMO
+        // Enciende el shader en un canvas y devuelve su control
+        // ({ remedir, setTapado }), o null si ese canvas se quedó sin WebGL (y
+        // entonces ya lo escondió).
+        //   opciones.nombre          — solo para los avisos de la consola.
+        //   opciones.medirMarco      — opcional. Devuelve { x, y, ancho, alto }
+        //                              en px CSS: el marco que se dibuja y dónde
+        //                              cae la esquina de arriba a la izquierda
+        //                              del canvas dentro de él. Sin esto el marco
+        //                              es el propio canvas.
+        //   opciones.observarTambien — opcional. Otro elemento cuyo cambio de
+        //                              tamaño obliga a remedir (el del marco).
+        function crearHumo(canvas, opciones) {
+            const nombre = opciones.nombre;
+            const medirMarco = opciones.medirMarco || null;
+            const esconder = function () { canvas.style.display = 'none'; };
+
+            let gl = null;
+            try {
+                const ctxOpciones = { antialias: false, alpha: false };
+                gl = canvas.getContext('webgl', ctxOpciones) ||
+                     canvas.getContext('experimental-webgl', ctxOpciones);
+            } catch (e) {
+                gl = null;
+            }
+            if (!gl) { esconder(); return null; }
+
+            function compilar(tipo, fuente) {
+                const s = gl.createShader(tipo);
+                gl.shaderSource(s, fuente);
+                gl.compileShader(s);
+                if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+                    console.warn(nombre + ':', gl.getShaderInfoLog(s));
+                    return null;
+                }
+                return s;
+            }
+
+            const vs = compilar(gl.VERTEX_SHADER, VERT);
+            const fs = compilar(gl.FRAGMENT_SHADER, FRAG);
+            if (!vs || !fs) { esconder(); return null; }
+
+            const programa = gl.createProgram();
+            gl.attachShader(programa, vs);
+            gl.attachShader(programa, fs);
+            gl.linkProgram(programa);
+            gl.deleteShader(vs);
+            gl.deleteShader(fs);
+            if (!gl.getProgramParameter(programa, gl.LINK_STATUS)) {
+                console.warn(nombre + ':', gl.getProgramInfoLog(programa));
+                esconder();
                 return null;
             }
-            return s;
-        }
+            gl.useProgram(programa);
 
-        const vs = compilar(gl.VERTEX_SHADER, VERT);
-        const fs = compilar(gl.FRAGMENT_SHADER, FRAG);
-        if (!vs || !fs) { esconder(); return; }
+            // Un solo triángulo que se sale de la pantalla: cubre todo el viewport
+            // con 3 vértices en vez de los 6 que costarían dos triángulos.
+            const buffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+            const posicion = gl.getAttribLocation(programa, 'a_position');
+            gl.enableVertexAttribArray(posicion);
+            gl.vertexAttribPointer(posicion, 2, gl.FLOAT, false, 0, 0);
 
-        const programa = gl.createProgram();
-        gl.attachShader(programa, vs);
-        gl.attachShader(programa, fs);
-        gl.linkProgram(programa);
-        gl.deleteShader(vs);
-        gl.deleteShader(fs);
-        if (!gl.getProgramParameter(programa, gl.LINK_STATUS)) {
-            console.warn('Shader de la corona:', gl.getProgramInfoLog(programa));
-            esconder();
-            return;
-        }
-        gl.useProgram(programa);
+            const uni = {
+                colors:    gl.getUniformLocation(programa, 'u_colors'),
+                scene:     gl.getUniformLocation(programa, 'u_scene'),
+                shape:     gl.getUniformLocation(programa, 'u_shape'),
+                surface:   gl.getUniformLocation(programa, 'u_surface'),
+                finish:    gl.getUniformLocation(programa, 'u_finish'),
+                transform: gl.getUniformLocation(programa, 'u_transform'),
+                space:     gl.getUniformLocation(programa, 'u_space'),
+                marco:     gl.getUniformLocation(programa, 'u_marco')
+            };
 
-        // Un solo triángulo que se sale de la pantalla: cubre todo el viewport
-        // con 3 vértices en vez de los 6 que costarían dos triángulos.
-        const buffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-        const posicion = gl.getAttribLocation(programa, 'a_position');
-        gl.enableVertexAttribArray(posicion);
-        gl.vertexAttribPointer(posicion, 2, gl.FLOAT, false, 0, 0);
-
-        const uni = {
-            colors:    gl.getUniformLocation(programa, 'u_colors'),
-            scene:     gl.getUniformLocation(programa, 'u_scene'),
-            shape:     gl.getUniformLocation(programa, 'u_shape'),
-            surface:   gl.getUniformLocation(programa, 'u_surface'),
-            finish:    gl.getUniformLocation(programa, 'u_finish'),
-            transform: gl.getUniformLocation(programa, 'u_transform'),
-            space:     gl.getUniformLocation(programa, 'u_space')
-        };
-
-        // Nada de esto cambia nunca: se sube una sola vez, no cada fotograma.
-        const planos = [];
-        for (let i = 0; i < COLORES.length; i++) {
-            planos.push(COLORES[i][0], COLORES[i][1], COLORES[i][2]);
-        }
-        gl.uniform3fv(uni.colors, new Float32Array(planos));
-        gl.uniform4f(uni.shape, U.scale, U.intensity, U.paramA, U.warp);
-        gl.uniform4f(uni.surface, U.detail, U.contrast, U.brightness, U.saturation);
-        gl.uniform4f(uni.finish, U.hue, U.vignette, U.blur, U.grain);
-        gl.uniform4f(uni.transform, U.seed, U.rotate, U.drift, U.oklab);
-        gl.uniform4f(uni.space, U.offsetX, U.offsetY, 0, 0);
-
-        let raf = 0;
-        let vivo = true;
-        let enPantalla = true;
-        // El portal tapa el canvas con un velo negro en su acto 2 y luego se
-        // queda otro tramo entero en pantalla. Mientras el velo esté opaco esto
-        // vale true y aquí no se dibuja nada. Lo escribe window.anxieHumo.
-        let tapado = false;
-        let pestaniaVisible = document.visibilityState === 'visible';
-        const arranque = performance.now();
-
-        // clientWidth/clientHeight y NO getBoundingClientRect: el canvas cuelga
-        // de .corona-lienzo, que va con transform: scale(), y el rect vendría
-        // ya escalado -- el canvas se redimensionaría en cada fotograma del
-        // zoom, que es lo más caro que se puede hacer aquí.
-        function ajustarTamanio() {
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            const anchoCrudo = Math.max(1, Math.round(canvas.clientWidth * dpr));
-            const altoCrudo = Math.max(1, Math.round(canvas.clientHeight * dpr));
-            const recorte = Math.min(1, Math.sqrt(MAX_PIXELES / Math.max(1, anchoCrudo * altoCrudo)));
-            const ancho = Math.max(1, Math.round(anchoCrudo * recorte));
-            const alto = Math.max(1, Math.round(altoCrudo * recorte));
-            if (canvas.width !== ancho || canvas.height !== alto) {
-                canvas.width = ancho;
-                canvas.height = alto;
-                gl.viewport(0, 0, ancho, alto);
+            // Nada de esto cambia nunca: se sube una sola vez, no cada fotograma.
+            const planos = [];
+            for (let i = 0; i < COLORES.length; i++) {
+                planos.push(COLORES[i][0], COLORES[i][1], COLORES[i][2]);
             }
-        }
+            gl.uniform3fv(uni.colors, new Float32Array(planos));
+            gl.uniform4f(uni.shape, U.scale, U.intensity, U.paramA, U.warp);
+            gl.uniform4f(uni.surface, U.detail, U.contrast, U.brightness, U.saturation);
+            gl.uniform4f(uni.finish, U.hue, U.vignette, U.blur, U.grain);
+            gl.uniform4f(uni.transform, U.seed, U.rotate, U.drift, U.oklab);
+            gl.uniform4f(uni.space, U.offsetX, U.offsetY, 0, 0);
 
-        function pedirFotograma() {
-            if (vivo && enPantalla && pestaniaVisible && !tapado && raf === 0) {
-                raf = requestAnimationFrame(dibujar);
+            let raf = 0;
+            let vivo = true;
+            let enPantalla = true;
+            // El portal tapa el canvas con un velo negro en su acto 2 y luego se
+            // queda otro tramo entero en pantalla. Mientras el velo esté opaco esto
+            // vale true y aquí no se dibuja nada. Lo escribe window.anxieHumo.
+            let tapado = false;
+            let pestaniaVisible = document.visibilityState === 'visible';
+            // El marco se mide con getBoundingClientRect, que obliga a calcular
+            // el layout: solo se vuelve a medir cuando algo cambió de tamaño o
+            // terminó de moverse, no en cada fotograma.
+            let marcoSucio = true;
+            let marcoCss = null;
+            const arranque = performance.now();
+
+            // clientWidth/clientHeight y NO getBoundingClientRect: el canvas del
+            // portal cuelga de .corona-lienzo, que va con transform: scale(), y el
+            // rect vendría ya escalado -- el canvas se redimensionaría en cada
+            // fotograma del zoom, que es lo más caro que se puede hacer aquí.
+            function ajustarTamanio() {
+                const cssAncho = Math.max(1, canvas.clientWidth);
+                const cssAlto = Math.max(1, canvas.clientHeight);
+                if (medirMarco && marcoSucio) {
+                    marcoCss = medirMarco();
+                }
+
+                // El techo de píxeles va contra el MARCO, no contra el canvas: si
+                // no, un canvas chiquito dentro de un marco grande sacaría el humo
+                // con otra resolución que el del portal y no se verían iguales.
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                const areaMarco = marcoCss
+                    ? marcoCss.ancho * marcoCss.alto * dpr * dpr
+                    : cssAncho * cssAlto * dpr * dpr;
+                const recorte = Math.min(1, Math.sqrt(MAX_PIXELES / Math.max(1, areaMarco)));
+                const escala = dpr * recorte;
+                const ancho = Math.max(1, Math.round(cssAncho * escala));
+                const alto = Math.max(1, Math.round(cssAlto * escala));
+                const cambioTamanio = canvas.width !== ancho || canvas.height !== alto;
+                if (cambioTamanio) {
+                    canvas.width = ancho;
+                    canvas.height = alto;
+                    gl.viewport(0, 0, ancho, alto);
+                }
+
+                if (cambioTamanio || marcoSucio) {
+                    marcoSucio = false;
+                    if (marcoCss) {
+                        // gl_FragCoord cuenta desde ABAJO, así que el desplazamiento
+                        // vertical es lo que queda del marco por debajo del canvas.
+                        const sx = ancho / cssAncho;
+                        const sy = alto / cssAlto;
+                        gl.uniform4f(uni.marco,
+                            marcoCss.x * sx,
+                            (marcoCss.alto - marcoCss.y - cssAlto) * sy,
+                            marcoCss.ancho * sx,
+                            marcoCss.alto * sy);
+                    } else {
+                        gl.uniform4f(uni.marco, 0, 0, ancho, alto);
+                    }
+                }
             }
-        }
 
-        function pararFotograma() {
-            if (raf !== 0) { cancelAnimationFrame(raf); raf = 0; }
-        }
+            function pedirFotograma() {
+                if (vivo && enPantalla && pestaniaVisible && !tapado && raf === 0) {
+                    raf = requestAnimationFrame(dibujar);
+                }
+            }
 
-        function dibujar(ahora) {
-            raf = 0;
-            if (!vivo || !enPantalla || !pestaniaVisible || tapado) return;
-            ajustarTamanio();
-            gl.uniform4f(uni.scene, canvas.width, canvas.height,
-                         ((ahora - arranque) / 1000) * U.timeScale, U.colorCount);
-            gl.drawArrays(gl.TRIANGLES, 0, 3);
-            pedirFotograma();
-        }
+            function pararFotograma() {
+                if (raf !== 0) { cancelAnimationFrame(raf); raf = 0; }
+            }
 
-        // Fuera de pantalla no se dibuja. El portal mide varias pantallas de
-        // alto, así que la mayor parte de la visita el shader no se ve y no
-        // tiene por qué estar quemando GPU.
-        if (window.IntersectionObserver) {
-            new IntersectionObserver(function (entradas) {
-                enPantalla = entradas[0] ? entradas[0].isIntersecting : true;
-                if (enPantalla) pedirFotograma(); else pararFotograma();
-            }).observe(canvas);
-        }
+            function dibujar(ahora) {
+                raf = 0;
+                if (!vivo || !enPantalla || !pestaniaVisible || tapado) return;
+                ajustarTamanio();
+                gl.uniform4f(uni.scene, canvas.width, canvas.height,
+                             ((ahora - arranque) / 1000) * U.timeScale, U.colorCount);
+                gl.drawArrays(gl.TRIANGLES, 0, 3);
+                pedirFotograma();
+            }
 
-        document.addEventListener('visibilitychange', function () {
-            pestaniaVisible = document.visibilityState === 'visible';
-            if (pestaniaVisible) pedirFotograma(); else pararFotograma();
-        });
-
-        if (window.ResizeObserver) {
-            // ResizeObserver mide la caja de contenido, que el transform NO
-            // toca, así que aquí sí es seguro.
-            new ResizeObserver(function () {
+            function remedir() {
+                if (!vivo) return;
+                marcoSucio = true;
                 ajustarTamanio();
                 pedirFotograma();
-            }).observe(canvas);
-        } else {
-            window.addEventListener('resize', function () {
-                ajustarTamanio();
-                pedirFotograma();
+            }
+
+            // Fuera de pantalla no se dibuja. El portal mide varias pantallas de
+            // alto, así que la mayor parte de la visita el shader no se ve y no
+            // tiene por qué estar quemando GPU. Lo mismo la marca del hero en
+            // cuanto bajas.
+            if (window.IntersectionObserver) {
+                new IntersectionObserver(function (entradas) {
+                    enPantalla = entradas[0] ? entradas[0].isIntersecting : true;
+                    if (enPantalla) pedirFotograma(); else pararFotograma();
+                }).observe(canvas);
+            }
+
+            document.addEventListener('visibilitychange', function () {
+                pestaniaVisible = document.visibilityState === 'visible';
+                if (pestaniaVisible) pedirFotograma(); else pararFotograma();
             });
+
+            if (window.ResizeObserver) {
+                // ResizeObserver mide la caja de contenido, que el transform NO
+                // toca, así que aquí sí es seguro.
+                const ro = new ResizeObserver(remedir);
+                ro.observe(canvas);
+                if (opciones.observarTambien) ro.observe(opciones.observarTambien);
+            } else {
+                window.addEventListener('resize', remedir);
+            }
+
+            // Si el navegador tira el contexto (cambio de GPU, pestaña dormida
+            // mucho rato, driver que se queja) escondemos el canvas en vez de
+            // dejar un rectángulo negro.
+            canvas.addEventListener('webglcontextlost', function (e) {
+                e.preventDefault();
+                vivo = false;
+                pararFotograma();
+                esconder();
+            });
+
+            ajustarTamanio();
+            pedirFotograma();
+
+            return {
+                remedir: remedir,
+                setTapado: function (valor) {
+                    valor = !!valor;
+                    if (valor === tapado) return;
+                    tapado = valor;
+                    if (tapado) pararFotograma(); else pedirFotograma();
+                }
+            };
         }
 
-        // Si el navegador tira el contexto (cambio de GPU, pestaña dormida
-        // mucho rato, driver que se queja) volvemos al verde plano en vez de
-        // dejar un rectángulo negro.
-        canvas.addEventListener('webglcontextlost', function (e) {
-            e.preventDefault();
-            vivo = false;
-            pararFotograma();
-            esconder();
-        });
+        // 👑 EL PORTAL: el marco es el propio canvas.
+        const humoCorona = canvasCorona
+            ? crearHumo(canvasCorona, { nombre: 'Shader de la corona' })
+            : null;
 
         // 🔌 LO ÚNICO QUE ESTE BLOQUE EXPONE
         // pintarCorona() (el JS del portal, más arriba) llama a setTapado(true)
@@ -1659,15 +1765,52 @@ void main() {
         // de scroll.
         window.anxieHumo = {
             setTapado: function (valor) {
-                valor = !!valor;
-                if (valor === tapado) return;
-                tapado = valor;
-                if (tapado) pararFotograma(); else pedirFotograma();
+                if (humoCorona) humoCorona.setTapado(valor);
             }
         };
 
-        ajustarTamanio();
-        pedirFotograma();
+        // 🔤 LA MARCA DEL HERO: el marco es la tarjeta entera (.hero-panel), y
+        // el canvas es el trozo de ella que ocupan las letras.
+        if (canvasLetras) {
+            const panel = canvasLetras.closest('.hero-panel');
+            const marca = canvasLetras.closest('.hero-wordmark');
+            const humoLetras = crearHumo(canvasLetras, {
+                nombre: 'Shader de la marca',
+                observarTambien: panel,
+                // En celular y tablet la tarjeta es alta y angosta, y el anillo
+                // (que se mide contra el lado CORTO) quedaba tan chico que su
+                // filo blanco pasaba por todas las letras y "STORE" se perdía
+                // contra el fondo. Ahí el marco se ensancha a 1.6 veces las
+                // letras (sin pasarse del alto de la tarjeta): el centro de la
+                // palabra cae en el humo oscuro y el filo solo roza las
+                // puntas, que es como se ve en PC.
+                medirMarco: panel ? function () {
+                    const rp = panel.getBoundingClientRect();
+                    const rc = canvasLetras.getBoundingClientRect();
+                    const vertical = rp.height > rp.width;
+                    const ancho = vertical
+                        ? Math.max(rp.width, Math.min(rp.height, rc.width * 1.6))
+                        : rp.width;
+                    const izquierda = rp.left - (ancho - rp.width) / 2;
+                    return {
+                        x: rc.left - izquierda,
+                        y: rc.top - rp.top,
+                        ancho: ancho,
+                        alto: rp.height
+                    };
+                } : null
+            });
+
+            // La marca entra bajando 20px (la ola del hero): si se midió a media
+            // animación el marco quedó corrido, así que al terminar se remide.
+            // Lo mismo cuando carga la tipografía, que cambia el ancho.
+            if (humoLetras && marca) {
+                marca.addEventListener('animationend', humoLetras.remedir);
+                if (document.fonts && document.fonts.ready) {
+                    document.fonts.ready.then(humoLetras.remedir);
+                }
+            }
+        }
     })();
     </script>
 
