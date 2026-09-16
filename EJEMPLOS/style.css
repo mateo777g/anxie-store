@@ -1,0 +1,3142 @@
+* {
+	box-sizing: border-box;
+}
+
+html {
+	scroll-behavior: smooth;
+}
+
+body {
+	margin: 0;
+	min-height: 100vh;
+	background: #111315;
+	color: #f4f6f8;
+	font-family: Arial, sans-serif;
+}
+
+/* =========================================================================
+ * MENÚ FLOTANTE (.menu) - reemplaza a la navbar vieja.
+ *
+ * Píldora fija arriba al centro. Cerrada: "Menú" + hamburguesa. Abierta: se
+ * estira y un círculo baja desde arriba pintando el panel con los links.
+ * Todo es CSS: el JS solo pone/quita .is-open, el alto abierto y el tema.
+ *
+ * Los 4 colores del menú son variables y cambian según la sección que tenga
+ * debajo (data-theme, lo escribe el JS). Cambiar el tema no anima el custom
+ * property en sí, pero SÍ anima el background-color / color que lo usa, que
+ * es lo que se ve.
+ *   --menu-bg        fondo de la píldora cerrada
+ *   --menu-fg        texto/hamburguesa sobre esa píldora
+ *   --menu-panel     color del círculo que entra al abrir
+ *   --menu-panel-fg  texto sobre el panel abierto
+ *
+ * Cada tema usa para el panel un color que NO usa su píldora, así el morph
+ * se nota. Los tres contrastan contra el fondo de su sección:
+ *   blue  -> sobre la portada azul   (sección 1)
+ *   dark  -> sobre el fondo negro    (sección 2)
+ *   light -> sobre el panel blanco   (sección 3)
+ * ========================================================================= */
+.menu {
+	--menu-ease: cubic-bezier(0.22, 1, 0.36, 1);
+	--menu-bg: #ffffff;
+	--menu-fg: #1355e8;
+	--menu-panel: #111315;
+	--menu-panel-fg: #f4f6f8;
+	/* Alto de la barra cerrada. Lo usan la píldora y el propio botón. */
+	--menu-bar: 48px;
+	position: fixed;
+	top: 20px;
+	left: 50%;
+	/* Por encima de todo: la sección 3 llega a z-index 3. */
+	z-index: 100;
+	/* El contenedor no debe tapar clics de la página: solo la píldora los recibe. */
+	pointer-events: none;
+	animation: menu-in 520ms var(--menu-ease) both;
+}
+
+/* La píldora abre la ola de entrada de la portada: mismos valores que el
+   data-reveal de la sección 1 (desde arriba y desenfocada), sólo que acá va
+   como animation y no como transition porque no depende del JS. Si tocas los
+   -20px o el blur, tocá también .intro--animate [data-reveal]. */
+@keyframes menu-in {
+	from {
+		opacity: 0;
+		filter: blur(10px);
+		transform: translate(-50%, -20px);
+	}
+	to {
+		opacity: 1;
+		filter: none;
+		transform: translate(-50%, 0);
+	}
+}
+
+.menu[data-theme="blue"] {
+	--menu-bg: #ffffff;
+	--menu-fg: #1355e8;
+	--menu-panel: #111315;
+	--menu-panel-fg: #f4f6f8;
+}
+
+.menu[data-theme="dark"] {
+	--menu-bg: #1355e8;
+	--menu-fg: #ffffff;
+	--menu-panel: #f4f6f8;
+	--menu-panel-fg: #111315;
+}
+
+.menu[data-theme="light"] {
+	--menu-bg: #111315;
+	--menu-fg: #f4f6f8;
+	--menu-panel: #1355e8;
+	--menu-panel-fg: #ffffff;
+}
+
+.menu__shell {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	width: 156px;
+	height: var(--menu-bar);
+	overflow: hidden;
+	border-radius: 999px;
+	background: var(--menu-bg);
+	box-shadow: 0 10px 30px rgba(3, 4, 7, 0.22);
+	pointer-events: auto;
+	transition:
+		width 800ms var(--menu-ease),
+		height 800ms var(--menu-ease),
+		border-radius 800ms var(--menu-ease),
+		transform 250ms var(--menu-ease),
+		background-color 400ms ease;
+}
+
+.menu:not(.is-open) .menu__shell:hover {
+	transform: scale(1.05);
+}
+
+.menu.is-open .menu__shell {
+	width: 280px;
+	border-radius: 30px;
+}
+
+/*
+ * El círculo mide 200% del alto de la píldora y cae desde arriba. Cerrado su
+ * borde inferior queda justo en el tope (top: -200% = invisible); abierto baja
+ * hasta -20% y cubre todo el panel. Es el mismo truco del diseño original,
+ * espejado porque acá el menú vive arriba y no abajo.
+ */
+.menu__circle {
+	position: absolute;
+	top: -200%;
+	left: 50%;
+	z-index: 0;
+	width: 200%;
+	height: 200%;
+	border-radius: 50%;
+	background: var(--menu-panel);
+	transform: translateX(-50%);
+	transition: top 800ms var(--menu-ease), background-color 400ms ease;
+}
+
+.menu.is-open .menu__circle {
+	top: -20%;
+	transition-delay: 100ms, 0ms;
+}
+
+.menu__bar {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-shrink: 0;
+	width: 100%;
+	height: var(--menu-bar);
+	padding: 0 20px;
+	border: 0;
+	/* Hereda el radio de la píldora para que el anillo de foco salga redondo
+	   y no un rectángulo asomando por los costados. */
+	border-radius: inherit;
+	background: none;
+	color: var(--menu-fg);
+	font-family: inherit;
+	font-size: 0.95rem;
+	font-weight: 700;
+	line-height: 1;
+	cursor: pointer;
+	transition: color 300ms ease, padding 800ms var(--menu-ease);
+}
+
+.menu.is-open .menu__bar {
+	padding: 0 24px;
+	color: var(--menu-panel-fg);
+}
+
+.menu__bar:focus-visible {
+	outline: 2px solid currentColor;
+	outline-offset: -5px;
+}
+
+.menu__icon {
+	position: relative;
+	display: grid;
+	width: 24px;
+	height: 24px;
+	place-items: center;
+}
+
+.menu__icon i {
+	position: absolute;
+	width: 18px;
+	height: 2px;
+	border-radius: 999px;
+	background: currentColor;
+	transition: transform 400ms var(--menu-ease), background-color 300ms ease;
+}
+
+.menu__icon i:first-child {
+	transform: translateY(-3px);
+}
+
+.menu__icon i:last-child {
+	transform: translateY(3px);
+}
+
+.menu.is-open .menu__icon i:first-child {
+	transform: rotate(45deg);
+}
+
+.menu.is-open .menu__icon i:last-child {
+	transform: rotate(-45deg);
+}
+
+/*
+ * Grid de una sola columna en vez de flex: así la columna mide lo que el ítem
+ * más ancho ("Licencias") y TODOS los links quedan del mismo ancho. Con eso los
+ * iconos caen alineados en una misma vertical, y el bloque entero sigue
+ * centrado dentro del panel (justify-content: center).
+ */
+.menu__items {
+	position: relative;
+	z-index: 1;
+	display: grid;
+	justify-content: center;
+	justify-items: start;
+	flex-shrink: 0;
+	gap: 16px;
+	margin: 0;
+	padding: 4px 24px 26px;
+	list-style: none;
+	visibility: hidden;
+	transition: visibility 0s linear 400ms;
+}
+
+.menu.is-open .menu__items {
+	visibility: visible;
+	transition-delay: 0s;
+}
+
+/* Cada link entra escalonado detrás del círculo (--i lo pone el JS). */
+.menu__item {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	color: var(--menu-panel-fg);
+	font-size: 1.45rem;
+	font-weight: 700;
+	letter-spacing: 0.01em;
+	line-height: 1;
+	text-transform: uppercase;
+	text-decoration: none;
+	opacity: 0;
+	transition: opacity 400ms ease, color 300ms ease;
+}
+
+/*
+ * Icono a la izquierda del texto. Ancho fijo (no 1em) para que no cambie de
+ * tamaño si algún día se toca el font-size del link, y para que los cuatro
+ * ocupen exactamente lo mismo.
+ *
+ * La caja es el equivalente de un .menu__char: recorta la columna de dos
+ * copias del SVG que arma el JS, y el roll la sube en el hover. El --c lo pone
+ * el JS en 0, así el icono abre la ola.
+ */
+.menu__ico {
+	display: block;
+	flex-shrink: 0;
+	width: 22px;
+	height: 22px;
+	overflow: hidden;
+}
+
+/* Cada copia ocupa la celda entera: la columna mide 44px y el -50% del roll
+   deja la segunda copia exactamente donde estaba la primera. */
+.menu__ico .menu__roll > span {
+	display: grid;
+	height: 22px;
+	place-items: center;
+}
+
+.menu__ico svg {
+	width: 100%;
+	height: 100%;
+}
+
+/* El recorte del roll vive acá, no en el link: si estuviera en el link, el
+   height: 1em cortaría el icono. */
+.menu__text {
+	display: flex;
+	height: 1em;
+	overflow: hidden;
+}
+
+.menu.is-open .menu__item {
+	opacity: 1;
+	transition-delay: calc(360ms + var(--i, 0) * 80ms), 0s;
+}
+
+/*
+ * Roll del hover: cada letra es una columna con la letra duplicada, y al
+ * pasar el mouse la columna sube 50% con un retardo por letra. Al salir
+ * vuelve de golpe (transition 0ms) en vez de desandar la animación; el JS
+ * retiene la salida hasta que el roll termina para que no corte a mitad.
+ */
+.menu__char {
+	display: block;
+	height: 1em;
+	overflow: hidden;
+}
+
+.menu__roll {
+	display: flex;
+	flex-direction: column;
+	transform: translateY(0);
+	transition: transform 0ms;
+}
+
+.menu__roll span {
+	display: block;
+	height: 1em;
+	line-height: 1em;
+}
+
+.menu__item.is-rolling .menu__roll {
+	transform: translateY(-50%);
+	transition: transform 800ms var(--menu-ease);
+	transition-delay: calc(var(--c, 0) * 30ms);
+}
+
+.menu__space {
+	display: block;
+	width: 0.3em;
+}
+
+/*
+ * Velo del panel lateral. En escritorio no existe: el menú de PC es la píldora
+ * que se estira sobre la página, sin panel de alto completo detrás.
+ * Se enciende en el @media de 640px. Ver el bloque MENÚ de móvil.
+ */
+.menu-scrim {
+	display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.menu {
+		animation: none;
+	}
+
+	.menu__shell,
+	.menu__circle,
+	.menu__bar,
+	.menu__icon i,
+	.menu__item {
+		transition-duration: 1ms;
+	}
+
+	.menu.is-open .menu__item {
+		transition-delay: 0s;
+	}
+
+	.menu__item.is-rolling .menu__roll {
+		transition: none;
+		transform: none;
+	}
+}
+
+/* =========================================================================
+ * SECCIÓN 1 - Portada azul (#inicio). Primera vista de la página.
+ * Estática: no tiene scroll animado. Es HERMANA de .scroll-hero, nunca
+ * ancestro de .scroll-hero__words, así que no afecta su matemática ni el
+ * background-attachment: fixed del resaltado.
+ * ========================================================================= */
+.intro {
+	/* Queda FIJADA cuando su borde inferior toca el borde inferior de la
+	   ventana, y a partir de ahí la sección 2 le pasa por encima en vez de
+	   empujarla. Es el equivalente del pin "bottom bottom" del diseño
+	   original. --pin-top lo calcula el JS: vale 0 mientras la portada mida
+	   una pantalla, y se vuelve negativo si su contenido la hace más alta
+	   (así se sigue viendo su parte de abajo antes de fijarse).
+	   OJO: tiene que ser `top`, no `bottom`. Con `bottom` el sticky tira del
+	   elemento HACIA ARRIBA para mostrarlo antes, que es lo contrario.
+	   Ver "TRANSICIÓN 1 -> 2" más abajo. */
+	position: sticky;
+	top: var(--pin-top, 0px);
+	z-index: 0;
+	display: grid;
+	min-height: 100svh;
+	place-items: center;
+	overflow: hidden;
+	padding: 150px clamp(24px, 4.6vw, 96px) 110px;
+	background: #1355e8;
+	color: #ffffff;
+}
+
+.intro__grid {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	opacity: 0.5;
+	background-image:
+		linear-gradient(rgba(255, 255, 255, 0.13) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(255, 255, 255, 0.13) 1px, transparent 1px);
+	background-size: 48px 48px;
+	mask-image: radial-gradient(120% 90% at 50% 30%, #000 20%, transparent 75%);
+	-webkit-mask-image: radial-gradient(120% 90% at 50% 30%, #000 20%, transparent 75%);
+	pointer-events: none;
+}
+
+/* Texto a la izquierda, isotipo a la derecha. La columna del logo se
+   encoge antes que la del texto para que el título nunca se parta feo. */
+.intro__content {
+	position: relative;
+	z-index: 1;
+	display: grid;
+	grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr);
+	align-items: center;
+	gap: clamp(24px, 5vw, 72px);
+	width: min(100%, 1760px);
+	text-align: left;
+}
+
+.intro__copy {
+	min-width: 0;
+}
+
+.intro__kicker {
+	margin: 0 0 22px;
+	color: rgba(255, 255, 255, 0.72);
+	font-size: 0.76rem;
+	font-weight: 700;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+}
+
+.intro__title {
+	margin: 0;
+	/* El 6.9vw está calculado para que "FRAGMENTLESS" (la palabra más larga,
+	   que no puede partirse) siempre quepa en su columna. Subirlo la
+	   desborda en anchos medios. */
+	font-size: clamp(2.6rem, 6.9vw, 8.2rem);
+	font-weight: 700;
+	letter-spacing: -0.035em;
+	line-height: 0.94;
+	text-transform: uppercase;
+}
+
+/* El ® va chiquito y pegado a la línea base de "SOFTWARE". */
+.intro__title-mark {
+	display: inline-block;
+	margin-left: 0.06em;
+	font-size: 0.28em;
+	font-weight: 700;
+	letter-spacing: 0;
+	vertical-align: baseline;
+}
+
+.intro__subtitle {
+	margin: 28px 0 0;
+	max-width: 620px;
+	color: rgba(255, 255, 255, 0.8);
+	font-size: clamp(1rem, 1.6vw, 1.2rem);
+	line-height: 1.55;
+}
+
+.intro__actions {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	flex-wrap: wrap;
+	gap: 14px;
+	margin-top: 38px;
+}
+
+.intro__logo {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 0;
+}
+
+/* El <picture> no debe existir para el layout: con display: contents el
+   <img> sigue siendo hijo directo del flex, así que el encuadre queda
+   igual que cuando acá había un <img> suelto. */
+.intro__logo picture {
+	display: contents;
+}
+
+.intro__logo img {
+	/* El SVG trae aire alrededor del hexágono, por eso el ancho del <img>
+	   va bastante por encima del tamaño visible del cubo. */
+	width: min(100%, 560px);
+	height: auto;
+	display: block;
+}
+
+/* El JS pone .is-playable cuando ya precargó los 36 cuadros: recién ahí el
+   isotipo responde al clic, así que recién ahí se avisa que es clickeable. */
+.intro__logo.is-playable img {
+	cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	/* Sin animación no hay nada que re-disparar: el isotipo se queda quieto
+	   en el frame35 y deja de anunciarse como clickeable. */
+	.intro__logo.is-playable img {
+		cursor: default;
+	}
+}
+
+.intro__cta,
+.intro__ghost {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 50px;
+	padding: 0 28px;
+	border-radius: 999px;
+	font-size: 0.95rem;
+	font-weight: 700;
+	text-decoration: none;
+	transition: transform 180ms ease, background-color 180ms ease, color 180ms ease;
+}
+
+.intro__cta {
+	background: #ffffff;
+	color: #1355e8;
+	box-shadow: 0 10px 26px rgba(3, 4, 7, 0.22);
+}
+
+.intro__ghost {
+	border: 1px solid rgba(255, 255, 255, 0.42);
+	color: #ffffff;
+}
+
+.intro__cta:hover,
+.intro__cta:focus-visible,
+.intro__ghost:hover,
+.intro__ghost:focus-visible {
+	transform: translateY(-2px);
+}
+
+.intro__ghost:hover,
+.intro__ghost:focus-visible {
+	background: rgba(255, 255, 255, 0.12);
+}
+
+.intro__scroll {
+	position: absolute;
+	z-index: 1;
+	bottom: 38px;
+	left: 50%;
+	transform: translateX(-50%);
+	display: inline-flex;
+	align-items: center;
+	gap: 9px;
+	color: rgba(255, 255, 255, 0.72);
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	text-decoration: none;
+	transition: color 180ms ease;
+}
+
+.intro__scroll:hover,
+.intro__scroll:focus-visible {
+	color: #ffffff;
+}
+
+.intro__scroll svg {
+	width: 16px;
+	height: 16px;
+}
+
+/* -------------------------------------------------------------------------
+ * Entrada escalonada de la portada (texto, isotipo y el "Desliza").
+ * Es la MISMA ola que la sección 4 (desde arriba y desenfocado), sólo que
+ * acá no la dispara un observer: la portada ya se ve al cargar, así que el
+ * JS pone .is-revealed en el primer frame.
+ *
+ * .intro--animate la agrega el JS y no el HTML, igual que en clientes: es
+ * la clase que esconde las piezas, así que sin JS (o con
+ * prefers-reduced-motion) la portada se ve entera desde el principio en vez
+ * de quedar invisible para siempre.
+ * ------------------------------------------------------------------------- */
+.intro--animate [data-reveal] {
+	opacity: 0;
+	filter: blur(10px);
+	transform: translateY(-20px);
+}
+
+.intro--animate.is-revealed [data-reveal] {
+	opacity: 1;
+	filter: none;
+	transform: none;
+	transition: opacity 520ms ease, filter 520ms ease, transform 520ms ease;
+	transition-delay: calc(var(--n, 0) * 110ms);
+}
+
+/* El "Desliza" se centra con translateX(-50%), así que su transform no puede
+   resetearse a none: se le repite el centrado en los dos estados. */
+.intro--animate .intro__scroll {
+	transform: translate(-50%, -20px);
+}
+
+.intro--animate.is-revealed .intro__scroll {
+	transform: translateX(-50%);
+}
+
+/* =========================================================================
+ * SECCIONES 2 y 3 - Comparten el mismo riel de scroll (.scroll-hero):
+ *   · Sección 2 -> .scroll-hero__track / __pin / __words (fondo negro).
+ *   · Sección 3 -> .scroll-hero__surface (panel blanco que se encima).
+ * No tocar sin leer las TRAMPAS del CLAUDE_LEEME.txt.
+ * ========================================================================= */
+.scroll-hero {
+	--start: 38vh;
+	--line-height: 1.1;
+	/* Scroll que toma cada palabra en llegar a la banda de resaltado. */
+	--word-step: 18svh;
+	/* Grados con los que entra girada la sección 2 sobre la portada azul. */
+	--tilt-start: 30deg;
+	position: relative;
+	/* Por encima de la portada azul fijada. */
+	z-index: 1;
+	/* Al girar, la esquina superior derecha del pin se sale por la derecha
+	   (queda muy por debajo de la ventana, no se ve, pero generaría barra de
+	   scroll horizontal). `clip` y NO `hidden`: hidden convertiría a la
+	   sección en contenedor de scroll y el position: sticky del pin dejaría
+	   de funcionar. */
+	overflow-x: clip;
+	background: #030407;
+	color: #f4f6f8;
+	line-height: var(--line-height);
+}
+
+/*
+ * El track es el riel de scroll: una pantalla para la lista fijada, el
+ * recorrido palabra por palabra, y una pantalla más para que la sección 3
+ * suba encima sin que la lista se mueva.
+ */
+.scroll-hero__track {
+	height: calc(200svh + (var(--count) - 1) * var(--word-step));
+}
+
+.scroll-hero__pin {
+	position: sticky;
+	top: 0;
+	height: 100svh;
+	overflow: hidden;
+}
+
+.scroll-hero__grid {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	opacity: 0.28;
+	background-image:
+		linear-gradient(rgba(210, 220, 240, 0.1) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(210, 220, 240, 0.1) 1px, transparent 1px);
+	background-size: 48px 48px;
+	mask-image: linear-gradient(-20deg, transparent 42%, #000 78%);
+	pointer-events: none;
+}
+
+.scroll-hero__word-layout {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+	gap: 0.24em;
+	width: 100%;
+	/* La primera línea queda centrada sobre la banda de resaltado. */
+	padding: calc(var(--start) - 0.5lh) 24px 0;
+	font-size: clamp(1.55rem, 3.8vw, 4.2rem);
+	font-weight: 700;
+}
+
+.scroll-hero__lead {
+	margin: 0;
+	font-size: inherit;
+	font-weight: inherit;
+	line-height: var(--line-height);
+	color: rgba(244, 246, 248, 0.92);
+	white-space: nowrap;
+}
+
+.scroll-hero__words {
+	--shift: 0px;
+	position: relative;
+	/* Desplazado por JS; con `top` y no `transform` para no romper el
+	   background-attachment: fixed que dibuja la banda de resaltado. */
+	top: var(--shift);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	font-weight: inherit;
+	line-height: var(--line-height);
+}
+
+.scroll-hero__words li {
+	--dimmed: rgba(244, 246, 248, 0.2);
+	background-image: linear-gradient(
+		180deg,
+		var(--dimmed) 0 calc(var(--start) - 0.5lh),
+		#1355e8 calc(var(--start) - 0.5lh) calc(var(--start) + 0.5lh),
+		var(--dimmed) calc(var(--start) + 0.5lh)
+	);
+	background-attachment: fixed;
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+/* =========================================================================
+ * TRANSICIÓN 1 -> 2 - La sección negra entra GIRADA sobre la portada azul.
+ *
+ * Mientras la portada azul está fijada (.intro es sticky), la sección 2
+ * sube desde abajo girada --tilt-start sobre su ESQUINA INFERIOR IZQUIERDA
+ * y se endereza hasta 0deg. El giro empieza cuando el tope de la sección 2
+ * toca el borde inferior de la ventana y termina cuando ese tope llega al
+ * 25% superior. El JS pone/quita la clase .is-tilting y el ángulo --tilt.
+ *
+ * Esto NO toca la transición de la sección 2 a la 3 (el panel blanco).
+ * ========================================================================= */
+.scroll-hero.is-tilting {
+	/* Durante el giro el negro lo pinta el pin. Si lo siguiera pintando la
+	   sección, por detrás del panel inclinado se vería un rectángulo negro
+	   recto y se perdería la cuña azul. */
+	background: transparent;
+}
+
+.scroll-hero.is-tilting .scroll-hero__pin {
+	background: #030407;
+	transform: rotate(var(--tilt, 0deg));
+	/* Esquina inferior izquierda = el pivote del diseño original. */
+	transform-origin: 0 100%;
+	will-change: transform;
+}
+
+/*
+ * TRAMPA 1, versión giro: con un ancestro transformado (el pin), el
+ * background-attachment: fixed de la banda azul deja de resolverse contra
+ * la ventana y se vería el resaltado en el lugar equivocado. Mientras dura
+ * el giro pintamos las palabras planas y apagadas. Al terminar el giro el
+ * JS quita .is-tilting y el transform, y vuelve la banda normal: en ese
+ * punto todavía NO hay ninguna palabra sobre la banda (la primera queda
+ * 25vh por debajo), así que el cambio no se ve.
+ */
+.scroll-hero.is-tilting .scroll-hero__words li {
+	background-image: none;
+	-webkit-background-clip: border-box;
+	background-clip: border-box;
+	color: var(--dimmed);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.scroll-hero {
+		--tilt-start: 0deg;
+	}
+}
+
+/* SECCIÓN 3 - Panel blanco. */
+.scroll-hero__surface {
+	--surface-progress: 0;
+	--surface-text-progress: 0;
+	/* ENGANCHE (scroll jacking): scroll de más que se come el __stage sticky
+	   quedándose quieto, para que la sección 3 no se caiga de golpe en la 4
+	   (las dos usan el mismo #f4f6f8 y el corte se leía raro). Es lo único
+	   que hay que tocar para que enganche más o menos. 0 = sin enganche. */
+	--surface-hold: 50svh;
+	position: relative;
+	z-index: 3;
+	/* Se solapa sobre la última pantalla del track: sube por encima de la
+	   lista congelada en vez de empujarla. */
+	margin-top: -100svh;
+	/* Bloque y NO grid: el __stage es sticky, y un sticky dentro de un grid
+	   se pega solo dentro de SU celda (o sea, no se pega). En flujo normal
+	   se pega contra la caja del panel, que es lo que hace falta.
+	   La colocación que hacía el grid ahora la hace el propio __stage. */
+	display: block;
+	/* min-height y NO height: en pantallas bajas o en móvil las tarjetas no
+	   caben en una pantalla y el panel tiene que poder crecer. Esto no
+	   desincroniza nada: la matemática del solape depende del margin-top
+	   negativo (que fija dónde EMPIEZA el panel), no de su alto. */
+	min-height: 100svh;
+	/* El padding vertical se mudó al __stage. */
+	padding: 0 24px;
+	background: #f4f6f8;
+	color: #111315;
+	border-radius: calc(1.25rem * (1 - var(--surface-progress))) calc(1.25rem * (1 - var(--surface-progress))) 0 0;
+	transform: scale(calc(0.9 + (var(--surface-progress) * 0.1)));
+	/* El pivote del scale es el borde de abajo del PANEL, o sea el de antes
+	   de sumarle el enganche. Si se dejara en 100% el panel entraría desde
+	   más abajo y cambiaría la transición 2 -> 3. */
+	transform-origin: 50% calc(100% - var(--surface-hold));
+	will-change: transform, border-radius;
+}
+
+/*
+ * El enganche de la sección 3. Mide una pantalla y es sticky, así que se
+ * queda clavado mientras el panel consume sus --surface-hold de más. Cuando
+ * se despega, el borde de abajo del panel queda justo en el borde de abajo
+ * de la ventana: la sección 4 entra enseguida, sin hueco muerto.
+ *
+ * --stage-top lo escribe el JS: es 0 cuando los planes caben en una
+ * pantalla, y negativo cuando no (mismo truco que el --pin-top de la
+ * portada), para que el enganche nunca deje las tarjetas cortadas.
+ */
+.scroll-hero__surface-stage {
+	position: sticky;
+	top: var(--stage-top, 0px);
+	display: grid;
+	/* start y NO center: el contenido se ancla ARRIBA, a padding-top del
+	   borde del stage. Con center quedaba a 140px del tope de la ventana y el
+	   titular de los planes caía mucho más abajo que el de la sección 4 (que
+	   entra a 80px); ahora los dos aterrizan a la misma altura y el paso 3 -> 4
+	   no da el saltito.
+	   El hueco que antes se repartía arriba y abajo ahora queda TODO abajo: es
+	   espacio libre a propósito, para cuando las tarjetas de planes crezcan.
+	   Ojo: el alto de la sección no cambia, lo fija el min-height de 100svh
+	   (el contenido + padding mide ~817px, así que sobra). */
+	place-items: start center;
+	min-height: 100svh;
+	padding: 80px 0 64px;
+}
+
+/*
+ * El tramo que se come el enganche. Es alto de verdad (no padding del panel):
+ * el sticky del __stage solo puede correrse dentro de la caja de CONTENIDO de
+ * su padre, así que un padding-bottom no le daría nada de juego.
+ */
+.scroll-hero__surface-hold {
+	height: var(--surface-hold);
+}
+
+.scroll-hero__surface-content {
+	/* 1040px: era el ancho de la navbar vieja. La navbar ya no existe, pero
+	   el valor se dejó porque a las tarjetas les queda bien. Antes era 760px,
+	   que alcanzaba para una sola línea de texto. */
+	width: min(100%, 1040px);
+	text-align: center;
+	opacity: var(--surface-text-progress);
+	transform: translateY(calc((1 - var(--surface-text-progress)) * 24px));
+	transition: opacity 120ms linear, transform 120ms linear;
+}
+
+/* -------------------------------------------------------------------------
+ * SECCIÓN 3 - Planes.
+ * Vive DENTRO de .scroll-hero__surface-content, así que hereda tal cual el
+ * desvanecido de entrada (--surface-text-progress) que ya tenía el texto
+ * anterior. No define animación de scroll propia: si le agregas una, se va a
+ * pelear con ese fundido.
+ * ------------------------------------------------------------------------- */
+.plans__title {
+	margin: 0;
+	font-size: clamp(1.9rem, 3.4vw, 3rem);
+	font-weight: 700;
+	letter-spacing: -0.045em;
+	line-height: 1.05;
+}
+
+.plans__title span {
+	color: #1355e8;
+}
+
+.plans__subtitle {
+	margin: 14px auto 0;
+	max-width: 540px;
+	color: rgba(17, 19, 21, 0.6);
+	font-size: clamp(0.9rem, 1.2vw, 1rem);
+	line-height: 1.5;
+}
+
+/* Fila del switch mensual / anual. */
+.plans__billing {
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+	margin: 22px 0 30px;
+	padding: 8px 16px;
+	border: 1px solid rgba(17, 19, 21, 0.1);
+	border-radius: 999px;
+	background: #ffffff;
+	box-shadow: 0 6px 18px rgba(3, 4, 7, 0.05);
+}
+
+.plans__billing-label {
+	color: rgba(17, 19, 21, 0.45);
+	font-size: 0.85rem;
+	font-weight: 700;
+	transition: color 180ms ease;
+}
+
+.plans__billing-label.is-active {
+	color: #111315;
+}
+
+.plans__switch {
+	display: flex;
+	align-items: center;
+	width: 46px;
+	height: 26px;
+	padding: 3px;
+	border: 0;
+	border-radius: 999px;
+	background: rgba(17, 19, 21, 0.14);
+	cursor: pointer;
+	transition: background-color 200ms ease;
+}
+
+.plans__switch[aria-checked="true"] {
+	background: rgba(19, 85, 232, 0.22);
+}
+
+.plans__switch:focus-visible {
+	outline: 2px solid #1355e8;
+	outline-offset: 2px;
+}
+
+/* El círculo del switch va en azul de marca. */
+.plans__switch-thumb {
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: #1355e8;
+	box-shadow: 0 2px 6px rgba(19, 85, 232, 0.45);
+	transition: transform 200ms ease;
+}
+
+.plans__switch[aria-checked="true"] .plans__switch-thumb {
+	/* 46 de ancho - 6 de padding - 20 del círculo = 20px de recorrido. */
+	transform: translateX(20px);
+}
+
+.plans__badge {
+	color: #1355e8;
+	font-size: 0.62rem;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
+.plans__grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	align-items: stretch;
+	gap: 16px;
+	text-align: left;
+}
+
+.plans__card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	padding: 32px 24px;
+	border: 1px solid rgba(17, 19, 21, 0.09);
+	border-radius: 18px;
+	background: #ffffff;
+	color: #111315;
+	box-shadow: 0 12px 30px rgba(3, 4, 7, 0.06);
+}
+
+/* Plan del centro: tarjeta negra y un poco más grande. */
+.plans__card--featured {
+	z-index: 1;
+	border-color: transparent;
+	background: #111315;
+	color: #ffffff;
+	transform: scale(1.04);
+	box-shadow: 0 22px 50px rgba(3, 4, 7, 0.3);
+}
+
+.plans__name {
+	margin: 0;
+	font-size: 1.05rem;
+	font-weight: 700;
+}
+
+.plans__desc {
+	margin: 5px 0 0;
+	color: rgba(17, 19, 21, 0.55);
+	font-size: 0.82rem;
+	line-height: 1.4;
+}
+
+.plans__price {
+	display: flex;
+	align-items: baseline;
+	gap: 4px;
+	margin: 22px 0 0;
+}
+
+.plans__currency {
+	color: rgba(17, 19, 21, 0.5);
+	font-size: 1.15rem;
+	font-weight: 700;
+}
+
+.plans__amount {
+	font-size: clamp(2.1rem, 3.6vw, 2.9rem);
+	font-weight: 700;
+	letter-spacing: -0.04em;
+	/* Números de ancho fijo: el conteo del precio no descuadra la línea. */
+	font-variant-numeric: tabular-nums;
+}
+
+.plans__period {
+	color: rgba(17, 19, 21, 0.55);
+	font-size: 0.82rem;
+}
+
+/* Código de moneda (MXN): un poco más grande que "/mes" pero lejos del
+   tamaño del número, para que quede como aclaración, no como parte del precio. */
+.plans__currency-code {
+	color: rgba(17, 19, 21, 0.55);
+	font-size: 0.92rem;
+	font-weight: 700;
+}
+
+.plans__card--featured .plans__desc,
+.plans__card--featured .plans__currency,
+.plans__card--featured .plans__currency-code,
+.plans__card--featured .plans__period {
+	color: rgba(255, 255, 255, 0.6);
+}
+
+.plans__cta {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 46px;
+	margin: 22px 0 0;
+	border-radius: 12px;
+	background: #1355e8;
+	color: #ffffff;
+	font-size: 0.88rem;
+	font-weight: 700;
+	text-decoration: none;
+	box-shadow: 0 8px 20px rgba(19, 85, 232, 0.28);
+	transition: transform 180ms ease, filter 180ms ease;
+}
+
+.plans__cta:hover,
+.plans__cta:focus-visible {
+	transform: translateY(-2px);
+	filter: brightness(1.08);
+}
+
+/* Ícono "cómo se calcula" del precio anual. Absoluto y oculto por default:
+   no le suma nada al alto de la tarjeta (ni con el anual prendido, ver
+   .plans__annual-tooltip más abajo), así que la sección no se mueve un
+   píxel al mostrarlo. Solo aparece con el anual activo (JS agrega
+   .is-yearly a .plans__grid). Ancla arriba a la derecha, a la misma
+   distancia del borde que el padding de la tarjeta. */
+.plans__annual-info {
+	position: absolute;
+	top: 32px;
+	right: 24px;
+	display: none;
+}
+
+.plans__grid.is-yearly .plans__annual-info {
+	display: block;
+}
+
+.plans__annual-info-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 22px;
+	height: 22px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: none;
+	color: rgba(17, 19, 21, 0.35);
+	cursor: pointer;
+	transition: color 160ms ease;
+}
+
+.plans__annual-info-btn svg {
+	width: 18px;
+	height: 18px;
+}
+
+.plans__annual-info-btn:hover,
+.plans__annual-info-btn:focus-visible {
+	color: #1355e8;
+}
+
+.plans__annual-info-btn:focus-visible {
+	outline: 2px solid #1355e8;
+	outline-offset: 2px;
+}
+
+.plans__card--featured .plans__annual-info-btn {
+	color: rgba(255, 255, 255, 0.4);
+}
+
+.plans__card--featured .plans__annual-info-btn:hover,
+.plans__card--featured .plans__annual-info-btn:focus-visible {
+	color: #8ab0ff;
+}
+
+/* La ventanita. Blanca siempre (incluso sobre la tarjeta negra): así
+   contrasta igual en las 3 tarjetas en vez de tener que llevar un juego
+   de colores aparte por tarjeta. Absoluta -> no empuja nada. */
+.plans__annual-tooltip {
+	position: absolute;
+	top: calc(100% + 10px);
+	right: 0;
+	width: 216px;
+	padding: 12px 14px;
+	border: 1px solid rgba(17, 19, 21, 0.08);
+	border-radius: 10px;
+	background: #ffffff;
+	color: rgba(17, 19, 21, 0.85);
+	font-size: 0.78rem;
+	font-weight: 400;
+	line-height: 1.45;
+	text-align: left;
+	box-shadow: 0 16px 32px rgba(3, 4, 7, 0.22);
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(-4px);
+	transition: opacity 160ms ease, transform 160ms ease;
+	pointer-events: none;
+	z-index: 10;
+}
+
+.plans__annual-info-btn:hover + .plans__annual-tooltip,
+.plans__annual-info-btn:focus + .plans__annual-tooltip,
+.plans__annual-info-btn:focus-visible + .plans__annual-tooltip {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0);
+	pointer-events: auto;
+}
+
+.plans__features {
+	display: grid;
+	gap: 8px;
+	margin: 17px 0 0;
+	padding: 20px 0 0;
+	border-top: 1px solid rgba(17, 19, 21, 0.1);
+	list-style: none;
+	color: rgba(17, 19, 21, 0.7);
+	font-size: 0.84rem;
+	line-height: 1.35;
+}
+
+.plans__card--featured .plans__features {
+	border-top-color: rgba(255, 255, 255, 0.16);
+	color: rgba(255, 255, 255, 0.78);
+}
+
+.plans__features li {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+/* El check va como máscara en vez de 15 SVG inline repetidos. */
+.plans__features li::before {
+	content: "";
+	width: 15px;
+	height: 15px;
+	flex-shrink: 0;
+	background: #1355e8;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 13 4 4 10-10'/%3E%3C/svg%3E") center / contain no-repeat;
+	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 13 4 4 10-10'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* Sobre la tarjeta negra el azul de marca queda muy apagado. */
+.plans__card--featured .plans__features li::before {
+	background: #8ab0ff;
+}
+
+/* Los 2 puntos de IA (modelo + créditos OpenAI) van primero en la lista y
+   se marcan con un rayo en vez de la palomita, para que se noten como algo
+   aparte del resto de funciones. Mismo color que ya traía el ::before
+   (heredado), solo cambia el ícono y el peso del texto.
+   OJO: antes era una estrellita de 4 puntas, pero se parecía demasiado al
+   logo de Gemini (mala idea justo al lado de texto que dice "GPT"). El
+   rayo no se confunde con el logo de nadie. */
+.plans__feature--ai {
+	font-weight: 700;
+}
+
+/* .plans__features li.plans__feature--ai (no solo .plans__feature--ai): tiene
+   que igualar la especificidad de ".plans__features li::before" de arriba
+   para poder pisarle el mask; si no, la palomita gana y el ícono no cambia. */
+.plans__features li.plans__feature--ai::before {
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'%3E%3Cpath d='M13 2 3 14h7l-1 8 10-12h-7l1-8z'/%3E%3C/svg%3E") center / contain no-repeat;
+	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'%3E%3Cpath d='M13 2 3 14h7l-1 8 10-12h-7l1-8z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* =========================================================================
+ * SECCIÓN 4 - Clientes (#clientes). Última de la página.
+ *
+ * Fondo #f4f6f8: EL MISMO que el panel de planes de la sección 3, a propósito.
+ * La maqueta original usaba blanco puro, pero contra el panel de arriba se veía
+ * un escalón raro justo en la costura. Con el mismo gris las dos secciones leen
+ * como una sola superficie, y las tarjetas blancas (#fff) contrastan igual que
+ * las de planes. Si lo cambias, cámbialo también en .clients__rule::before/after.
+ *
+ * Estática: no tiene riel de scroll propio ni transición de entrada como las de
+ * arriba, solo la ola escalonada que dispara el IntersectionObserver del JS.
+ *
+ * Es HERMANA de .scroll-hero, nunca ancestro de .scroll-hero__words: no toca
+ * el track, ni el pin, ni el surface. Ver CLAUDE_LEEME.txt.
+ *
+ * Layout: tres columnas. La del medio son 3 tarjetas negras de alto natural,
+ * y es la que MARCA EL ALTO de la fila; las de los costados se reparten ese
+ * alto 7/3 (--tall / --short), por eso quedan espejadas.
+ * ========================================================================= */
+.clients {
+	position: relative;
+	/* Los 114/112 de antes bajaron a 80/96: el titular de dos líneas suma
+	   ~58px y estos recortes (+ el margin-top de la grilla) los devuelven,
+	   así la sección no queda más larga que antes. */
+	padding: 80px clamp(20px, 4vw, 40px) 96px;
+	background: #f4f6f8;
+	color: #111315;
+}
+
+.clients__inner {
+	/* Mismo ancho que .scroll-hero__surface-content, así las tarjetas de
+	   clientes caen alineadas con las de planes justo arriba. */
+	width: min(100%, 1040px);
+	margin: 0 auto;
+}
+
+.clients__head {
+	max-width: 900px;
+	margin: 0 auto;
+	text-align: center;
+}
+
+/* Mismas medidas que .plans__title: los dos titulares van en dos líneas con
+   la segunda en azul, así que la sección 3 y la 4 se leen igual. Si tocas
+   uno, toca el otro. El alto que gana esta sección por la segunda línea se
+   compensa abajo, en el padding de .clients y el margin-top de la grilla. */
+.clients__title {
+	margin: 0;
+	font-size: clamp(1.9rem, 3.4vw, 3rem);
+	font-weight: 700;
+	letter-spacing: -0.045em;
+	line-height: 1.05;
+}
+
+.clients__title span {
+	color: #1355e8;
+}
+
+.clients__subtitle {
+	margin: 14px auto 0;
+	max-width: 560px;
+	color: rgba(17, 19, 21, 0.6);
+	font-size: clamp(0.9rem, 1.2vw, 1rem);
+	line-height: 1.5;
+}
+
+.clients__grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	align-items: stretch;
+	gap: 10px;
+	margin-top: 38px;
+}
+
+.clients__col {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+/* Las tarjetas de la columna del medio NO llevan flex: se quedan en su alto
+   natural y entre las tres definen el alto de la fila. */
+.clients__card--tall {
+	flex: 7 1 0;
+}
+
+.clients__card--short {
+	flex: 3 1 0;
+}
+
+.clients__card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	margin: 0;
+	padding: 20px;
+	border: 1px solid rgba(17, 19, 21, 0.1);
+	border-radius: 12px;
+}
+
+.clients__card--paper {
+	background: #ffffff;
+}
+
+.clients__card--ink {
+	background: #111111;
+	border-color: rgba(255, 255, 255, 0.08);
+	color: #ffffff;
+}
+
+/* Azul de marca, el mismo de la portada y del resaltado de las palabras. */
+.clients__card--brand {
+	background: #1355e8;
+	border-color: transparent;
+	color: #ffffff;
+}
+
+/* Tarjetas vacías: quedan solo el fondo y el cuadrado del avatar, abajo a
+   la derecha. Sin cita no hay `margin: auto 0 0` que empuje nada, así que el
+   auto va aquí. El min-height es el que sostiene la fila: las tres negras
+   del medio marcan el alto y las laterales se lo reparten 7/3. */
+.clients__card--empty .clients__avatar {
+	margin-top: auto;
+	align-self: flex-end;
+}
+
+.clients__card--ink.clients__card--empty {
+	min-height: 184px;
+}
+
+/* Cuadrícula de las dos tarjetas blancas, con la máscara elíptica que la
+   desvanece hacia abajo. Va detrás del texto (z-index 0 contra 1). */
+.clients__card-grid {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	background-image:
+		linear-gradient(90deg, rgba(79, 79, 79, 0.18) 1px, transparent 1px),
+		linear-gradient(rgba(79, 79, 79, 0.18) 1px, transparent 1px);
+	background-size: 50px 56px;
+	mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, #000 70%, transparent 110%);
+	-webkit-mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, #000 70%, transparent 110%);
+	pointer-events: none;
+}
+
+/* El `margin-top: auto` es lo que empuja la cita Y el pie al fondo de la
+   tarjeta: en las tarjetas altas el texto queda abajo y arriba se ve la
+   cuadrícula sola, que es justo el efecto del diseño. */
+.clients__quote {
+	position: relative;
+	z-index: 1;
+	margin: auto 0 0;
+	font-size: 0.95rem;
+	line-height: 1.5;
+}
+
+.clients__card--ink .clients__quote {
+	font-size: 0.88rem;
+}
+
+.clients__author {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 16px;
+	padding-top: 20px;
+}
+
+.clients__name {
+	margin: 0;
+	font-size: 1.15rem;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+}
+
+.clients__role {
+	margin: 3px 0 0;
+	color: rgba(17, 19, 21, 0.6);
+	font-size: 0.88rem;
+}
+
+.clients__card--ink .clients__role,
+.clients__card--brand .clients__role {
+	color: rgba(255, 255, 255, 0.72);
+}
+
+/* Monograma en vez de foto: no hay retratos reales de estos clientes, y
+   poner caras de terceros en un testimonio de relleno sería peor que un
+   placeholder honesto. Si algún día llegan las fotos, se reemplaza el
+   <span> por un <img> del mismo tamaño y no hay que tocar nada más. */
+.clients__avatar {
+	display: grid;
+	flex-shrink: 0;
+	width: 64px;
+	height: 64px;
+	place-items: center;
+	border-radius: 12px;
+	font-size: 1.05rem;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+}
+
+.clients__card--paper .clients__avatar {
+	background: #eaf0fd;
+	color: #1355e8;
+}
+
+.clients__card--ink .clients__avatar {
+	background: rgba(255, 255, 255, 0.12);
+}
+
+.clients__card--brand .clients__avatar {
+	background: rgba(255, 255, 255, 0.18);
+}
+
+/* Variante con foto real: el mismo cuadrado de 64px y el mismo radio que el
+   monograma, así que el pie de la tarjeta no se mueve. El `cover` la recorta
+   al cuadrado sin deformarla. */
+.clients__avatar--photo {
+	display: block;
+	object-fit: cover;
+}
+
+/* Remate de abajo: una línea con un cuadradito en cada punta. Es decorativo
+   y cierra la página; no participa del layout (position: absolute). */
+.clients__rule {
+	position: absolute;
+	bottom: 18px;
+	left: 50%;
+	width: min(100% - 40px, 1040px);
+	height: 64px;
+	border-bottom: 2px solid #e2e6ea;
+	transform: translateX(-50%);
+	pointer-events: none;
+}
+
+.clients__rule::before,
+.clients__rule::after {
+	content: "";
+	position: absolute;
+	bottom: -8px;
+	width: 14px;
+	height: 14px;
+	border: 1px solid #d8dce1;
+	/* Tapan la línea en las puntas, así que van del color de la sección. */
+	background: #f4f6f8;
+}
+
+.clients__rule::before {
+	left: -7px;
+}
+
+.clients__rule::after {
+	right: -7px;
+}
+
+/* -------------------------------------------------------------------------
+ * Ola de entrada. La clase .clients--animate la pone el JS: sin JS (o con
+ * prefers-reduced-motion) nunca se agrega y la sección se ve entera desde el
+ * principio, en vez de quedar invisible para siempre.
+ *
+ * Las piezas entran DESDE ARRIBA (-20px) y desenfocadas, como en el diseño
+ * original. El escalonado sí se apretó: el original usaba 400ms por pieza y
+ * con 7 tarjetas la última tardaba casi 3s en aparecer.
+ * ------------------------------------------------------------------------- */
+.clients--animate [data-reveal] {
+	opacity: 0;
+	filter: blur(10px);
+	transform: translateY(-20px);
+}
+
+.clients--animate.is-revealed [data-reveal] {
+	opacity: 1;
+	filter: none;
+	transform: none;
+	transition: opacity 520ms ease, filter 520ms ease, transform 520ms ease;
+	transition-delay: calc(var(--n, 0) * 110ms);
+}
+
+/* =========================================================================
+ * FOOTER (.footer) - cierra la página, después de la sección 4.
+ *
+ * Fondo #030407: EL MISMO negro de la sección 2, no el #111315 del body.
+ * Contra el gris claro de clientes el corte se lee como el final de la
+ * página. Si lo cambias, mira también .footer__stripes (las rayas son
+ * blancas translúcidas y dependen de que el fondo sea oscuro).
+ *
+ * Traducido del componente "footer-section-1" (React + motion) a CSS
+ * pelado, igual que el menú y los testimonios. Lo único que hace el JS es
+ * poner .is-revealed (la ola) y escribir el año.
+ *
+ * Estático y hermano de .scroll-hero: no toca el track, ni el pin, ni el
+ * surface. Ver CLAUDE_LEEME.txt.
+ * ========================================================================= */
+.footer {
+	position: relative;
+	padding: 72px 0 0;
+	background: #030407;
+	color: #f4f6f8;
+	overflow: hidden;
+}
+
+/* El <h2> que le da nombre accesible al footer; no se ve. */
+.footer__sr {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+.footer__inner {
+	/* Mismo ancho que .clients__inner, así el logo cae centrado con las
+	   tarjetas de arriba. */
+	width: min(100%, 1040px);
+	margin: 0 auto;
+	padding: 0 clamp(20px, 4vw, 40px) 56px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 38px;
+}
+
+.footer__logo {
+	display: block;
+	line-height: 0;
+}
+
+/* Acá va el ISOTIPO (el cubo), no el logotipo de letras: el logotipo es de
+   trazo tan fino que a este tamaño se empasta.
+   El SVG trae aire alrededor del hexágono (mismo caso que .intro__logo),
+   así que el alto del <img> queda bastante por encima del tamaño visible
+   del cubo: 78px de caja ~= 48px de cubo. */
+.footer__logo img {
+	width: auto;
+	height: 78px;
+	transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.footer__logo:hover img,
+.footer__logo:focus-visible img {
+	transform: scale(1.06);
+}
+
+.footer__nav {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 6px 14px;
+}
+
+/* El hover del original: una píldora que crece desde el centro y el texto
+   que pasa a blanco pleno. La píldora es ::before para no meter un <span>
+   extra en cada link. */
+.footer__link {
+	position: relative;
+	/* Sin esto, el ::before con z-index: -1 se iría DETRÁS del fondo del
+	   footer (el link no crea contexto de apilado por sí solo) y la píldora
+	   del hover no se vería nunca. */
+	isolation: isolate;
+	padding: 7px 14px;
+	color: rgba(244, 246, 248, 0.62);
+	font-size: 0.95rem;
+	font-weight: 600;
+	text-decoration: none;
+	transition: color 300ms ease, transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.footer__link::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	border-radius: 8px;
+	background: rgba(244, 246, 248, 0.1);
+	opacity: 0;
+	transform: scale(0.6);
+	transition: opacity 300ms ease, transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.footer__link:hover,
+.footer__link:focus-visible {
+	color: #ffffff;
+	transform: scale(1.05);
+}
+
+.footer__link:hover::before,
+.footer__link:focus-visible::before {
+	opacity: 1;
+	transform: scale(1);
+}
+
+.footer__link:active {
+	transform: scale(0.95);
+}
+
+/* Rótulo "Fragmentless Social" del pie. Nace OCULTO: en escritorio el pie
+   va centrado y sin rótulo, y lo enciende el @media de 640px. Es la única
+   regla de base que agrega el footer de móvil, y no cambia nada de lo que
+   ya se veía en PC. */
+.footer__social-title {
+	display: none;
+}
+
+.footer__social {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 18px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.footer__icon {
+	display: grid;
+	place-items: center;
+	width: 34px;
+	height: 34px;
+	color: rgba(244, 246, 248, 0.72);
+	transition: color 240ms ease, transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.footer__icon svg {
+	width: 20px;
+	height: 20px;
+}
+
+.footer__icon:hover,
+.footer__icon:focus-visible {
+	color: #ffffff;
+	transform: translateY(-3px) scale(1.14);
+}
+
+/* Banda de rayas diagonales que se desplaza sola. El paso de la animación
+   (200px) es múltiplo exacto del mosaico (10px): por eso el loop no tiene
+   costura. Si cambias background-size, cambia también el keyframe. */
+.footer__stripes {
+	height: 48px;
+	border-top: 1px solid rgba(244, 246, 248, 0.12);
+	border-bottom: 1px solid rgba(244, 246, 248, 0.12);
+	background-image: repeating-linear-gradient(315deg, rgba(244, 246, 248, 0.16) 0 1px, transparent 0 50%);
+	background-size: 10px 10px;
+	animation: footer-stripes 20s linear infinite;
+}
+
+@keyframes footer-stripes {
+	to {
+		background-position: 200px 0;
+	}
+}
+
+.footer__base {
+	padding: 30px 20px 34px;
+	text-align: center;
+}
+
+.footer__copy {
+	margin: 0;
+	color: rgba(244, 246, 248, 0.45);
+	font-size: 0.82rem;
+}
+
+/* -------------------------------------------------------------------------
+ * Ola de entrada, misma mecánica que la sección 4: la clase .footer--animate
+ * la pone el JS, así que sin JS (o con prefers-reduced-motion) el footer se
+ * ve entero desde el principio en vez de quedar invisible para siempre.
+ *
+ * Acá las piezas suben DESDE ABAJO (+18px), al revés que en clientes: es lo
+ * que hacía el componente original y encaja con que el footer entre por el
+ * borde de abajo de la pantalla.
+ * ------------------------------------------------------------------------- */
+.footer--animate [data-reveal] {
+	opacity: 0;
+	transform: translateY(18px);
+}
+
+.footer--animate.is-revealed [data-reveal] {
+	opacity: 1;
+	transform: none;
+	transition: opacity 520ms ease, transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
+	transition-delay: calc(var(--n, 0) * 110ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.footer__stripes {
+		animation: none;
+	}
+}
+
+@media (max-width: 900px) {
+	/* Sin enganche en móvil: con las tarjetas en una sola columna los planes
+	   miden bastante más que una pantalla, así que clavarlos un tramo sería
+	   dejar media sección congelada a mitad de lectura. Acá la sección 3 ya
+	   tiene scroll propio de sobra, que es justo lo que el enganche busca. */
+	.scroll-hero__surface {
+		--surface-hold: 0svh;
+	}
+
+	.plans__grid {
+		grid-template-columns: 1fr;
+		gap: 14px;
+	}
+
+	.plans__card--featured {
+		transform: none;
+	}
+
+	/* Una sola columna: las tarjetas vuelven a su alto natural, así que el
+	   7/3 de las laterales deja de tener sentido. */
+	.clients__grid {
+		grid-template-columns: 1fr;
+	}
+
+	.clients__card--tall,
+	.clients__card--short {
+		flex: 0 1 auto;
+	}
+}
+
+/* =========================================================================
+ * BANDA DE TABLET (641px - 900px) - Tablets en vertical (iPad 768x1024,
+ * iPad Air 834x1112) y teléfonos acostados (667x375, 844x390).
+ *
+ * Esta franja no la había diseñado nadie: era el diseño de PC con las
+ * grillas de 3 columnas pasadas a UNA sola, o sea 3 tarjetas de plan de
+ * 650-770px de ancho una debajo de la otra (medido en 768x1024: la sección
+ * 3 pedía 1868px de alto, casi dos pantallas) y las 7 tarjetas de clientes
+ * en fila india.
+ *
+ * Acá abajo se arregla tomando prestada la idea del teléfono (carrusel)
+ * pero con la tarjeta ACOTADA, que es lo que faltaba: en un ancho de
+ * tablet, una tarjeta estirada a todo lo ancho no se lee, se deforma.
+ *
+ * NO toca ni el diseño de móvil (≤640) ni el de PC (≥901): los dos están
+ * congelados. Ver CLAUDE_LEEME.txt.
+ * ========================================================================= */
+@media (min-width: 641px) and (max-width: 900px) {
+	/* Misma razón que en móvil: la columna `auto` del grid no puede
+	   achicarse por debajo del min-content, y el riel mide las 3 tarjetas
+	   juntas a lo ancho. */
+	.scroll-hero__surface-stage {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	/*
+	 * EL RIEL. A diferencia del de móvil, este NO se sale a los bordes de
+	 * la pantalla: se queda dentro del panel y son las tarjetas vecinas las
+	 * que asoman recortadas por los costados.
+	 *
+	 * El padding-inline es la cuenta que permite centrar la PRIMERA y la
+	 * ÚLTIMA tarjeta: la mitad del riel menos la mitad de una tarjeta. Sin
+	 * él, el scroll-snap no podría dejar los extremos en el medio.
+	 */
+	.plans__grid {
+		display: flex;
+		align-items: stretch;
+		gap: 16px;
+		padding-inline: calc(50% - 200px);
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		overscroll-behavior-x: contain;
+		scrollbar-width: none;
+	}
+
+	.plans__grid::-webkit-scrollbar {
+		display: none;
+	}
+
+	/* 400px fijos y no un %: es el ancho en el que la tarjeta se lee igual
+	   que en PC. Con % se estiraría a 700px en una tablet. */
+	.plans__card {
+		flex: 0 0 400px;
+		scroll-snap-align: center;
+	}
+
+	/*
+	 * CLIENTES: las 3 tarjetas que se ven en móvil, pero en FILA. Con las 7
+	 * de PC apiladas la sección medía 1415px; así entra en una pantalla y se
+	 * parece a la de PC, que es de lo que se trata la coherencia.
+	 */
+	.clients__col {
+		display: contents;
+	}
+
+	.clients__grid {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.clients__col:nth-child(2) .clients__card:nth-child(n + 2),
+	.clients__col:nth-child(3) .clients__card {
+		display: none;
+	}
+
+	/* Con 3 tarjetas en una tablet cada una queda en ~230px, y ahí el
+	   cuadrado de 64px del avatar le come el renglón al nombre ("Ángel
+	   Reyes" se partía en dos). El de 52px del teléfono sí deja el nombre
+	   en una línea. */
+	.clients__avatar {
+		width: 52px;
+		height: 52px;
+		font-size: 0.92rem;
+	}
+}
+
+@media (max-width: 640px) {
+	/* =====================================================================
+	 * MENÚ EN MÓVIL - píldora a la derecha que se abre como barra lateral.
+	 *
+	 * Dos cambios respecto a PC:
+	 *   1. Cerrada, la píldora deja el centro (ahí cae la isla dinámica del
+	 *      iPhone), se ancla a la derecha y se acorta: "Menú" y la hamburguesa
+	 *      van juntos y centrados en vez de repartidos a los extremos.
+	 *   2. Abierta no se estira en su sitio como en PC: se convierte en un
+	 *      panel de alto completo pegado al borde derecho, con velo detrás.
+	 *      Así el menú puede crecer en links sin quedarse sin alto.
+	 *
+	 * El truco para que la píldora MORFE al panel (y no pegue un salto) es que
+	 * .menu pasa a ocupar la pantalla entera como caja de posicionamiento: la
+	 * píldora se acomoda arriba a la derecha con un margen, y al abrir sólo
+	 * cambian ancho, alto, margen y radio, que sí transicionan. .menu sigue con
+	 * pointer-events: none, así que aunque cubra todo no tapa clics.
+	 * ===================================================================== */
+	.menu {
+		--menu-bar: 44px;
+		display: flex;
+		align-items: flex-start;
+		justify-content: flex-end;
+		top: 0;
+		left: auto;
+		right: 0;
+		width: 100%;
+		height: 100dvh;
+		animation-name: menu-in-mobile;
+	}
+
+	/* Igual que menu-in pero sin el -50%: acá la píldora ya no está centrada. */
+	@keyframes menu-in-mobile {
+		from {
+			opacity: 0;
+			filter: blur(10px);
+			transform: translateY(-20px);
+		}
+		to {
+			opacity: 1;
+			filter: none;
+			transform: none;
+		}
+	}
+
+	/* El margen es lo que separa la píldora del borde; al abrir se va a 0 y el
+	   panel queda pegado. Por eso hay que sumarlo a la transición heredada. */
+	.menu__shell {
+		width: 108px;
+		margin: 16px 16px 0 0;
+		transition:
+			width 800ms var(--menu-ease),
+			height 800ms var(--menu-ease),
+			margin 800ms var(--menu-ease),
+			border-radius 800ms var(--menu-ease),
+			transform 250ms var(--menu-ease),
+			background-color 400ms ease;
+	}
+
+	/* El alto lo manda el CSS (100% de .menu = pantalla), no el JS: en móvil
+	   setMenuOpen() no escribe style.height. Ver index.html. */
+	.menu.is-open .menu__shell {
+		width: min(82vw, 380px);
+		height: 100%;
+		margin: 0;
+		border-radius: 26px 0 0 26px;
+	}
+
+	.menu__bar {
+		justify-content: center;
+		gap: 8px;
+		padding: 0 14px;
+		font-size: 0.88rem;
+	}
+
+	.menu.is-open .menu__bar {
+		justify-content: space-between;
+		gap: 0;
+		padding: 0 22px;
+	}
+
+	/* En el panel los links van alineados a la izquierda y ocupan el alto que
+	   sobra. El scroll propio es lo que lo hace escalable: si algún día hay
+	   diez links, la lista scrollea sola en vez de desbordar el panel. */
+	.menu.is-open .menu__items {
+		flex: 1 1 auto;
+		/* Es un grid: sin align-content las filas se reparten el alto sobrante
+		   del panel y los links quedan desparramados. */
+		align-content: start;
+		justify-content: start;
+		gap: 22px;
+		min-height: 0;
+		padding: 30px 26px 34px;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+	}
+
+	.menu__item {
+		font-size: 1.3rem;
+	}
+
+	/* Velo: deja ver la página detrás y, al ser hermano de .menu, el click en
+	   él lo recoge el listener de "click afuera" y cierra el panel. */
+	.menu-scrim {
+		display: block;
+		position: fixed;
+		inset: 0;
+		z-index: 99;
+		background: rgba(3, 4, 7, 0.5);
+		opacity: 0;
+		pointer-events: none;
+		/* La curva va escrita a mano: --menu-ease vive en .menu y el velo es
+		   hermano, así que no la hereda. */
+		transition: opacity 500ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	body.has-menu-open .menu-scrim {
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	/* Con el panel abierto la página de atrás no scrollea. */
+	body.has-menu-open {
+		overflow: hidden;
+	}
+
+	.menu__item {
+		font-size: 1.3rem;
+	}
+
+	/* Sección 1 */
+	.intro {
+		padding: 120px 20px 96px;
+	}
+
+	/* En móvil se apila: primero el isotipo, después el texto. Y va todo
+	   centrado, al revés que en PC (donde el texto va a la izquierda y el
+	   isotipo a la derecha, en dos columnas). El text-align: center del
+	   contenedor se encarga del kicker, el título y el subtítulo de una. */
+	.intro__content {
+		grid-template-columns: minmax(0, 1fr);
+		gap: 32px;
+		text-align: center;
+	}
+
+	.intro__logo {
+		order: -1;
+	}
+
+	.intro__logo img {
+		width: min(58%, 240px);
+	}
+
+	/* El 11vw está calculado igual que el 6.9vw de escritorio: es el máximo con
+	   el que "FRAGMENTLESS" (la palabra más larga, que no se puede partir)
+	   todavía entra en su caja. Con 12vw se desbordaba ~18px, y una línea que
+	   no entra Chrome NO la centra: la clava en el borde izquierdo y la deja
+	   derramarse a la derecha, así que el título se veía corrido mientras el
+	   resto del bloque estaba centrado. */
+	.intro__title {
+		font-size: clamp(2.2rem, 11vw, 3.6rem);
+	}
+
+	/* El auto de los costados centra la caja; el max-width de 620px sólo
+	   entra en juego en las pantallas más anchas de este rango. */
+	.intro__subtitle {
+		margin-inline: auto;
+	}
+
+	.intro__actions {
+		justify-content: center;
+	}
+
+	.intro__cta,
+	.intro__ghost {
+		width: 100%;
+	}
+
+	.intro__scroll {
+		bottom: 28px;
+	}
+
+	/* =====================================================================
+	 * SECCIÓN 2 EN MÓVIL - Apilada y centrada, al revés que en PC (donde
+	 * "Tú podrás" y la lista van lado a lado, en una fila).
+	 *
+	 *   · "Tú podrás" se sale del flujo y se clava arriba del pin: queda
+	 *     quieto durante todo el recorrido.
+	 *   · La lista se queda sola en el flujo, así que su primera línea
+	 *     sigue cayendo exactamente sobre la banda de resaltado
+	 *     (el padding-top de siempre) y el JS no se entera del cambio:
+	 *     sigue moviendo SOLO el <ul> con --shift.
+	 *
+	 * Con el ancho entero para la lista, cada frase entra en UNA línea,
+	 * que es de lo que se trata el apilado.
+	 * ===================================================================== */
+	.scroll-hero {
+		/* La banda baja de 38vh a 46vh. No es estético: es el colchón que
+		   separa a "Tú podrás" de las palabras YA pasadas. Al final del
+		   recorrido la lista subió 5 líneas, y con 38vh la primera frase
+		   terminaba encima del "Tú podrás". Este --start no toca la
+		   matemática del solape con la sección 3 (esa depende del track,
+		   el pin y el margin-top del surface, no de la banda). */
+		--start: 46vh;
+	}
+
+	/* block y no flex: el lead sale del flujo y la lista se queda sola. */
+	.scroll-hero__word-layout {
+		display: block;
+		padding: calc(var(--start) - 0.5lh) 20px 0;
+		text-align: center;
+		font-size: clamp(1.45rem, 7.2vw, 2.4rem);
+	}
+
+	/* Absoluto contra el __word-layout, que arranca en el tope del pin.
+	   Nada de position: fixed: el pin ya está fijado, y un fixed encima se
+	   quedaría pegado también fuera de la sección.
+
+	   El top NO es un número a ojo: es el punto donde la lista TERMINA el
+	   recorrido, menos el alto del propio lead y un respiro. O sea, el
+	   lead queda lo más abajo posible sin que la primera frase se le
+	   monte encima al final del scroll:
+
+	     final de la lista = var(--start) - 0.5lh - (--count - 1) * 1lh
+	     lead              = ese punto - 1lh (su alto) - 0.6lh (respiro)
+
+	   que sumado da el (--count + 1.1) de abajo. Al depender de --start,
+	   de --count y del alto de línea, se recoloca solo en cualquier
+	   pantalla y si algún día se agrega o quita una frase de la lista. */
+	.scroll-hero__lead {
+		position: absolute;
+		top: calc(var(--start) - (var(--count) + 1.1) * 1lh);
+		left: 20px;
+		right: 20px;
+		white-space: normal;
+	}
+
+	.scroll-hero__words {
+		min-width: 0;
+	}
+
+	/* =====================================================================
+	 * SECCIÓN 3 EN MÓVIL - Los 3 planes dejan de ir apilados y pasan a un
+	 * CARRUSEL horizontal: se desliza a la izquierda para el Básico y a la
+	 * derecha para el Premium, y arranca centrado en el Negocio (eso último
+	 * lo pone el JS, acá el CSS solo arma el riel).
+	 *
+	 * Con una sola tarjeta a la vista la sección entra en UNA pantalla, que
+	 * es lo que la empareja con la 1 y la 2. Por eso los paddings de acá
+	 * abajo están apretados: son el presupuesto de alto, no un capricho.
+	 * Si algún día se agrega una función más a la lista, revisa que siga
+	 * cabiendo (o baja el padding del __stage).
+	 * ===================================================================== */
+	.scroll-hero__surface {
+		padding: 0 20px;
+	}
+
+	/* minmax(0, 1fr) y no la columna `auto` implícita: una columna auto no
+	   puede achicarse por debajo del min-content de su contenido, y el riel
+	   de tarjetas de abajo mide (a lo ancho) las 3 tarjetas juntas. Sin
+	   esto la columna crece a ~650px, el contenido se desborda de la
+	   pantalla y el 100% de las tarjetas resuelve contra ese ancho inflado.
+	   Con el minmax(0, ...) la columna se queda en el ancho de la ventana y
+	   el desborde se lo come el scroll horizontal del riel, que es el que
+	   tiene que comérselo. */
+	.scroll-hero__surface-stage {
+		grid-template-columns: minmax(0, 1fr);
+		/* Todo el ritmo vertical de la sección va en clamps de svh: en un
+		   teléfono alto respira, y en uno bajo se comprime solo en vez de
+		   empujar la tarjeta fuera de la pantalla. */
+		padding: clamp(72px, 10svh, 88px) 0 clamp(16px, 2.6svh, 24px);
+	}
+
+	/* Todo centrado, al revés que en PC (donde el bloque de texto va a la
+	   izquierda). El text-align: center ya viene del base; acá solo se
+	   quita el left que tenía el móvil. */
+	.scroll-hero__surface-content {
+		text-align: center;
+	}
+
+	.plans__title {
+		font-size: clamp(1.8rem, 7.8vw, 2.5rem);
+	}
+
+	.plans__subtitle {
+		max-width: 34ch;
+		margin: clamp(8px, 1.4svh, 14px) auto 0;
+		font-size: 0.92rem;
+	}
+
+	.plans__billing {
+		gap: 10px;
+		margin: clamp(14px, 2.2svh, 20px) 0 clamp(16px, 2.6svh, 24px);
+		padding: 7px 14px;
+	}
+
+	/*
+	 * EL RIEL. Se sale de los 20px de padding del panel (margin negativo) y
+	 * se los devuelve como padding propio: así la tarjeta queda centrada con
+	 * su margen de siempre PERO las vecinas asoman pegadas al borde de la
+	 * pantalla, que es la pista de que hay más planes al lado.
+	 *
+	 * overscroll-behavior-x: contain -> el swipe horizontal muere acá y no
+	 * se lo lleva la página (en iOS, el "atrás" por gesto).
+	 */
+	.plans__grid {
+		display: flex;
+		gap: 12px;
+		/* +40 = los 20px de padding que el panel tiene a cada lado. */
+		width: calc(100% + 40px);
+		margin-inline: -20px;
+		padding-inline: 26px;
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		overscroll-behavior-x: contain;
+		text-align: center;
+		scrollbar-width: none;
+	}
+
+	.plans__grid::-webkit-scrollbar {
+		display: none;
+	}
+
+	/* 0 0 100% = el ancho visible MENOS el padding-inline del riel, o sea
+	   una tarjeta por pantalla. El snap al centro las clava una por una. */
+	.plans__card {
+		flex: 0 0 100%;
+		scroll-snap-align: center;
+		padding: clamp(18px, 2.6svh, 24px) 20px;
+	}
+
+	.plans__name {
+		font-size: 1.2rem;
+	}
+
+	.plans__desc {
+		font-size: 0.88rem;
+	}
+
+	/* El precio es flex, así que centrarlo no es text-align sino justify. */
+	.plans__price {
+		justify-content: center;
+		margin-top: clamp(12px, 2svh, 18px);
+	}
+
+	.plans__amount {
+		font-size: 2.4rem;
+	}
+
+	.plans__currency-code {
+		font-size: 1rem;
+	}
+
+	.plans__cta {
+		min-height: clamp(44px, 5.6svh, 48px);
+		margin-top: clamp(12px, 2svh, 18px);
+		font-size: 0.95rem;
+	}
+
+	/* El ícono del precio anual sigue el padding nuevo de la tarjeta. */
+	.plans__annual-info {
+		top: clamp(18px, 2.6svh, 24px);
+		right: 20px;
+	}
+
+	/*
+	 * La lista se centra COMO BLOQUE (fit-content + auto), no frase por
+	 * frase: con text-align: center cada palomita quedaría a distinta
+	 * altura horizontal y la columna de íconos se vería en zigzag. Así el
+	 * bloque va al medio y las filas siguen alineadas entre ellas.
+	 */
+	.plans__features {
+		width: fit-content;
+		max-width: 100%;
+		margin: clamp(10px, 1.8svh, 14px) auto 0;
+		padding-top: clamp(12px, 2svh, 16px);
+		gap: clamp(6px, 1.1svh, 8px);
+		font-size: 0.88rem;
+		text-align: left;
+	}
+
+	/* =====================================================================
+	 * SECCIÓN 4 EN MÓVIL - Los comentarios se quedan PLANOS, apilados uno
+	 * debajo del otro como siempre (nada de carrusel: eso es de la sección
+	 * 3). Lo que cambia acá es el encuadre, para que la sección mida lo
+	 * mismo que las otras vistas:
+	 *
+	 *   · el contenido baja (la píldora del menú ocupa de 16px a 60px y el
+	 *     titular le quedaba pegado). Mismo padding que el __stage de la
+	 *     sección 3: si tocas uno, toca el otro;
+	 *   · se ven 3 testimonios y no 7;
+	 *   · la sección mide una pantalla y las 3 tarjetas se reparten el alto
+	 *     que sobra.
+	 * ===================================================================== */
+	.clients {
+		/* Columna flexible para que la grilla se quede con el alto que sobra
+		   entre el titular y el remate de abajo. */
+		display: flex;
+		flex-direction: column;
+		min-height: 100svh;
+		padding: clamp(72px, 10svh, 88px) 20px 86px;
+	}
+
+	.clients__inner {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		/* Sin esto un hijo flex no puede achicarse por debajo de su
+		   contenido y la grilla se pasaría de la pantalla. */
+		min-height: 0;
+	}
+
+	.clients__head {
+		text-align: center;
+	}
+
+	.clients__title {
+		font-size: clamp(1.8rem, 7.8vw, 2.5rem);
+	}
+
+	.clients__subtitle {
+		max-width: 34ch;
+		margin: clamp(8px, 1.4svh, 14px) auto 0;
+		font-size: 0.92rem;
+	}
+
+	/*
+	 * La grilla se come el alto sobrante (flex: 1). Como sus filas son de
+	 * alto automático, el align-content: stretch de serie reparte ese
+	 * sobrante ENTRE LAS TRES por igual: cada tarjeta conserva el alto que
+	 * le pide su contenido y crece desde ahí, así que el texto nunca queda
+	 * apretado ni recortado.
+	 */
+	.clients__grid {
+		flex: 1;
+		min-height: 0;
+		margin-top: clamp(18px, 3svh, 28px);
+	}
+
+	/*
+	 * Las columnas dejan de ser cajas y sus tarjetas pasan a ser hijas
+	 * directas de la grilla (en PC siguen siendo 3 columnas de verdad).
+	 * Hace falta para el reparto de alto de arriba: si las tarjetas
+	 * quedaran dentro de la columna, la que crecería sería la COLUMNA y la
+	 * tarjeta se quedaría chica con un hueco debajo.
+	 */
+	.clients__col {
+		display: contents;
+	}
+
+	/*
+	 * SOLO 3 TESTIMONIOS en móvil, uno de cada color. Las otras 4 son
+	 * relleno: en una pantalla no aportan y alargan la sección. En PC
+	 * siguen estando las 7. Si algún día hay testimonios reales, esto es
+	 * lo que hay que revisar.
+	 */
+	.clients__col:nth-child(2) .clients__card:nth-child(n + 2),
+	.clients__col:nth-child(3) .clients__card {
+		display: none;
+	}
+
+	/*
+	 * La cita del cliente (la de verdad, la de Anxie Store) es más larga que
+	 * el relleno que había y estiró la sección 40px: en 390x844 se pasaba de
+	 * la pantalla. Se recupera ese alto en los dos únicos lugares que sobran,
+	 * y hacen falta LOS DOS (cada uno solo deja 2-3px afuera):
+	 *
+	 *   · el piso de las negras vacías, que no lleva contenido;
+	 *   · la cita, 0.95rem -> 0.85rem.
+	 *
+	 * El bloque de teléfonos bajitos (≤640 y ≤740 de alto) pisa estas dos
+	 * reglas más abajo con sus propios valores: ahí el alto se pelea de otra
+	 * manera y meterle este clamp lo empeoraba 3px. No lo unifiques.
+	 */
+
+	/* El piso de 184px de las negras vacías es de PC, donde tres de ellas
+	   marcan el alto de la fila. Acá abajo son un piso a secas, y en una
+	   pantalla baja es lo primero que empuja la sección fuera de la
+	   ventana. Con el clamp se achican solas cuando no hay alto. */
+	.clients__card--ink.clients__card--empty {
+		min-height: clamp(104px, 16svh, 150px);
+	}
+
+	.clients__quote {
+		font-size: 0.85rem;
+	}
+
+	.clients__avatar {
+		width: 52px;
+		height: 52px;
+		font-size: 0.92rem;
+	}
+
+	.clients__rule {
+		width: calc(100% - 32px);
+	}
+
+	/* =====================================================================
+	 * FOOTER EN MÓVIL - Los atajos dejan de ser una fila de píldoras y se
+	 * agrupan en una CAJITA: una fila por atajo, separadas por líneas, con
+	 * la flecha a la derecha. Debajo, el rótulo de redes y los dos iconos
+	 * más grandes.
+	 *
+	 * El isotipo de arriba no va. La banda de rayas y el © de abajo quedan
+	 * EXACTAMENTE como estaban: no se tocan.
+	 * ===================================================================== */
+	.footer {
+		padding-top: 56px;
+	}
+
+	/* stretch y no center: la cajita tiene que ocupar todo el ancho. */
+	.footer__inner {
+		align-items: stretch;
+		gap: 24px;
+		padding-bottom: 44px;
+	}
+
+	/* Fuera el isotipo: la cajita ya abre el pie y el cubo la empujaba
+	   media pantalla hacia abajo. */
+	.footer__logo {
+		display: none;
+	}
+
+	/* LA CAJITA. El overflow: hidden es lo que hace que las filas de las
+	   puntas queden recortadas por el borde redondeado. */
+	.footer__nav {
+		flex-direction: column;
+		flex-wrap: nowrap;
+		gap: 0;
+		border: 1px solid rgba(244, 246, 248, 0.14);
+		border-radius: 14px;
+		overflow: hidden;
+	}
+
+	.footer__link {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 15px 18px;
+		color: rgba(244, 246, 248, 0.92);
+		font-size: 0.92rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+
+	/* La línea va entre filas, no en cada una: así no se dibuja uno doble
+	   contra el borde de la caja. */
+	.footer__link + .footer__link {
+		border-top: 1px solid rgba(244, 246, 248, 0.12);
+	}
+
+	/* La flecha: un cuadrado al que solo se le pintan dos lados y se gira
+	   45°. Va en ::after porque el ::before ya es la píldora del hover. */
+	.footer__link::after {
+		content: "";
+		width: 7px;
+		height: 7px;
+		border-right: 2px solid rgba(244, 246, 248, 0.4);
+		border-bottom: 2px solid rgba(244, 246, 248, 0.4);
+		transform: rotate(-45deg);
+	}
+
+	/* La píldora del hover pasa a cubrir la fila entera (sin radio propio:
+	   el de la caja ya la recorta). */
+	.footer__link::before {
+		border-radius: 0;
+	}
+
+	/* Y sin el scale del hover/tap: en una fila de ancho completo se ve
+	   como si la caja se deformara. */
+	.footer__link:hover,
+	.footer__link:focus-visible,
+	.footer__link:active {
+		transform: none;
+	}
+
+	/* El margen negativo se come parte del gap de 24px del __inner: el
+	   rótulo tiene que leerse pegado a SUS iconos, no flotando entre la
+	   cajita y ellos. */
+	.footer__social-title {
+		display: block;
+		margin: 4px 0 -10px;
+		/* Los 18px son el padding de las filas de la cajita: así el rótulo
+		   arranca en la MISMA vertical que "INICIO" y compañía, y no en el
+		   borde de la caja. */
+		padding-left: 18px;
+		color: rgba(244, 246, 248, 0.5);
+		font-size: 0.78rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+
+	/* Mismo riel que el rótulo y las filas. El 8 no es 18 porque el icono
+	   tiene su propia caja de 46px con el dibujo de 26 centrado: le sobran
+	   10px a cada lado, y 8 + 10 = los 18 del resto. Así lo que queda
+	   alineado es el DIBUJO, no su caja invisible. */
+	.footer__social {
+		justify-content: flex-start;
+		gap: 8px;
+		padding-left: 8px;
+	}
+
+	.footer__icon {
+		width: 46px;
+		height: 46px;
+	}
+
+	.footer__icon svg {
+		width: 26px;
+		height: 26px;
+	}
+
+	.footer__stripes {
+		height: 40px;
+	}
+}
+
+/* =========================================================================
+ * PANTALLAS ACOSTADAS / VENTANAS BAJAS (ancho ≥ 641px y alto ≤ 620px).
+ * Un teléfono acostado (667x375, 844x390) o una ventana de escritorio
+ * aplastada. El problema no es el ancho, es el ALTO: con los paddings de
+ * siempre la portada pedía 637px en una ventana de 375 (medido), o sea que
+ * los dos botones caían fuera de pantalla, y la lista de palabras se metía
+ * debajo de la píldora del menú.
+ *
+ * No entra en los teléfonos de pie: esos tienen su propio bloque más abajo
+ * (≤640 de ancho). Acá SOLO se recorta espacio vertical, nada de layout.
+ * ========================================================================= */
+@media (min-width: 641px) and (max-height: 620px) {
+	/* padding-block y no padding: los costados (el clamp con vw) se
+	   respetan, que de ancho no falta nada. */
+	.intro {
+		padding-block: 44px 36px;
+	}
+
+	.intro__kicker {
+		margin-bottom: 10px;
+	}
+
+	/* El título se ata al ANCHO y al ALTO a la vez, y manda el que menos
+	   deje: con solo vw, en un teléfono acostado (667x375) salía de 46px y
+	   dos líneas de titular se comían 86px de los 375 que hay. El min()
+	   hace que en una ventana baja el alto sea el que decide. */
+	.intro__title {
+		font-size: clamp(2rem, min(6.9vw, 9svh), 8.2rem);
+	}
+
+	.intro__subtitle {
+		margin-top: 16px;
+	}
+
+	.intro__actions {
+		margin-top: 20px;
+	}
+
+	/* El isotipo es lo más alto de la fila y acá el alto es lo que falta. */
+	.intro__logo img {
+		width: min(100%, 300px);
+		max-height: 62svh;
+		object-fit: contain;
+	}
+
+	/* El "DESLIZA ↓" vive pegado abajo (absolute) y en una ventana baja se
+	   le monta encima a los botones. */
+	.intro__scroll {
+		display: none;
+	}
+
+	/*
+	 * Las palabras: con la banda en 38vh de 375px quedaba en el pixel 142,
+	 * y las 5 frases ya pasadas subían hasta meterse detrás del menú. Se
+	 * baja la banda y se achica la letra en proporción AL ALTO (svh, no vw:
+	 * de ancho sobra, lo que falta es alto).
+	 */
+	.scroll-hero {
+		--start: 54vh;
+	}
+
+	.scroll-hero__word-layout {
+		font-size: clamp(1rem, 4.6svh, 2.6rem);
+	}
+}
+
+/* =========================================================================
+ * TELÉFONOS BAJITOS (≤640px de ancho y ≤740px de alto).
+ * iPhone SE (320x568 y 375x667), Androids viejos (360x640). El diseño de
+ * móvil está pensado para los de 800px de alto para arriba; acá abajo hay
+ * entre 130 y 240px de más que recortar (medido antes: la portada pedía
+ * 792px en una pantalla de 568).
+ *
+ * Es recorte de espacio y de tamaños, NO otro diseño: la estructura (el
+ * carrusel de planes, los 3 testimonios, la cajita del pie) es la misma.
+ * ========================================================================= */
+@media (max-width: 640px) and (max-height: 740px) {
+	/* Sección 1 */
+	.intro {
+		padding: 86px 20px 62px;
+	}
+
+	.intro__content {
+		gap: 20px;
+	}
+
+	/* El isotipo pasa de 58% a 40%: es la pieza que más alto ocupa y la que
+	   menos información lleva (el nombre ya está escrito debajo). */
+	.intro__logo img {
+		width: min(40%, 168px);
+	}
+
+	.intro__kicker {
+		margin-bottom: 12px;
+	}
+
+	.intro__title {
+		font-size: clamp(2rem, 10vw, 3.2rem);
+	}
+
+	.intro__subtitle {
+		margin-top: 16px;
+		font-size: 0.95rem;
+	}
+
+	.intro__actions {
+		margin-top: 20px;
+		gap: 10px;
+	}
+
+	/* Sección 3: la lista de funciones es lo que más pesa de la tarjeta
+	   (9 renglones), y en 320px de ancho varios se parten en dos líneas.
+	   Bajarla un punto es lo que más alto devuelve. */
+	.plans__features {
+		gap: 5px;
+		font-size: 0.8rem;
+	}
+
+	.plans__card {
+		padding: 16px 16px;
+	}
+
+	.plans__amount {
+		font-size: 2.1rem;
+	}
+
+	.plans__cta {
+		min-height: 42px;
+	}
+
+	/* Sección 4. El padding de abajo (86px) estaba calculado para que el
+	   remate decorativo respirara, pero de ese remate lo único que se ve es
+	   la línea, que vive a 18px del borde: los otros 64px son la caja vacía
+	   que la sostiene. Recortarlo no tapa nada. */
+	.clients {
+		padding-bottom: 64px;
+	}
+
+	.clients__grid {
+		gap: 8px;
+	}
+
+	.clients__card--ink.clients__card--empty {
+		min-height: clamp(96px, 16svh, 150px);
+	}
+
+	.clients__quote {
+		font-size: 0.88rem;
+	}
+
+	.clients__avatar {
+		width: 44px;
+		height: 44px;
+	}
+}
+
+
+/* =========================================================================
+ * PÁGINA DE TÉRMINOS (terminos.html).
+ *
+ * Es una página APARTE, no una sección de index.html: no toca el track, ni
+ * el pin, ni el surface del scroll-hero, así que no puede desincronizar
+ * nada de las secciones 2 y 3. Comparte style.css sólo para heredar el
+ * sistema visual (azul #1355e8, negro #030407/#111315, panel #f4f6f8).
+ *
+ * El FOOTER se reusa tal cual. Funciona sin JS: la clase .footer--animate
+ * (la que esconde las piezas) la pone el JS de index.html, que acá no
+ * existe, así que el footer se ve entero desde el principio. Por eso el
+ * año del copyright va escrito a mano en el HTML.
+ * ========================================================================= */
+.terms-page {
+	background: #f4f6f8;
+	color: #111315;
+}
+
+/* -------------------------------------------------------------------------
+ * Portada azul, versión corta. Mismo azul y misma grilla que la sección 1,
+ * pero sin sticky y sin animación: acá no hay riel de scroll que respetar.
+ * ------------------------------------------------------------------------- */
+.terms-hero {
+	position: relative;
+	padding: 96px clamp(20px, 4vw, 40px) 72px;
+	background: #1355e8;
+	color: #ffffff;
+	overflow: hidden;
+}
+
+.terms-hero__grid {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	opacity: 0.5;
+	background-image:
+		linear-gradient(rgba(255, 255, 255, 0.13) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(255, 255, 255, 0.13) 1px, transparent 1px);
+	background-size: 48px 48px;
+	mask-image: radial-gradient(120% 90% at 50% 30%, #000 20%, transparent 75%);
+	-webkit-mask-image: radial-gradient(120% 90% at 50% 30%, #000 20%, transparent 75%);
+	pointer-events: none;
+}
+
+.terms-hero__inner {
+	position: relative;
+	z-index: 1;
+	width: min(100%, 1040px);
+	margin: 0 auto;
+}
+
+/* Botón de volver. Es el único enlace de navegación de la página: no se
+   monta el menú flotante porque vive del JS de index.html. */
+.terms-back {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 40px;
+	padding: 0 18px;
+	border: 1px solid rgba(255, 255, 255, 0.42);
+	border-radius: 999px;
+	color: #ffffff;
+	font-size: 0.9rem;
+	font-weight: 700;
+	text-decoration: none;
+	transition: transform 180ms ease, background-color 180ms ease;
+}
+
+.terms-back:hover,
+.terms-back:focus-visible {
+	transform: translateY(-2px);
+	background: rgba(255, 255, 255, 0.12);
+}
+
+.terms-back svg {
+	width: 16px;
+	height: 16px;
+}
+
+.terms-hero__kicker {
+	margin: 34px 0 16px;
+	color: rgba(255, 255, 255, 0.72);
+	font-size: 0.76rem;
+	font-weight: 700;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+}
+
+.terms-hero__title {
+	margin: 0;
+	max-width: 14ch;
+	font-size: clamp(2.4rem, 6vw, 4.6rem);
+	font-weight: 700;
+	letter-spacing: -0.045em;
+	line-height: 1.02;
+}
+
+.terms-hero__lead {
+	margin: 22px 0 0;
+	max-width: 56ch;
+	color: rgba(255, 255, 255, 0.82);
+	font-size: clamp(0.98rem, 1.4vw, 1.12rem);
+	line-height: 1.6;
+}
+
+.terms-hero__meta {
+	margin: 28px 0 0;
+	color: rgba(255, 255, 255, 0.62);
+	font-size: 0.84rem;
+}
+
+/* -------------------------------------------------------------------------
+ * Cuerpo: índice pegajoso a la izquierda, contenido a la derecha.
+ * En móvil el índice se cae arriba y deja de ser sticky.
+ * ------------------------------------------------------------------------- */
+.terms-body {
+	width: min(100%, 1040px);
+	margin: 0 auto;
+	padding: clamp(40px, 6vw, 72px) clamp(20px, 4vw, 40px) clamp(56px, 8vw, 96px);
+	display: grid;
+	grid-template-columns: minmax(0, 240px) minmax(0, 1fr);
+	gap: clamp(28px, 4vw, 56px);
+	align-items: start;
+}
+
+.terms-toc {
+	position: sticky;
+	/* 92px: deja aire respecto del borde y no compite con nada fijo. */
+	top: 92px;
+	padding: 22px 20px;
+	border: 1px solid rgba(17, 19, 21, 0.09);
+	border-radius: 18px;
+	background: #ffffff;
+	box-shadow: 0 12px 30px rgba(3, 4, 7, 0.06);
+}
+
+.terms-toc__title {
+	margin: 0 0 14px;
+	color: rgba(17, 19, 21, 0.45);
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+}
+
+.terms-toc__list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	counter-reset: toc;
+}
+
+.terms-toc__link {
+	display: block;
+	padding: 7px 0;
+	color: rgba(17, 19, 21, 0.66);
+	font-size: 0.9rem;
+	font-weight: 600;
+	line-height: 1.35;
+	text-decoration: none;
+	transition: color 180ms ease, transform 180ms ease;
+}
+
+.terms-toc__link::before {
+	counter-increment: toc;
+	content: counter(toc) ". ";
+	color: rgba(17, 19, 21, 0.32);
+	font-variant-numeric: tabular-nums;
+}
+
+.terms-toc__link:hover,
+.terms-toc__link:focus-visible {
+	color: #1355e8;
+	transform: translateX(3px);
+}
+
+.terms-toc__link:hover::before,
+.terms-toc__link:focus-visible::before {
+	color: #1355e8;
+}
+
+.terms__sr {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+.terms-content {
+	min-width: 0;
+}
+
+/* Cada regla es una tarjeta blanca, igual que las de planes: se escanea
+   mejor en pantalla y en persona que un muro de párrafos. */
+.terms__section {
+	padding: clamp(24px, 3vw, 34px);
+	border: 1px solid rgba(17, 19, 21, 0.09);
+	border-radius: 18px;
+	background: #ffffff;
+	box-shadow: 0 12px 30px rgba(3, 4, 7, 0.06);
+	/* scroll-margin y no padding: las anclas del índice tienen que frenar
+	   con aire arriba, no empujar la caja. */
+	scroll-margin-top: 24px;
+}
+
+.terms__section + .terms__section {
+	margin-top: 18px;
+}
+
+.terms__num {
+	display: block;
+	margin: 0 0 10px;
+	color: #1355e8;
+	font-size: 0.74rem;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+}
+
+.terms__heading {
+	margin: 0 0 16px;
+	font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+	font-weight: 700;
+	letter-spacing: -0.035em;
+	line-height: 1.12;
+}
+
+.terms__sub {
+	margin: 26px 0 12px;
+	font-size: 1rem;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+}
+
+.terms__text {
+	margin: 0 0 14px;
+	color: rgba(17, 19, 21, 0.72);
+	font-size: 0.98rem;
+	line-height: 1.62;
+}
+
+.terms__text:last-child,
+.terms__list:last-child,
+.terms__steps:last-child {
+	margin-bottom: 0;
+}
+
+.terms__text strong {
+	color: #111315;
+}
+
+/* Enlace dentro del texto. Sólo se usa para los cruces entre secciones
+   (la 02 manda a la 08 y al revés), así que no hace falta nada más. */
+.terms__link {
+	color: #1355e8;
+	font-weight: 700;
+	text-decoration: none;
+	border-bottom: 1px solid rgba(19, 85, 232, 0.35);
+	transition: border-color 180ms ease;
+}
+
+.terms__link:hover,
+.terms__link:focus-visible {
+	border-bottom-color: #1355e8;
+}
+
+.terms__list {
+	margin: 0 0 14px;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.terms__list li {
+	position: relative;
+	padding-left: 24px;
+	color: rgba(17, 19, 21, 0.72);
+	font-size: 0.98rem;
+	line-height: 1.55;
+}
+
+.terms__list li::before {
+	content: "";
+	position: absolute;
+	top: 0.62em;
+	left: 4px;
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: #1355e8;
+}
+
+/* Lista de "esto NO lo hacemos": misma caja, viñeta apagada. */
+.terms__list--no li::before {
+	background: rgba(17, 19, 21, 0.22);
+}
+
+/* Lista numerada, para las reglas que se cuentan (reembolso). */
+.terms__steps {
+	margin: 0 0 14px;
+	padding: 0;
+	list-style: none;
+	counter-reset: step;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.terms__steps li {
+	position: relative;
+	padding-left: 40px;
+	color: rgba(17, 19, 21, 0.72);
+	font-size: 0.98rem;
+	line-height: 1.55;
+}
+
+.terms__steps li::before {
+	counter-increment: step;
+	content: counter(step);
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: grid;
+	place-items: center;
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	background: #1355e8;
+	color: #ffffff;
+	font-size: 0.8rem;
+	font-weight: 700;
+}
+
+/* Nota al margen, azul tenue. Para los "ojo con esto". */
+.terms__note {
+	margin: 18px 0 0;
+	padding: 16px 18px;
+	border-left: 3px solid #1355e8;
+	border-radius: 0 12px 12px 0;
+	background: rgba(19, 85, 232, 0.06);
+	color: rgba(17, 19, 21, 0.78);
+	font-size: 0.94rem;
+	line-height: 1.55;
+}
+
+.terms__note p {
+	margin: 0;
+}
+
+.terms__note p + p {
+	margin-top: 10px;
+}
+
+/* Bloque negro destacado. Reservado para la regla de los créditos de IA,
+   que es la que más malentendidos genera y merece su propia caja. */
+.terms__section--highlight {
+	border-color: transparent;
+	background: #111315;
+	color: #f4f6f8;
+	box-shadow: 0 18px 40px rgba(3, 4, 7, 0.22);
+}
+
+.terms__section--highlight .terms__num {
+	color: #6f9bff;
+}
+
+.terms__section--highlight .terms__text,
+.terms__section--highlight .terms__list li,
+.terms__section--highlight .terms__steps li {
+	color: rgba(244, 246, 248, 0.74);
+}
+
+.terms__section--highlight .terms__text strong {
+	color: #ffffff;
+}
+
+.terms__section--highlight .terms__note {
+	border-left-color: #6f9bff;
+	background: rgba(244, 246, 248, 0.07);
+	color: rgba(244, 246, 248, 0.82);
+}
+
+/* La frase que no se puede saltar nadie. */
+.terms__shout {
+	margin: 18px 0;
+	padding: 18px 20px;
+	border-radius: 14px;
+	background: #1355e8;
+	color: #ffffff;
+	font-size: clamp(1rem, 1.8vw, 1.2rem);
+	font-weight: 700;
+	line-height: 1.4;
+	letter-spacing: -0.02em;
+}
+
+/* -------------------------------------------------------------------------
+ * Tablas. Van dentro de .terms__table-wrap, que es el que scrollea en
+ * horizontal: la tabla no se encoge, se arrastra. Es lo único de la página
+ * que puede pasarse de ancho.
+ * ------------------------------------------------------------------------- */
+.terms__table-wrap {
+	margin: 0 0 14px;
+	overflow-x: auto;
+	border: 1px solid rgba(17, 19, 21, 0.09);
+	border-radius: 14px;
+}
+
+.terms__table {
+	width: 100%;
+	min-width: 480px;
+	border-collapse: collapse;
+	font-size: 0.94rem;
+}
+
+.terms__table th,
+.terms__table td {
+	padding: 12px 16px;
+	text-align: right;
+	white-space: nowrap;
+	font-variant-numeric: tabular-nums;
+}
+
+.terms__table thead th {
+	background: rgba(17, 19, 21, 0.04);
+	color: #111315;
+	font-size: 0.82rem;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+}
+
+.terms__table tbody th {
+	font-weight: 600;
+}
+
+.terms__table th:first-child,
+.terms__table td:first-child {
+	text-align: left;
+	white-space: normal;
+	color: rgba(17, 19, 21, 0.72);
+	font-weight: 600;
+}
+
+.terms__table tbody tr + tr th,
+.terms__table tbody tr + tr td {
+	border-top: 1px solid rgba(17, 19, 21, 0.08);
+}
+
+/* La fila que importa: lo que pagas si NO te vas por la anual. */
+.terms__table tr.is-key td,
+.terms__table tr.is-key th {
+	background: rgba(19, 85, 232, 0.06);
+	color: #111315;
+	font-weight: 700;
+}
+
+.terms__table tr.is-save td {
+	color: #1355e8;
+	font-weight: 700;
+}
+
+/* Cierre: la misma puerta de siempre, WhatsApp. */
+.terms__end {
+	margin-top: 28px;
+	padding: clamp(26px, 3.4vw, 38px);
+	border-radius: 18px;
+	background: #1355e8;
+	color: #ffffff;
+	text-align: center;
+}
+
+.terms__end-title {
+	margin: 0 0 10px;
+	font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+	font-weight: 700;
+	letter-spacing: -0.035em;
+}
+
+.terms__end-text {
+	margin: 0 auto 22px;
+	max-width: 46ch;
+	color: rgba(255, 255, 255, 0.82);
+	font-size: 0.98rem;
+	line-height: 1.6;
+}
+
+.terms__end-cta {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 50px;
+	padding: 0 28px;
+	border-radius: 999px;
+	background: #ffffff;
+	color: #1355e8;
+	font-size: 0.95rem;
+	font-weight: 700;
+	text-decoration: none;
+	box-shadow: 0 10px 26px rgba(3, 4, 7, 0.22);
+	transition: transform 180ms ease;
+}
+
+.terms__end-cta:hover,
+.terms__end-cta:focus-visible {
+	transform: translateY(-2px);
+}
+
+.terms__updated {
+	margin: 22px 0 0;
+	color: rgba(17, 19, 21, 0.45);
+	font-size: 0.84rem;
+	text-align: center;
+}
+
+@media (max-width: 900px) {
+	.terms-body {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.terms-toc {
+		position: static;
+	}
+}
+
+@media (max-width: 620px) {
+	.terms-hero {
+		padding-top: 80px;
+	}
+
+	.terms__section {
+		padding: 22px 18px;
+	}
+
+	.terms__table th,
+	.terms__table td {
+		padding: 10px 12px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.terms-back,
+	.terms-toc__link,
+	.terms__end-cta {
+		transition: none;
+	}
+}

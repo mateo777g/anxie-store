@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Fragmentless</title>
+	<!-- La barra del navegador en el celular se pinta del azul de la marca:
+	     las dos páginas arrancan con la portada azul (#1355e8), así que la
+	     barra se funde con ella en vez de cortar la pantalla en dos. -->
+	<meta name="theme-color" content="#1355e8">
+	<!-- Isotipo blanco sobre placa azul: se lee en una pestaña clara, en una
+	     oscura y sobre la barra azul de arriba. El -v2 del nombre es a
+	     propósito, es lo que obliga al celular a bajar el icono nuevo; si se
+	     vuelve a cambiar, va como -v3. Ver el comentario dentro del archivo. -->
+	<link rel="icon" href="assets/favicon-v2.svg" type="image/svg+xml">
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<!--
+		MENÚ FLOTANTE (reemplazó a la navbar vieja).
+		Píldora fija arriba al centro. Cerrada muestra "Menú" + hamburguesa;
+		al abrirse se estira y un círculo baja desde arriba pintando el panel.
+		El color lo cambia el JS según la sección que tenga debajo
+		(data-theme = blue | dark | light). Ver CLAUDE_LEEME.txt.
+		Atajos: #inicio = sección 1 (portada azul), #gestion = sección 2.
+	-->
+	<nav class="menu" data-theme="blue" aria-label="Menú principal">
+		<div class="menu__shell">
+			<!-- El círculo que "moja" el panel al abrir. Va detrás del texto. -->
+			<span class="menu__circle" aria-hidden="true"></span>
+
+			<button type="button" class="menu__bar" aria-expanded="false" aria-controls="menu-items">
+				<span class="menu__label">Menú</span>
+				<span class="menu__icon" aria-hidden="true"><i></i><i></i></span>
+			</button>
+
+			<!--
+				Las letras (.menu__text) las parte el JS en dos copias para el roll
+				del hover, y al icono le hace lo mismo: entra en la misma ola, como
+				el cuadro 0 de la fila, así que la ola arranca en él.
+			-->
+			<ul class="menu__items" id="menu-items">
+				<li><a class="menu__item" href="#inicio">
+					<span class="menu__ico" aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M3 10a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+							<path d="M15 21v-8H9v8" />
+						</svg>
+					</span>
+					<span class="menu__text">Inicio</span>
+				</a></li>
+				<li><a class="menu__item" href="#licencias">
+					<span class="menu__ico" aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<rect x="2" y="5" width="20" height="14" rx="2" />
+							<path d="M2 10h20" />
+						</svg>
+					</span>
+					<span class="menu__text">Planes</span>
+				</a></li>
+				<li><a class="menu__item" href="#clientes">
+					<span class="menu__ico" aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<circle cx="12" cy="8" r="4" />
+							<path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1" />
+						</svg>
+					</span>
+					<span class="menu__text">Clientes</span>
+				</a></li>
+				<!--
+					Contacto no es una sección de la página: abre WhatsApp directo al
+					número del negocio, con el mensaje ya escrito. Mismo destino que
+					el botón blanco de la portada y el icono del pie.
+					El texto va URL-encodeado a mano (acentos incluidos) para que el
+					link funcione sin JS y se pueda copiar tal cual.
+				-->
+				<li><a class="menu__item" href="https://wa.me/5212721467532?text=Hola%2C%20vengo%20de%20la%20p%C3%A1gina%20de%20Fragmentless%20y%20me%20interesa%20rentar%20una%20suscripci%C3%B3n%20del%20software.%20%C2%BFMe%20pueden%20dar%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener">
+					<span class="menu__ico" aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z" />
+						</svg>
+					</span>
+					<span class="menu__text">Contacto</span>
+				</a></li>
+			</ul>
+		</div>
+	</nav>
+
+	<!--
+		Velo del panel lateral. SOLO existe en móvil (en escritorio el CSS lo
+		deja en display: none y no pinta nada).
+		Va a propósito FUERA de .menu: así el click sobre él cae en el listener
+		de "click afuera" que ya cierra el menú, sin código nuevo.
+	-->
+	<div class="menu-scrim" aria-hidden="true"></div>
+
+	<main>
+		<!--
+			SECCIÓN 1 - Portada azul (estática).
+			Es la primera vista de la página. No participa del riel de scroll de
+			la sección 2: es un hermano, no un ancestro, de .scroll-hero__words.
+		-->
+		<section id="inicio" class="intro" aria-labelledby="intro-titulo">
+			<div class="intro__grid" aria-hidden="true"></div>
+
+			<!--
+				Dos columnas: el texto a la izquierda y el isotipo (frame 35, la
+				versión blanca) a la derecha. En móvil se apilan y el isotipo
+				pasa arriba del texto.
+			-->
+			<div class="intro__content">
+				<!--
+					Todo el contenido entra escalonado al cargar, con la misma ola
+					que la sección 4 (mismo data-reveal, mismo --n = lugar en la
+					fila). La píldora del menú también entra en esta ola, pero con
+					su propio @keyframes menu-in, porque vive fuera de .intro.
+
+					El isotipo sólo APARECE con la ola: su animación de armado
+					(los 36 cuadros) es aparte y no se toca. Una mueve opacidad,
+					blur y posición del contenedor; la otra cambia el src del img.
+				-->
+				<div class="intro__copy">
+					<p class="intro__kicker" data-reveal style="--n: 0;">Software por suscripción</p>
+					<h1 id="intro-titulo" class="intro__title" data-reveal style="--n: 1;">Fragmentless<br>Software<span class="intro__title-mark">®</span></h1>
+					<p class="intro__subtitle" data-reveal style="--n: 2;">Menú, mesas, ventas y anuncios con IA en un solo panel, instalado en la computadora de tu negocio. Sin planillas sueltas.</p>
+
+					<div class="intro__actions" data-reveal style="--n: 3;">
+						<a class="intro__cta" href="https://wa.me/5212721467532?text=Hola%2C%20vengo%20de%20la%20p%C3%A1gina%20de%20Fragmentless%20y%20me%20interesa%20rentar%20una%20suscripci%C3%B3n%20del%20software.%20%C2%BFMe%20pueden%20dar%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener">Hablemos por WhatsApp</a>
+						<a class="intro__ghost" href="#gestion">Ver cómo funciona</a>
+					</div>
+				</div>
+
+				<!--
+					El <picture> es lo que parte el isotipo en dos versiones:
+					en móvil (≤640) manda el <source> y se ve la PLACA fija, porque la
+					animación de 36 cuadros se trababa en el teléfono; de 641 para
+					arriba no hay <source> que coincida, gana el <img> y la animación
+					corre como siempre.
+
+					OJO: cuando el <source> coincide, el src del <img> queda ignorado.
+					Por eso el JS ni arranca en móvil (ver initLogo): cambiarle el src
+					no se vería, y precargar los 36 cuadros sería gastar datos al pedo.
+				-->
+				<div class="intro__logo" aria-hidden="true" data-reveal style="--n: 4;">
+					<picture>
+						<source media="(max-width: 640px)" srcset="assets/logo-placa-azul.svg">
+						<img src="assets/svg/blanco/fragmentless-white-frame35.svg" alt="">
+					</picture>
+				</div>
+			</div>
+
+			<a class="intro__scroll" href="#gestion" data-reveal style="--n: 5;">
+				<span>Desliza</span>
+				<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M12 5v14" />
+					<path d="m5 12 7 7 7-7" />
+				</svg>
+			</a>
+		</section>
+
+		<!--
+			SECCIONES 2 y 3 - Van juntas dentro del mismo riel de scroll:
+			  · Sección 2 = .scroll-hero__track / __pin -> la lista de palabras
+			    sobre fondo negro que sube y se congela.
+			  · Sección 3 = .scroll-hero__surface -> el panel blanco que se
+			    encima sobre la lista ya congelada.
+			La matemática de las dos está amarrada (ver CLAUDE_LEEME.txt).
+		-->
+		<section id="gestion" class="scroll-hero" style="--count: 6;" aria-labelledby="gestion-titulo">
+			<div class="scroll-hero__track">
+				<div class="scroll-hero__pin">
+					<div class="scroll-hero__grid" aria-hidden="true"></div>
+					<div class="scroll-hero__word-layout">
+						<h2 id="gestion-titulo" class="scroll-hero__lead">Tú podrás</h2>
+						<ul class="scroll-hero__words" aria-label="Acciones disponibles">
+							<li>actualizar tu menú.</li>
+							<li>controlar tus mesas.</li>
+							<li>registrar ventas.</li>
+							<li>hacer análisis con IA.</li>
+							<li>crear anuncios.</li>
+							<li>guardar tus anuncios.</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+
+			<!--
+				SECCIÓN 3 - Panel blanco que se solapa sobre la sección 2.
+				id="licencias" para el link del menú. El salto NO lo hace el ancla
+				sola (el panel es sticky, ver el JS): el JS calcula a mano el scroll
+				donde los planes quedan quietos en pantalla.
+			-->
+			<div id="licencias" class="scroll-hero__surface">
+				<!--
+					__stage = el ENGANCHE de la sección 3 (scroll jacking). Es
+					sticky y mide una pantalla; el panel de abajo le deja
+					--surface-hold de sobra, así que los planes se quedan
+					quietos en pantalla ese tramo antes de que suba la
+					sección 4. Es solo un envoltorio de posición: no toca el
+					track, ni el pin, ni el solape. Ver CLAUDE_LEEME.txt.
+
+					Todo lo de los planes va DENTRO de .scroll-hero__surface-content,
+					así que aparece con el mismo desvanecido sutil de siempre (lo
+					maneja --surface-text-progress). No tiene animación propia.
+				-->
+				<div class="scroll-hero__surface-stage">
+					<div class="scroll-hero__surface-content">
+						<h2 class="plans__title">Planes que crecen<br><span>con tu negocio.</span></h2>
+						<p class="plans__subtitle">Elige el plan que necesitas hoy. Puedes cambiarlo o cancelarlo cuando quieras.</p>
+
+						<div class="plans__billing">
+							<span class="plans__billing-label is-active" data-billing="monthly">Mensual</span>
+
+							<button type="button" class="plans__switch" role="switch" aria-checked="false" aria-label="Cambiar entre facturación mensual y anual">
+								<span class="plans__switch-thumb" aria-hidden="true"></span>
+							</button>
+
+							<span class="plans__billing-label" data-billing="yearly">Anual</span>
+							<span class="plans__badge">Ahorra 20%</span>
+						</div>
+
+						<!-- data-monthly / data-yearly: los lee el JS para el conteo del precio. -->
+						<div class="plans__grid">
+							<article class="plans__card">
+								<h3 class="plans__name">Plan Básico</h3>
+								<p class="plans__desc">El panel completo, con IA esencial</p>
+
+								<p class="plans__price">
+									<span class="plans__currency">$</span>
+									<span class="plans__amount" data-monthly="1199" data-yearly="959">1,199</span>
+									<span class="plans__currency-code">MXN</span>
+									<span class="plans__period">/mes</span>
+								</p>
+
+								<!-- Solo se ve con el anual activo (lo prende/apaga el JS con
+									 .plans__grid.is-yearly). Explica cómo se arma ese precio. -->
+								<div class="plans__annual-info">
+									<button type="button" class="plans__annual-info-btn" aria-describedby="anual-basico" aria-label="Cómo se calcula el precio anual">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+											<circle cx="12" cy="12" r="10" />
+											<line x1="12" y1="8" x2="12" y2="12" />
+											<line x1="12" y1="16" x2="12.01" y2="16" />
+										</svg>
+									</button>
+									<span class="plans__annual-tooltip" id="anual-basico" role="tooltip">Pagás los 12 meses de una sola vez: $11,510 MXN al año, un 20% menos que pagar $1,199 MXN cada mes.</span>
+								</div>
+
+								<!-- Igual que los otros botones de contacto, pero el mensaje ya
+									 nombra el plan para que no haya que preguntarlo. -->
+								<a class="plans__cta" href="https://wa.me/5212721467532?text=Hola%2C%20vengo%20de%20la%20p%C3%A1gina%20de%20Fragmentless%20y%20me%20interesa%20contratar%20el%20Plan%20B%C3%A1sico.%20%C2%BFMe%20pueden%20dar%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener">Elegir plan</a>
+
+								<ul class="plans__features">
+									<li class="plans__feature--ai">GPT-4o + GPT Image 1.5 High</li>
+									<li class="plans__feature--ai">Créditos de OpenAI: $6 USD</li>
+									<li>Sitio web y panel con tu marca</li>
+									<li>Menú digital que actualizas tú mismo</li>
+									<li>Control de mesas</li>
+									<li>Registro de ventas</li>
+									<li>Reportes y análisis de ventas con IA</li>
+									<li>Creación de anuncios con IA y plantillas</li>
+									<li>Biblioteca de tus anuncios</li>
+								</ul>
+							</article>
+
+							<!-- Plan destacado: tarjeta negra, un poco más grande. -->
+							<article class="plans__card plans__card--featured">
+								<h3 class="plans__name">Plan Negocio</h3>
+								<p class="plans__desc">El panel completo, con IA avanzada</p>
+
+								<p class="plans__price">
+									<span class="plans__currency">$</span>
+									<span class="plans__amount" data-monthly="1549" data-yearly="1239">1,549</span>
+									<span class="plans__currency-code">MXN</span>
+									<span class="plans__period">/mes</span>
+								</p>
+
+								<div class="plans__annual-info">
+									<button type="button" class="plans__annual-info-btn" aria-describedby="anual-negocio" aria-label="Cómo se calcula el precio anual">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+											<circle cx="12" cy="12" r="10" />
+											<line x1="12" y1="8" x2="12" y2="12" />
+											<line x1="12" y1="16" x2="12.01" y2="16" />
+										</svg>
+									</button>
+									<span class="plans__annual-tooltip" id="anual-negocio" role="tooltip">Pagás los 12 meses de una sola vez: $14,870 MXN al año, un 20% menos que pagar $1,549 MXN cada mes.</span>
+								</div>
+
+								<a class="plans__cta" href="https://wa.me/5212721467532?text=Hola%2C%20vengo%20de%20la%20p%C3%A1gina%20de%20Fragmentless%20y%20me%20interesa%20contratar%20el%20Plan%20Negocio.%20%C2%BFMe%20pueden%20dar%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener">Elegir plan</a>
+
+								<ul class="plans__features">
+									<li class="plans__feature--ai">GPT-4o + GPT Image 2.5 Flare</li>
+									<li class="plans__feature--ai">Créditos de OpenAI: $12 USD</li>
+									<li>Sitio web y panel con tu marca</li>
+									<li>Menú digital que actualizas tú mismo</li>
+									<li>Control de mesas</li>
+									<li>Registro de ventas</li>
+									<li>Reportes y análisis de ventas con IA</li>
+									<li>Creación de anuncios con IA y plantillas</li>
+									<li>Biblioteca de tus anuncios</li>
+								</ul>
+							</article>
+
+							<article class="plans__card">
+								<h3 class="plans__name">Plan Premium</h3>
+								<p class="plans__desc">El panel completo, con IA al máximo</p>
+
+								<p class="plans__price">
+									<span class="plans__currency">$</span>
+									<span class="plans__amount" data-monthly="1899" data-yearly="1519">1,899</span>
+									<span class="plans__currency-code">MXN</span>
+									<span class="plans__period">/mes</span>
+								</p>
+
+								<div class="plans__annual-info">
+									<button type="button" class="plans__annual-info-btn" aria-describedby="anual-premium" aria-label="Cómo se calcula el precio anual">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+											<circle cx="12" cy="12" r="10" />
+											<line x1="12" y1="8" x2="12" y2="12" />
+											<line x1="12" y1="16" x2="12.01" y2="16" />
+										</svg>
+									</button>
+									<span class="plans__annual-tooltip" id="anual-premium" role="tooltip">Pagás los 12 meses de una sola vez: $18,230 MXN al año, un 20% menos que pagar $1,899 MXN cada mes.</span>
+								</div>
+
+								<a class="plans__cta" href="https://wa.me/5212721467532?text=Hola%2C%20vengo%20de%20la%20p%C3%A1gina%20de%20Fragmentless%20y%20me%20interesa%20contratar%20el%20Plan%20Premium.%20%C2%BFMe%20pueden%20dar%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener">Elegir plan</a>
+
+								<ul class="plans__features">
+									<li class="plans__feature--ai">GPT-4o + GPT Image 2.5 Sunburst</li>
+									<li class="plans__feature--ai">Créditos de OpenAI: $18 USD</li>
+									<li>Sitio web y panel con tu marca</li>
+									<li>Menú digital que actualizas tú mismo</li>
+									<li>Control de mesas</li>
+									<li>Registro de ventas</li>
+									<li>Reportes y análisis de ventas con IA</li>
+									<li>Creación de anuncios con IA y plantillas</li>
+									<li>Biblioteca de tus anuncios</li>
+								</ul>
+							</article>
+						</div>
+					</div>
+				</div>
+
+				<!-- El tramo del enganche: alto y nada más. -->
+				<div class="scroll-hero__surface-hold" aria-hidden="true"></div>
+			</div>
+		</section>
+
+		<!--
+			SECCIÓN 4 - Clientes (#clientes). Última de la página.
+			Fondo blanco, estática: lo único que hace es aparecer escalonada
+			cuando entra en pantalla (lo dispara un IntersectionObserver).
+			Es HERMANA de .scroll-hero, igual que la portada azul: no toca el
+			track, ni el pin, ni el surface, así que no puede desincronizar la
+			matemática de las secciones 2 y 3. Ver CLAUDE_LEEME.txt.
+
+			El --n de cada pieza es su lugar en la ola de entrada.
+			OJO: la cita de Ángel Reyes (Anxie Store) es REAL, la dio el cliente
+			el 13-sep-2026. Las demás tarjetas siguen vacías a propósito.
+		-->
+		<section id="clientes" class="clients" aria-labelledby="clientes-titulo">
+			<div class="clients__inner">
+				<header class="clients__head">
+					<h2 id="clientes-titulo" class="clients__title" data-reveal style="--n: 0;">Negocios que ya trabajan<br><span>con Fragmentless.</span></h2>
+					<p class="clients__subtitle" data-reveal style="--n: 1;">Esto dicen los dueños que cambiaron las planillas sueltas por un solo panel.</p>
+				</header>
+
+				<div class="clients__grid">
+					<!-- Columna 1: tarjeta blanca grande (7) + tarjeta azul chica (3). -->
+					<div class="clients__col">
+						<figure class="clients__card clients__card--paper clients__card--tall" data-reveal style="--n: 0;">
+							<div class="clients__card-grid" aria-hidden="true"></div>
+							<blockquote class="clients__quote">"Antes tenía los productos apuntados por un lado y la publicidad la armaba por otro. Ahora subo la imagen desde el mismo panel donde ya la creé, la publico y en segundos está en la tienda: todo en un solo lugar."</blockquote>
+							<figcaption class="clients__author">
+								<div>
+									<p class="clients__name">Ángel Reyes</p>
+									<p class="clients__role">Dueño de Anxie Store</p>
+								</div>
+								<img class="clients__avatar clients__avatar--photo" src="assets/cliente1.jpg" alt="" width="64" height="64" loading="lazy">
+							</figcaption>
+						</figure>
+
+						<figure class="clients__card clients__card--brand clients__card--short clients__card--empty" data-reveal style="--n: 1;">
+							<span class="clients__avatar" aria-hidden="true"></span>
+						</figure>
+					</div>
+
+					<!-- Columna 2: las tres tarjetas negras. Son las que marcan el alto
+					     de la fila; las columnas 1 y 3 se reparten ese alto 7/3. -->
+					<div class="clients__col">
+						<figure class="clients__card clients__card--ink clients__card--empty" data-reveal style="--n: 2;">
+							<span class="clients__avatar" aria-hidden="true"></span>
+						</figure>
+
+						<figure class="clients__card clients__card--ink clients__card--empty" data-reveal style="--n: 3;">
+							<span class="clients__avatar" aria-hidden="true"></span>
+						</figure>
+
+						<figure class="clients__card clients__card--ink clients__card--empty" data-reveal style="--n: 4;">
+							<span class="clients__avatar" aria-hidden="true"></span>
+						</figure>
+					</div>
+
+					<!-- Columna 3: espejo de la 1 (azul chica arriba, blanca grande abajo). -->
+					<div class="clients__col">
+						<figure class="clients__card clients__card--brand clients__card--short clients__card--empty" data-reveal style="--n: 5;">
+							<span class="clients__avatar" aria-hidden="true"></span>
+						</figure>
+
+						<figure class="clients__card clients__card--paper clients__card--tall clients__card--empty" data-reveal style="--n: 6;">
+							<div class="clients__card-grid" aria-hidden="true"></div>
+							<span class="clients__avatar" aria-hidden="true"></span>
+						</figure>
+					</div>
+				</div>
+			</div>
+
+			<!-- Remate de abajo: la línea con los dos cuadraditos en las puntas. -->
+			<div class="clients__rule" aria-hidden="true"></div>
+		</section>
+	</main>
+
+	<!--
+		FOOTER (.footer) - cierra la página, justo después de la sección 4.
+
+		Negro (#030407, el mismo de la sección 2) contra el gris claro de
+		clientes: el corte marca el final de la página.
+
+		Traducido del componente "footer-section-1" (React + motion) a
+		CSS/JS pelado, igual que el menú y los testimonios: este proyecto no
+		tiene build ni dependencias.
+
+		Es HERMANO de .scroll-hero y va FUERA del <main>: no toca el track,
+		ni el pin, ni el surface. Ver CLAUDE_LEEME.txt.
+
+		El --n de cada pieza es su lugar en la ola de entrada.
+		OJO: los links de redes van a "#" hasta que existan las cuentas.
+	-->
+	<footer class="footer" aria-labelledby="footer-titulo">
+		<h2 id="footer-titulo" class="footer__sr">Fragmentless</h2>
+
+		<div class="footer__inner">
+			<a class="footer__logo" href="#inicio" data-reveal style="--n: 0;" aria-label="Fragmentless — volver al inicio">
+				<!-- Placa blanca con el cubo en negro. En móvil el pie no lleva
+				     isotipo (lo esconde el CSS), así que esto se ve de 641 para arriba. -->
+				<img src="assets/logo-placa-negro.svg" alt="Fragmentless" width="512" height="512">
+			</a>
+
+			<nav class="footer__nav" data-reveal style="--n: 1;" aria-label="Enlaces del pie">
+				<a class="footer__link" href="#inicio">Inicio</a>
+				<a class="footer__link" href="#licencias">Planes</a>
+				<a class="footer__link" href="#clientes">Clientes</a>
+				<a class="footer__link" href="terminos.html">Términos</a>
+			</nav>
+
+			<!-- Rótulo de las redes. SOLO se ve en móvil (en PC el pie va
+			     centrado y sin rótulo): nace oculto en el CSS base y lo
+			     enciende el @media de 640px. -->
+			<p class="footer__social-title" data-reveal style="--n: 2;">Fragmentless Social</p>
+
+			<ul class="footer__social" data-reveal style="--n: 2;">
+				<li><a class="footer__icon" href="https://www.instagram.com/mattthew.reyes/" target="_blank" rel="noopener" aria-label="Instagram">
+					<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+						<path d="M12 2c-2.72 0-3.06.01-4.12.06-1.07.05-1.79.22-2.43.47-.66.25-1.22.6-1.77 1.15-.55.55-.89 1.11-1.15 1.77-.25.64-.42 1.36-.47 2.43C2.01 8.94 2 9.28 2 12s.01 3.06.06 4.12c.05 1.07.22 1.79.47 2.43.25.66.6 1.22 1.15 1.77.55.55 1.11.89 1.77 1.15.64.25 1.36.42 2.43.47C8.94 21.99 9.28 22 12 22s3.06-.01 4.12-.06c1.07-.05 1.79-.22 2.43-.47.66-.25 1.22-.6 1.77-1.15.55-.55.89-1.11 1.15-1.77.25-.64.42-1.36.47-2.43.05-1.06.06-1.4.06-4.12s-.01-3.06-.06-4.12c-.05-1.07-.22-1.79-.47-2.43-.25-.66-.6-1.22-1.15-1.77-.55-.55-1.11-.89-1.77-1.15-.64-.25-1.36-.42-2.43-.47C15.06 2.01 14.72 2 12 2m0 1.8c2.67 0 2.99.01 4.04.06.97.05 1.5.21 1.86.35.47.18.8.4 1.15.75.35.35.57.68.75 1.15.14.36.3.89.35 1.86.05 1.05.06 1.37.06 4.03s-.01 2.99-.06 4.04c-.05.97-.21 1.5-.35 1.86-.18.47-.4.8-.75 1.15-.35.35-.68.57-1.15.75-.36.14-.89.3-1.86.35-1.05.05-1.37.06-4.04.06s-2.99-.01-4.04-.06c-.97-.05-1.5-.21-1.86-.35-.47-.18-.8-.4-1.15-.75-.35-.35-.57-.68-.75-1.15-.14-.36-.3-.89-.35-1.86-.05-1.05-.06-1.37-.06-4.04s.01-2.99.06-4.03c.05-.97.21-1.5.35-1.86.18-.47.4-.8.75-1.15.35-.35.68-.57 1.15-.75.36-.14.89-.3 1.86-.35C9.01 3.81 9.33 3.8 12 3.8m0 3.06a5.14 5.14 0 1 0 0 10.28 5.14 5.14 0 0 0 0-10.28m0 8.47a3.34 3.34 0 1 1 0-6.67 3.34 3.34 0 0 1 0 6.67m6.54-8.67a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0" />
+					</svg>
+				</a></li>
+				<li><a class="footer__icon" href="https://wa.me/5212721467532?text=Hola%2C%20vengo%20de%20la%20p%C3%A1gina%20de%20Fragmentless%20y%20me%20interesa%20rentar%20una%20suscripci%C3%B3n%20del%20software.%20%C2%BFMe%20pueden%20dar%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener" aria-label="WhatsApp">
+					<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+						<path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m0 1.8c2.16 0 4.19.84 5.72 2.37a8.03 8.03 0 0 1 2.37 5.72c0 4.46-3.63 8.09-8.09 8.09a8.1 8.1 0 0 1-4.12-1.13l-.3-.17-3.06.8.82-2.99-.19-.31a8.05 8.05 0 0 1-1.24-4.3c0-4.46 3.63-8.08 8.09-8.08m-3.7 4.34c-.17 0-.45.06-.69.32-.24.26-.9.88-.9 2.15s.92 2.49 1.05 2.66c.13.17 1.8 2.86 4.44 3.9 2.19.87 2.64.7 3.11.65.47-.04 1.53-.62 1.75-1.23.21-.6.21-1.12.15-1.23-.06-.11-.24-.17-.5-.3-.26-.13-1.53-.75-1.77-.84-.24-.09-.41-.13-.58.13-.17.26-.67.84-.82 1.01-.15.17-.3.19-.56.06-.26-.13-1.1-.4-2.1-1.29-.78-.69-1.3-1.55-1.45-1.81-.15-.26-.02-.4.11-.53.12-.12.26-.3.39-.45.13-.15.17-.26.26-.43.09-.17.04-.32-.02-.45-.06-.13-.57-1.4-.79-1.92-.2-.5-.41-.43-.56-.44h-.48" />
+					</svg>
+				</a></li>
+			</ul>
+		</div>
+
+		<!-- La banda de rayas diagonales que se desplaza sola. Decorativa. -->
+		<div class="footer__stripes" aria-hidden="true"></div>
+
+		<div class="footer__base" data-reveal style="--n: 3;">
+			<p class="footer__copy">&copy; <span class="footer__year">2026</span> Fragmentless. Todos los derechos reservados.</p>
+		</div>
+	</footer>
+
+	<script>
+		const scrollHero = document.querySelector('.scroll-hero');
+		const scrollTrack = document.querySelector('.scroll-hero__track');
+		const scrollPin = document.querySelector('.scroll-hero__pin');
+		const scrollWords = document.querySelector('.scroll-hero__words');
+		const scrollSurface = document.querySelector('.scroll-hero__surface');
+		const scrollStage = document.querySelector('.scroll-hero__surface-stage');
+		const introSection = document.querySelector('.intro');
+		// Se busca acá arriba y no abajo porque updateMenuTheme() lo usa.
+		const footerSection = document.querySelector('.footer');
+		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+		let heroFrame = 0;
+
+		const clamp01 = (value) => Math.min(Math.max(value, 0), 1);
+
+		/* =====================================================================
+		 * MENÚ FLOTANTE.
+		 * Tres cosas: abrir/cerrar la píldora, el roll de letras del hover, y
+		 * el tema de color según la sección que quede debajo.
+		 * No toca el track, ni el pin, ni el surface: no puede desincronizar
+		 * la matemática de las secciones 2 y 3.
+		 * ===================================================================== */
+		const menuRoot = document.querySelector('.menu');
+		const menuShell = menuRoot?.querySelector('.menu__shell');
+		const menuBar = menuRoot?.querySelector('.menu__bar');
+		const menuList = menuRoot?.querySelector('.menu__items');
+		const menuItems = menuRoot ? [...menuRoot.querySelectorAll('.menu__item')] : [];
+
+		// Parte el texto en letras duplicadas (una arriba y otra abajo) para que
+		// el hover pueda subir la columna. El aria-label deja la palabra entera
+		// para los lectores de pantalla, que si no leerían "IINNIICCIIOO".
+		// Solo se vacía .menu__text: el icono es hermano y se arma aparte.
+		//
+		// Las letras arrancan en --c 1 porque el cuadro 0 es el icono.
+		function buildRollingText(link) {
+			const target = link.querySelector('.menu__text');
+			if (!target) return;
+
+			const label = target.textContent.trim();
+			target.textContent = '';
+			link.setAttribute('aria-label', label);
+
+			[...label].forEach((char, index) => {
+				if (char === ' ') {
+					const space = document.createElement('span');
+					space.className = 'menu__space';
+					target.appendChild(space);
+					return;
+				}
+
+				const box = document.createElement('span');
+				box.className = 'menu__char';
+				box.style.setProperty('--c', index + 1);
+
+				const roll = document.createElement('span');
+				roll.className = 'menu__roll';
+				roll.appendChild(Object.assign(document.createElement('span'), { textContent: char }));
+				roll.appendChild(Object.assign(document.createElement('span'), { textContent: char }));
+
+				box.appendChild(roll);
+				target.appendChild(box);
+			});
+		}
+
+		// El icono usa exactamente el mismo mecanismo que una letra: una columna
+		// con dos copias del SVG que sube 50% en el hover. Se duplica acá y no en
+		// el HTML para no tener el mismo dibujo escrito dos veces por link.
+		//
+		// Queda en --c 0, o sea que es el primero de la ola: el icono sale y
+		// atrás van entrando las letras de izquierda a derecha.
+		function buildRollingIcon(link) {
+			const box = link.querySelector('.menu__ico');
+			const svg = box?.querySelector('svg');
+			if (!svg) return;
+
+			// Las copias se toman ANTES de vaciar la caja. Sacar el SVG del DOM no
+			// invalida la referencia, así que el original se puede reusar.
+			const copies = [svg, svg.cloneNode(true)];
+			box.replaceChildren();
+
+			const roll = document.createElement('span');
+			roll.className = 'menu__roll';
+			copies.forEach((copy) => {
+				const cell = document.createElement('span');
+				cell.appendChild(copy);
+				roll.appendChild(cell);
+			});
+
+			box.style.setProperty('--c', 0);
+			box.appendChild(roll);
+		}
+
+		// En móvil el menú no es la píldora que se estira, sino un panel lateral
+		// de alto completo: ahí el alto lo pone el CSS y medirlo a mano lo
+		// rompería. Mismo breakpoint que el @media del CSS.
+		const menuDrawer = window.matchMedia('(max-width: 640px)');
+
+		function setMenuOpen(open) {
+			menuRoot.classList.toggle('is-open', open);
+			menuBar.setAttribute('aria-expanded', String(open));
+			// Cerrado, los links no deben ser enfocables con Tab.
+			menuList.inert = !open;
+			// Alto medido en vez de fijo: si algún día se agrega o quita un link,
+			// la animación sigue cerrando justo. En el panel lateral, no: se deja
+			// vacío para que mande el height: 100% del CSS.
+			menuShell.style.height = open && !menuDrawer.matches
+				? `${menuBar.offsetHeight + menuList.offsetHeight}px`
+				: '';
+			// Enciende el velo y frena el scroll de la página detrás del panel.
+			document.body.classList.toggle('has-menu-open', open && menuDrawer.matches);
+		}
+
+		// Tema según lo que haya debajo de la píldora. Se mide con el rect real
+		// (no con la posición de layout), así que respeta el scale del panel
+		// blanco y el momento exacto en que tapa la franja del menú.
+		function updateMenuTheme() {
+			const probe = 44;
+			let theme = 'blue';
+
+			// De abajo hacia arriba: gana la sección más baja que ya haya
+			// pasado la franja del menú. El footer es negro, así que la
+			// píldora vuelve a 'dark' cuando llega ahí.
+			if (footerSection && footerSection.getBoundingClientRect().top <= probe) {
+				theme = 'dark';
+			} else if (scrollSurface && scrollSurface.getBoundingClientRect().top <= probe) {
+				theme = 'light';
+			} else if (scrollHero && scrollHero.getBoundingClientRect().top <= probe) {
+				theme = 'dark';
+			}
+
+			if (menuRoot.dataset.theme !== theme) menuRoot.dataset.theme = theme;
+		}
+
+		if (menuRoot) {
+			menuItems.forEach((link, index) => {
+				link.style.setProperty('--i', index);
+				buildRollingIcon(link);
+				buildRollingText(link);
+
+				// Bloqueo del roll: si el mouse sale a mitad de la animación, la
+				// salida se retiene hasta que termina. Si no, la columna pega un
+				// salto feo al volver a su lugar.
+				// El +1 es el icono, que también ocupa un lugar en la ola.
+				const lock = 30 * (link.querySelectorAll('.menu__char').length + 1) + 300;
+				let timer = 0;
+				let pendingLeave = false;
+
+				link.addEventListener('mouseenter', () => {
+					pendingLeave = false;
+					if (link.classList.contains('is-rolling')) return;
+					link.classList.add('is-rolling');
+					timer = window.setTimeout(() => {
+						timer = 0;
+						if (pendingLeave) {
+							pendingLeave = false;
+							link.classList.remove('is-rolling');
+						}
+					}, lock);
+				});
+
+				link.addEventListener('mouseleave', () => {
+					if (timer) pendingLeave = true;
+					else link.classList.remove('is-rolling');
+				});
+
+				link.addEventListener('click', () => setMenuOpen(false));
+			});
+
+			menuBar.addEventListener('click', () => {
+				setMenuOpen(!menuRoot.classList.contains('is-open'));
+			});
+
+			document.addEventListener('mousedown', (event) => {
+				if (menuRoot.classList.contains('is-open') && !menuRoot.contains(event.target)) {
+					setMenuOpen(false);
+				}
+			});
+
+			document.addEventListener('keydown', (event) => {
+				if (event.key === 'Escape' && menuRoot.classList.contains('is-open')) {
+					setMenuOpen(false);
+					menuBar.focus();
+				}
+			});
+
+			// Al cruzar el breakpoint el menú cambia de forma (píldora <-> panel):
+			// abierto quedaría a medio camino, con el alto inline de la otra
+			// versión. Se cierra y listo.
+			menuDrawer.addEventListener('change', () => setMenuOpen(false));
+
+			setMenuOpen(false);
+		}
+
+		/* =====================================================================
+		 * SALTOS DE ANCLA A MANO.
+		 * Las dos secciones de acá abajo son sticky, así que el salto del ancla
+		 * las lee "ya en su lugar" y no mueve nada. Por eso el destino se
+		 * calcula y se scrollea a mano:
+		 *
+		 *   #inicio    -> la portada es sticky dentro del <main>: mientras estés
+		 *                 en cualquier sección sigue pegada al tope, o sea que
+		 *                 para el navegador YA está arriba. Va al tope, 0.
+		 *   #licencias -> el panel blanco se clava cuando termina de tapar la
+		 *                 lista negra. Ese punto es justo --surface-progress = 1,
+		 *                 o sea scrollY = layoutTop(.scroll-hero__surface): ahí
+		 *                 los planes quedan quietos en pantalla.
+		 *
+		 * Vale para TODOS los links que apunten ahí (menú y footer).
+		 * ===================================================================== */
+		// Se probó bajar de más en pantallas bajas, para que las tarjetas no
+		// queden cortadas abajo. Es peor: empuja el título "Planes que crecen"
+		// FUERA de la pantalla (medido en 1280x700: top -96px). El tope del panel
+		// es el punto correcto en todos los tamaños; lo que sobra abajo se ve con
+		// un scroll corto, que es justo para lo que está el --surface-hold.
+		const manualAnchors = {
+			'#inicio': () => 0,
+			'#licencias': () => (scrollSurface ? layoutTop(scrollSurface) : null),
+		};
+
+		Object.entries(manualAnchors).forEach(([hash, targetTop]) => {
+			document.querySelectorAll(`a[href="${hash}"]`).forEach((link) => {
+				link.addEventListener('click', (event) => {
+					// Clic con Ctrl/Cmd o rueda: es "abrir en otra pestaña", no se toca.
+					if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+
+					const top = targetTop();
+					if (top === null) return;   // si la sección no está, que el ancla haga lo suyo
+
+					event.preventDefault();
+					window.scrollTo({ top, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+					// replaceState y no location.hash: poner el hash dispararía otra
+					// vez el salto del ancla, que es justo lo que estamos evitando.
+					history.replaceState(null, '', hash);
+				});
+			});
+		});
+
+		// Suma la cadena de offsetTop, así que la geometría sigue siendo
+		// correcta aunque arriba haya secciones estáticas (la portada azul).
+		// offsetTop tampoco se ve afectado por transform, o sea que no depende
+		// del scale que le aplicamos a la sección 3.
+		function layoutTop(element) {
+			let top = 0;
+			for (let node = element; node; node = node.offsetParent) top += node.offsetTop;
+			return top;
+		}
+
+		/*
+		 * PIN DE LA PORTADA (--pin-top).
+		 * La portada se fija recién cuando su borde inferior toca el borde
+		 * inferior de la ventana: sticky top = alto de ventana - su alto. Es 0
+		 * mientras mida una pantalla exacta (el caso normal).
+		 *
+		 * OJO, ACÁ HUBO UN BUG: esto se calculaba dentro de updateSectionTilt(),
+		 * o sea EN CADA FRAME DE SCROLL, usando window.innerHeight. En el
+		 * teléfono ese valor cambia MIENTRAS scrolleás, porque la barra de URL
+		 * del navegador se contrae, así que --pin-top saltaba (medido: 0 -> -24
+		 * -> 0 en un mismo gesto) y la portada temblaba. En PC no pasaba porque
+		 * ahí innerHeight no se mueve al scrollear.
+		 *
+		 * Dos cambios para que no vuelva:
+		 *   1. El pin NO depende del scroll, así que se calcula sólo al cargar y
+		 *      al cambiar el tamaño, nunca por frame.
+		 *   2. Se mide contra 100lvh, el alto con la barra de URL contraída, que
+		 *      es un valor FIJO (a diferencia de innerHeight y de 100dvh). En
+		 *      escritorio 100lvh vale exactamente innerHeight, así que allá el
+		 *      número que sale es el mismo de siempre.
+		 */
+		const touchDevice = window.matchMedia('(hover: none) and (pointer: coarse)');
+
+		function stableViewport() {
+			const probe = document.createElement('div');
+			probe.style.cssText = 'position:absolute;top:0;left:0;width:0;height:100lvh;visibility:hidden;pointer-events:none';
+			document.body.appendChild(probe);
+			const height = probe.offsetHeight;
+			probe.remove();
+			// Si el navegador no conoce lvh, offsetHeight da 0: se cae a innerHeight.
+			return height || window.innerHeight;
+		}
+
+		function updateIntroPin() {
+			if (!introSection) return;
+			const pinTop = Math.min(0, stableViewport() - introSection.offsetHeight);
+			introSection.style.setProperty('--pin-top', `${pinTop}px`);
+		}
+
+		// TRANSICIÓN SECCIÓN 1 -> SECCIÓN 2.
+		// La portada azul está fijada (sticky) y la sección negra entra girada
+		// sobre su esquina inferior izquierda hasta quedar recta.
+		//   giro máximo -> el tope de la sección 2 toca el borde inferior.
+		//   giro 0      -> ese mismo tope llega al 25% superior de la ventana.
+		// Al llegar a 0 se quita la clase (y con ella el transform), porque un
+		// ancestro transformado rompe el resaltado azul de las palabras.
+		function updateSectionTilt(viewport) {
+			const sectionTop = layoutTop(scrollHero) - window.scrollY;
+			const progress = clamp01((viewport - sectionTop) / (viewport * 0.75));
+			const tilting = progress < 1 && !reduceMotion.matches;
+
+			scrollHero.classList.toggle('is-tilting', tilting);
+
+			if (tilting) {
+				scrollPin.style.setProperty('--tilt', `calc(${1 - progress} * var(--tilt-start))`);
+			} else {
+				scrollPin.style.removeProperty('--tilt');
+			}
+		}
+
+		function updateScrollHero() {
+			heroFrame = 0;
+			if (!scrollHero || !scrollTrack || !scrollPin || !scrollWords || !scrollSurface) return;
+
+			const viewport = window.innerHeight;
+			updateSectionTilt(viewport);
+			if (menuRoot) updateMenuTheme();
+			const words = scrollWords.children;
+			// El track mide 2 pantallas (la fijada + el solape) más el recorrido de las palabras.
+			const wordDistance = Math.max(scrollTrack.offsetHeight - scrollPin.offsetHeight * 2, 1);
+			const lineHeight = words.length ? scrollWords.getBoundingClientRect().height / words.length : 0;
+
+			// 0 = primera palabra en la línea de resaltado, 1 = última palabra ahí (y ahí se queda).
+			const wordProgress = clamp01((window.scrollY - layoutTop(scrollTrack)) / wordDistance);
+			scrollWords.style.setProperty('--shift', `${-wordProgress * (words.length - 1) * lineHeight}px`);
+
+			// La sección 3 (panel blanco) sube por encima de la lista ya congelada.
+			const surfaceProgress = clamp01((window.scrollY + viewport - layoutTop(scrollSurface)) / viewport);
+			scrollSurface.style.setProperty('--surface-progress', surfaceProgress);
+			scrollSurface.style.setProperty('--surface-text-progress', clamp01((surfaceProgress - 0.25) / 0.5));
+
+			// ENGANCHE de la sección 3: el __stage se clava mientras el panel
+			// consume su --surface-hold. Si los planes miden MÁS que la ventana
+			// (pantallas bajas), se clava por abajo en vez de por arriba, así el
+			// enganche nunca deja las tarjetas cortadas. Mismo cálculo que el
+			// --pin-top de la portada. offsetHeight es layout: el scale del panel
+			// no lo afecta.
+			if (scrollStage) {
+				const stageTop = Math.min(0, viewport - scrollStage.offsetHeight);
+				scrollStage.style.setProperty('--stage-top', `${stageTop}px`);
+			}
+		}
+
+		window.addEventListener('scroll', () => {
+			if (!heroFrame) heroFrame = window.requestAnimationFrame(updateScrollHero);
+		}, { passive: true });
+		let pinWidth = window.innerWidth;
+
+		window.addEventListener('resize', () => {
+			// En un teléfono, un resize que sólo cambia el ALTO es la barra de URL
+			// contrayéndose a mitad del scroll, no un cambio real de layout:
+			// recalcular el pin ahí es justo lo que hacía temblar la portada. Los
+			// cambios de ancho (rotar el teléfono) sí valen. En escritorio se
+			// atienden todos, como siempre.
+			if (window.innerWidth !== pinWidth || !touchDevice.matches) {
+				pinWidth = window.innerWidth;
+				updateIntroPin();
+			}
+			updateScrollHero();
+		});
+		reduceMotion.addEventListener('change', updateScrollHero);
+		updateIntroPin();
+		updateScrollHero();
+
+		// El isotipo y las fuentes pueden cambiar el alto de la portada después
+		// del primer cálculo, y de ese alto depende el pin.
+		window.addEventListener('load', updateIntroPin);
+
+		/* =====================================================================
+		 * SECCIÓN 3 - Planes (mensual / anual).
+		 * El switch cambia el precio con un conteo animado (el equivalente
+		 * casero de NumberFlow). Es independiente del scroll: no toca ni el
+		 * track, ni el pin, ni el surface, así que no puede desincronizar la
+		 * matemática de las secciones 2 y 3.
+		 * ===================================================================== */
+		const billingSwitch = document.querySelector('.plans__switch');
+		const billingLabels = document.querySelectorAll('.plans__billing-label');
+		const priceAmounts = document.querySelectorAll('.plans__amount');
+		const plansGrid = document.querySelector('.plans__grid');
+		const priceFrames = new WeakMap();
+
+		function countPriceTo(node, target) {
+			// Los precios de 4 cifras se muestran con coma de miles (1,199), así
+			// que hay que sacarla antes de leer el número que había.
+			const from = Number(node.textContent.replace(/,/g, '')) || target;
+			cancelAnimationFrame(priceFrames.get(node));
+
+			if (from === target || reduceMotion.matches) {
+				node.textContent = target.toLocaleString('en-US');
+				return;
+			}
+
+			const started = performance.now();
+			const step = (now) => {
+				// easeOutCubic: arranca rápido y frena suave sobre el número final.
+				const progress = clamp01((now - started) / 420);
+				const eased = 1 - Math.pow(1 - progress, 3);
+				node.textContent = Math.round(from + (target - from) * eased).toLocaleString('en-US');
+				if (progress < 1) priceFrames.set(node, requestAnimationFrame(step));
+			};
+
+			priceFrames.set(node, requestAnimationFrame(step));
+		}
+
+		function setBilling(yearly) {
+			billingSwitch.setAttribute('aria-checked', String(yearly));
+			billingLabels.forEach((label) => {
+				label.classList.toggle('is-active', (label.dataset.billing === 'yearly') === yearly);
+			});
+			priceAmounts.forEach((node) => {
+				countPriceTo(node, Number(yearly ? node.dataset.yearly : node.dataset.monthly));
+			});
+			// El icono de "cómo se calcula" del precio anual solo tiene sentido
+			// mientras se está viendo el precio anual.
+			if (plansGrid) plansGrid.classList.toggle('is-yearly', yearly);
+		}
+
+		if (billingSwitch) {
+			billingSwitch.addEventListener('click', () => {
+				setBilling(billingSwitch.getAttribute('aria-checked') !== 'true');
+			});
+			// Arranca en mensual: el switch se mueve a anual recién cuando el usuario le da clic.
+			setBilling(false);
+		}
+
+		/* ---------------------------------------------------------------
+		 * CARRUSEL DE PLANES (móvil y tablet).
+		 * Hasta 900px de ancho las tarjetas de planes dejan de estar
+		 * apiladas y pasan a un riel horizontal con scroll-snap: en el
+		 * @media de 640px (teléfono, tarjeta a pantalla completa) y en el de
+		 * 641-900 (tablet, tarjeta acotada a 400px). Lo único que hace falta
+		 * de JS es ARRANCARLO en el plan destacado: el Negocio es el que
+		 * tiene que estar a la vista cuando la sección entra, y el Básico /
+		 * Premium se descubren deslizando a los lados.
+		 * (La sección 4 NO lleva riel: sus comentarios van apilados.)
+		 *
+		 * El centrado se calcula con offsetLeft y NO con getBoundingClientRect:
+		 * el panel de la sección 3 lleva un transform: scale() que depende del
+		 * scroll, y los rects vienen escalados por él (scrollLeft no). Con
+		 * offsetLeft, que es layout puro, la cuenta no se entera del scale.
+		 *
+		 * Va sin behavior: 'smooth' a propósito: es la posición de PARTIDA,
+		 * no una animación; la sección está lejos en la página y el usuario
+		 * nunca ve el salto.
+		 * --------------------------------------------------------------- */
+		// 900px y no 640: el riel existe en las DOS bandas, la de teléfono y
+		// la de tablet. Si acá dijera 640, en tablet el carrusel arrancaría
+		// en el Plan Básico en vez del Negocio.
+		const railLayout = window.matchMedia('(max-width: 900px)');
+		const featuredPlan = document.querySelector('.plans__card--featured');
+
+		function centerFeaturedPlan() {
+			if (!plansGrid || !featuredPlan) return;
+
+			// En escritorio el riel no existe (es un grid de 3 columnas sin
+			// scroll): scrollLeft 0 y listo, por si se venía de móvil.
+			if (!railLayout.matches) {
+				plansGrid.scrollLeft = 0;
+				return;
+			}
+
+			const cardX = featuredPlan.offsetLeft - plansGrid.offsetLeft;
+			plansGrid.scrollLeft = cardX - (plansGrid.clientWidth - featuredPlan.offsetWidth) / 2;
+		}
+
+		centerFeaturedPlan();
+		// Las fuentes pueden cambiar el ancho de las tarjetas después del
+		// primer cálculo, igual que le pasa al pin de la portada.
+		window.addEventListener('load', centerFeaturedPlan);
+		railLayout.addEventListener('change', centerFeaturedPlan);
+
+		// Solo los cambios de ANCHO: un resize de alto en el teléfono es la
+		// barra de URL, y recentrar ahí le movería el carrusel al usuario
+		// a mitad de lectura (mismo criterio que el pin de la portada).
+		let carouselWidth = window.innerWidth;
+
+		window.addEventListener('resize', () => {
+			if (window.innerWidth === carouselWidth) return;
+			carouselWidth = window.innerWidth;
+			centerFeaturedPlan();
+		});
+
+		/* =====================================================================
+		 * SECCIÓN 4 - Clientes.
+		 * Lo único que hace: cuando la sección entra en pantalla, pone
+		 * .is-revealed y el CSS hace la ola escalonada (cada pieza lleva su
+		 * --n). Se dispara UNA sola vez y el observer se desconecta.
+		 *
+		 * La clase .clients--animate se agrega acá y no en el HTML a
+		 * propósito: es la que esconde las piezas, así que sin JS (o con
+		 * prefers-reduced-motion) la sección se ve entera desde el principio
+		 * en vez de quedar invisible para siempre.
+		 *
+		 * No toca el track, ni el pin, ni el surface: no puede desincronizar
+		 * la matemática de las secciones 2 y 3.
+		 * ===================================================================== */
+		const clientsSection = document.querySelector('.clients');
+
+		if (clientsSection && !reduceMotion.matches && 'IntersectionObserver' in window) {
+			clientsSection.classList.add('clients--animate');
+
+			const clientsObserver = new IntersectionObserver((entries, observer) => {
+				entries.forEach((entry) => {
+					if (!entry.isIntersecting) return;
+					clientsSection.classList.add('is-revealed');
+					observer.disconnect();
+				});
+			}, { threshold: 0.15 });
+
+			clientsObserver.observe(clientsSection);
+		}
+
+		/* =====================================================================
+		 * FOOTER.
+		 * Dos cosas, las dos sueltas del scroll: la ola de entrada (misma
+		 * mecánica que la sección 4, con .footer--animate agregada acá y no
+		 * en el HTML para que sin JS el footer se vea entero) y el año del
+		 * copyright, que en el HTML va escrito para que tampoco dependa del
+		 * JS y acá solo se pisa con el real.
+		 * ===================================================================== */
+		const footerYear = document.querySelector('.footer__year');
+		if (footerYear) footerYear.textContent = new Date().getFullYear();
+
+		if (footerSection && !reduceMotion.matches && 'IntersectionObserver' in window) {
+			footerSection.classList.add('footer--animate');
+
+			const footerObserver = new IntersectionObserver((entries, observer) => {
+				entries.forEach((entry) => {
+					if (!entry.isIntersecting) return;
+					footerSection.classList.add('is-revealed');
+					observer.disconnect();
+				});
+			}, { threshold: 0.2 });
+
+			footerObserver.observe(footerSection);
+		}
+
+		/* =====================================================================
+		 * SECCIÓN 1 - Entrada del texto de la portada.
+		 * Misma ola escalonada que la sección 4, pero sin observer: la portada
+		 * ya está en pantalla al cargar, así que se esconde el texto y se
+		 * revela en el frame siguiente (los dos rAF son para que el navegador
+		 * alcance a pintar el estado escondido; con uno solo a veces junta los
+		 * dos estados en el mismo frame y no hay transición).
+		 *
+		 * .intro--animate se agrega acá y no en el HTML a propósito: sin JS (o
+		 * con prefers-reduced-motion) la portada se ve entera desde el
+		 * principio en vez de quedar invisible para siempre.
+		 * ===================================================================== */
+		if (introSection && !reduceMotion.matches) {
+			introSection.classList.add('intro--animate');
+
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => {
+					introSection.classList.add('is-revealed');
+				});
+			});
+		}
+
+		/* =====================================================================
+		 * SECCIÓN 1 - Isotipo animado de la portada.
+		 * 36 cuadros (frame00 -> frame35) que se intercambian cambiando el src
+		 * del <img>. Corre una sola vuelta al cargar, queda fijo en el frame35
+		 * y sólo vuelve a correr con un clic.
+		 *
+		 * Va como <img> y no inline a propósito: los 36 SVG comparten el mismo
+		 * id="glass" para su gradiente, así que inyectados en el documento los
+		 * ids chocan y todos los cuadros terminan pintados con el gradiente del
+		 * primero. Cada <img> es un documento aparte y no tiene ese problema.
+		 *
+		 * Tampoco es un WebP/GIF animado: eso no se puede frenar después de una
+		 * vuelta ni re-disparar desde JS.
+		 * ===================================================================== */
+		const introLogo = document.querySelector('.intro__logo');
+		const introLogoImg = introLogo?.querySelector('img');
+		const LOGO_COUNT = 36;
+		const LOGO_REST = LOGO_COUNT - 1;   // frame35 = logo rearmado, en reposo
+		const LOGO_STEP_MS = 70;            // 36 x 70ms ~= 2.5s la vuelta entera
+
+		const logoSrc = (i) => `assets/svg/blanco/fragmentless-white-frame${String(i).padStart(2, '0')}.svg`;
+
+		/*
+		 * En MÓVIL el isotipo no se anima: es la placa fija que sirve el
+		 * <source> del <picture>. Si esto corriera igual, precargaría los 36
+		 * cuadros (datos del teléfono a la basura) y le cambiaría el src a un
+		 * <img> que ni se muestra, porque cuando un <source> coincide el src
+		 * del <img> queda ignorado.
+		 *
+		 * El corte de 640 está escrito en tres lados: acá, en el <source> del
+		 * HTML y en el @media del CSS. Si cambia uno, cambian los tres.
+		 */
+		const logoAnimado = window.matchMedia('(min-width: 641px)');
+		let logoIniciado = false;
+
+		function initLogo() {
+			if (logoIniciado || !introLogoImg || !logoAnimado.matches) return;
+			logoIniciado = true;
+
+			// Bandera de "ya está corriendo": mientras esté en true el clic se
+			// ignora, para que no se reinicie la vuelta a la mitad.
+			let logoPlaying = false;
+
+			function playLogo() {
+				if (logoPlaying || reduceMotion.matches) return;
+				logoPlaying = true;
+
+				let frame = 0;
+				let last = 0;
+				let owed = 0;
+				introLogoImg.src = logoSrc(0);
+
+				// requestAnimationFrame acumulando el tiempo real, no
+				// setInterval: así la vuelta dura lo mismo a 60 que a 144 Hz y
+				// no se desfasa si un tick llega tarde.
+				function step(now) {
+					if (last) owed += now - last;
+					last = now;
+
+					const before = frame;
+					while (owed >= LOGO_STEP_MS && frame < LOGO_REST) {
+						owed -= LOGO_STEP_MS;
+						frame += 1;
+					}
+					// Sólo se toca el src cuando el cuadro cambió de verdad: el
+					// rAF corre ~4 veces por cada cuadro de 70ms.
+					if (frame !== before) introLogoImg.src = logoSrc(frame);
+
+					if (frame < LOGO_REST) {
+						requestAnimationFrame(step);
+					} else {
+						logoPlaying = false;   // recién acá el clic vuelve a valer
+					}
+				}
+
+				requestAnimationFrame(step);
+			}
+
+			// Precarga de los 36 antes de la primera vuelta: sin esto el primer
+			// ciclo va a tirones mientras bajan los archivos. Las imágenes
+			// quedan guardadas en el array para que no las junte el recolector
+			// antes de que el navegador las cachee.
+			const logoCache = [];
+			const logoReady = [];
+			for (let i = 0; i < LOGO_COUNT; i += 1) {
+				const img = new Image();
+				img.src = logoSrc(i);
+				logoCache.push(img);
+				// decode() falla si el cuadro no carga; que uno falte no debe
+				// dejar el isotipo muerto, así que se traga el error.
+				logoReady.push(img.decode ? img.decode().catch(() => {}) : Promise.resolve());
+			}
+
+			Promise.all(logoReady).then(() => {
+				introLogo.classList.add('is-playable');
+				playLogo();
+			});
+
+			introLogo.addEventListener('click', playLogo);
+		}
+
+		initLogo();
+
+		// Si alguien agranda la ventana y cruza el corte, el isotipo pasa a ser
+		// el animado: recién ahí se precargan los cuadros. Al revés no hace
+		// falta deshacer nada: la placa la pone el <picture> solo.
+		logoAnimado.addEventListener('change', initLogo);
+	</script>
+
+</body>
+</html>

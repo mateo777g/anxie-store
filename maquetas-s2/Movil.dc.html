@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@800&display=swap">
+  <style>
+    body { margin: 0; font-family: 'Montserrat', -apple-system, sans-serif; background: #101010; }
+    a { color: #6FBF8C; text-decoration: none; }
+    a:hover { color: #57C97E; }
+    * { box-sizing: border-box; }
+  </style>
+</helmet>
+
+<div style="position: relative; width: 390px; height: 844px; background: #101010; color: #ffffff; overflow: hidden; display: flex; flex-direction: column; justify-content: center; padding: 88px 20px 32px; font-family: 'Montserrat', sans-serif;">
+
+  <div style="position: absolute; inset: 0; pointer-events: none; background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.14) 1px, transparent 0); background-size: 16px 16px; -webkit-mask-image: linear-gradient(#000 0%, rgba(0, 0, 0, 0.45) 42%, transparent 80%); mask-image: linear-gradient(#000 0%, rgba(0, 0, 0, 0.45) 42%, transparent 80%);"></div>
+
+  <span style="position: absolute; top: 12px; left: 12px; width: 14px; height: 14px; border: 0 solid #ffffff; border-top-width: 2px; border-left-width: 2px;"></span>
+  <span style="position: absolute; top: 12px; right: 12px; width: 14px; height: 14px; border: 0 solid #ffffff; border-top-width: 2px; border-right-width: 2px;"></span>
+  <span style="position: absolute; bottom: 12px; left: 12px; width: 14px; height: 14px; border: 0 solid #ffffff; border-bottom-width: 2px; border-left-width: 2px;"></span>
+  <span style="position: absolute; bottom: 12px; right: 12px; width: 14px; height: 14px; border: 0 solid #ffffff; border-bottom-width: 2px; border-right-width: 2px;"></span>
+
+  <div style="position: relative; display: flex; flex-direction: column; gap: 16px; width: 100%;">
+
+    <!-- --n: 0. El atajo "Ver catalogo completo" no cabe aqui arriba: se va
+         abajo del todo, junto a la pildora. -->
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="width: 8px; height: 8px; border-radius: 50%; background: #6FBF8C;"></span>
+      <span style="width: 34px; height: 2px; background: #6FBF8C;"></span>
+      <span style="font-weight: 700; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: #6FBF8C;">Lo más cotizado</span>
+    </div>
+
+    <!-- --n: 1. SINGULAR: en celular solo entra UNA cuenta, y el rotulo de
+         atras (.corona-watermark) tambien esconde sus "s". -->
+    <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif; font-weight: 800; font-size: 44px; line-height: 0.9; letter-spacing: -0.05em; text-transform: uppercase; color: #ffffff;">Cuenta<br>destacada</h2>
+
+    <div style="height: 1px; background: rgba(255, 255, 255, 0.18);"></div>
+
+    <!-- --n: 3. Una sola cuenta, y de pie: con una sola tarjeta sobra ancho,
+         asi que la foto se lleva el protagonismo como en escritorio. -->
+    <article style="border-radius: 18px; background: #ffffff; border: 1px solid rgba(17, 17, 17, 0.08); box-shadow: 0 22px 44px -26px rgba(0, 0, 0, 0.8); overflow: hidden; margin-top: 4px;">
+      <div style="position: relative; width: 100%; aspect-ratio: 16 / 9; background: #e9e9e9;">
+        <img src="cuenta1.webp" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;">
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px; padding: 16px 16px 16px;">
+        <div style="display: flex; align-items: center; gap: 7px; font-size: 10px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: #3E8B5C;">
+          <span style="width: 6px; height: 6px; border-radius: 50%; background: #3E8B5C;"></span>
+          Disponible
+        </div>
+        <span style="font-weight: 600; font-size: 17px; line-height: 1.3; color: #1C4E2F;">Wildcat y Hacha de Kratos</span>
+        <span style="font-size: 10px; font-weight: 700; letter-spacing: 2.2px; text-transform: uppercase; color: #8a8a8a;">PC · Xbox · PlayStation · Switch</span>
+        <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 2px;">
+          <span style="font-weight: 800; font-size: 28px; letter-spacing: -0.8px; color: #111111;">$6000 MXN</span>
+          <span style="font-weight: 500; font-size: 13px; color: #5a5a5a;">≈ $353 USD</span>
+        </div>
+        <a href="#" style="margin-top: 4px; display: flex; align-items: center; justify-content: center; height: 48px; border-radius: 10px; background: #1C4E2F; color: #ffffff; font-weight: 700; font-size: 14px; letter-spacing: 0.4px;">Comprar por Discord</a>
+      </div>
+    </article>
+
+    <!-- --n: 5, el ultimo de la ola. -->
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 4px;">
+      <p style="margin: 0; text-align: center; font-weight: 600; font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255, 255, 255, 0.55);"><span style="color: #6FBF8C; font-weight: 800;">40</span> cuentas más en el catálogo</p>
+      <a href="#" style="display: inline-flex; align-items: center; justify-content: center; gap: 12px; width: 100%; height: 52px; border-radius: 50px; background: #ffffff; color: #1C4E2F; font-weight: 700; font-size: 14px; box-shadow: 0 8px 20px rgba(7, 28, 16, 0.28);">
+        Ver catálogo completo
+        <span style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #1C4E2F; color: #ffffff; font-weight: 800; font-size: 15px; line-height: 1;">&rarr;</span>
+      </a>
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

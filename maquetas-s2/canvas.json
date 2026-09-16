@@ -1,0 +1,30 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1440, "h": 900, "title": "Sección 2 — Escritorio (2 cuentas)" },
+    { "file": "Movil.dc.html", "x": 1560, "y": 0, "w": 390, "h": 844, "title": "Sección 2 — Celular (1 cuenta)" }
+  ],
+  "annotations": [
+    {
+      "id": "nota-propuesta",
+      "x": 0,
+      "y": -230,
+      "w": 820,
+      "text": "OPCIÓN C, ya como propuesta única.\nEl rótulo cruza el ancho entero como la marca del hero, una línea fina lo separa, y las dos cuentas van acostadas: la foto manda a la izquierda y los datos acompañan a la derecha.\nSigue siendo solo maqueta: no toqué index.html ni style.css."
+    },
+    {
+      "id": "nota-movil",
+      "x": 1560,
+      "y": -230,
+      "w": 390,
+      "text": "CELULAR: una sola cuenta, como ya dice el rótulo de atrás en singular. Con una sola tarjeta sobra ancho, así que aquí se pone de pie y la foto se lleva el protagonismo."
+    },
+    {
+      "id": "nota-animacion",
+      "x": 0,
+      "y": 990,
+      "w": 1000,
+      "text": "LA OLA NO SE TOCA. Las piezas son las mismas seis de hoy y en el mismo orden, así que los data-reveal siguen igual:\n--n 0 rótulo \"lo más cotizado\" · --n 1 el titular · --n 2 el atajo \"ver catálogo completo\" · --n 3 y 4 las cuentas · --n 5 la línea del pie.\n--n-ultimo sigue valiendo 5, o sea que la entrada, la salida y el portal de la corona quedan exactamente como están."
+    }
+  ],
+  "launch": { "view": "canvas" }
+}
