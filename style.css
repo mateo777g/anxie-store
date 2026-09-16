@@ -1234,7 +1234,7 @@ body {
 }
 
 /* ==========================================
-   CUENTA DESTACADA — el contenido del reposo del portal (sección 2)
+   CUENTAS DESTACADAS — el contenido del reposo del portal (sección 2)
    ==========================================
    Ya no es una sección del flujo con su fondo verde: es una CAPA dentro de
    .corona-pin, encima de la máscara, que aparece sobre el negro que deja la
@@ -1258,7 +1258,9 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 2.6rem;
+    /* Cinco piezas apiladas (encabezado, titular, regla, cuentas y pie), no
+       dos: el hueco es más corto que cuando aquí solo iban header y cuerpo. */
+    gap: 1.6rem;
     /* El padding de arriba deja libre el menú píldora, que es fixed. */
     padding: clamp(6rem, 11vh, 8rem) 3.5rem clamp(3.5rem, 8vh, 6rem) 3.5rem;
     /* Mientras no se ha revelado no debe comerse los clics: durante el
@@ -1299,7 +1301,7 @@ body {
  * sin cambio de clase no hay nada que animar.
  * ------------------------------------------------------------------------- */
 .destacada {
-    /* El --n más alto del markup (el CTA del aside). */
+    /* El --n más alto del markup (la línea del pie). */
     --n-ultimo: 5;
 }
 
@@ -1336,17 +1338,13 @@ body {
     }
 }
 
+/* Encabezado: solo el rótulo y el atajo, en una línea. El titular ya NO vive
+   aquí dentro — salió a ocupar el ancho entero, debajo. */
 .destacada-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
+    align-items: center;
     gap: 2.5rem;
-}
-
-.destacada-header-txt {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
 }
 
 /* La línea "● ── LO MÁS COTIZADO" aquí va sobre verde: el --verde-medio de
@@ -1355,13 +1353,24 @@ body {
 .destacada-eyebrow .eyebrow-linea { background: var(--verde-suave); }
 .destacada-eyebrow .eyebrow-texto { color: var(--verde-suave); }
 
+/* El titular cruza el ancho entero, a la escala de la marca del hero: es lo
+   que ata esta sección con la portada. */
 .destacada-titulo {
     font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
     font-weight: 800;
-    font-size: clamp(2rem, 4.2vw, 3.8rem);
-    line-height: 0.92;
-    letter-spacing: -0.04em;
+    font-size: clamp(2rem, 7.2vw, 6.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
     text-transform: uppercase;
+}
+
+/* Línea fina bajo el titular: separa el rótulo de las cuentas sin meter una
+   caja más. */
+.destacada-regla {
+    display: block;
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.18);
 }
 
 .destacada-link {
@@ -1389,56 +1398,69 @@ body {
     font-weight: 800;
 }
 
+/* DOS cuentas, en columnas iguales. En celular esto pasa a una sola columna y
+   la segunda tarjeta se esconde (ver el bloque responsive): dentro del pin del
+   portal no hay alto para dos, y por eso el rótulo de atrás dice "CUENTA
+   DESTACADA" en singular ahí. */
 .destacada-cuerpo {
     display: grid;
-    grid-template-columns: minmax(0, 430px) minmax(0, 1fr);
-    gap: 4rem;
-    align-items: center;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem;
+    align-items: stretch;
 }
 
-/* 🃏 TARJETA DE LA CUENTA
-   Sobre verde plano va en blanco: es el mismo blanco del hero, así que la
-   corona destapa "un papel blanco sobre fieltro verde". El borde degradado
-   oscuro de la maqueta antigua estaba pensado para fondo negro. */
+/* 🃏 TARJETA DE LA CUENTA — acostada: la foto manda a la izquierda y los datos
+   acompañan a la derecha. Blanca sobre el negro del portal, con el mismo borde
+   fino y la misma sombra abierta de la tarjeta del hero, para que las dos
+   secciones se lean como una sola pieza. */
 .cuenta-card {
-    border-radius: 18px;
+    display: grid;
+    /* La foto va en fracción y no en px fijos a propósito: las imágenes del
+       catálogo son banners 16/9 con texto en los extremos, y una columna
+       estrecha los recorta justo por ahí. En fracción la foto crece con la
+       tarjeta y el recorte se queda en algo razonable en cualquier ancho. */
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1fr);
+    border-radius: 20px;
     padding: 0;
     background-image: none;
     background-color: #ffffff;
-    box-shadow: 0 22px 48px rgba(7, 28, 16, 0.30);
+    border: 1px solid rgba(17, 17, 17, 0.08);
+    box-shadow:
+        0 1px 2px rgba(17, 17, 17, 0.04),
+        0 26px 52px -28px rgba(0, 0, 0, 0.75);
+    overflow: hidden;
 }
 
 .cuenta-card-inner {
-    height: 100%;
     background: #ffffff;
-    border-radius: 18px;
-    padding: 18px;
+    padding: 20px 22px;
     display: flex;
     flex-direction: column;
-    gap: 13px;
+    gap: 9px;
 }
 
-.cuenta-card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-/* Badge de plataformas: sobre tarjeta blanca se invierte a tinta */
+/* Plataformas: el badge oscuro de pastilla se cambia por una línea suelta.
+   Los iconos de renderPlataformasHTML() siguen siendo los mismos — lo único
+   que se va es la caja negra que los envolvía. */
 .cuenta-plataformas {
     display: inline-flex;
     align-items: center;
     flex-wrap: wrap;
-    background: var(--tinta);
-    color: #ffffff;
-    padding: 6px 14px;
-    border-radius: 50px;
-    font-size: 0.72rem;
+    background: none;
+    color: var(--gris-tenue);
+    padding: 0;
+    border-radius: 0;
+    /* Pequeño y apretado para que las cuatro plataformas quepan en UNA línea:
+       partidas en dos ensucian la columna y descuadran las dos tarjetas. */
+    font-size: 0.62rem;
     font-weight: 700;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
     text-transform: uppercase;
+}
+
+.cuenta-plataformas svg {
+    width: 13px;
+    height: 13px;
 }
 
 .cuenta-estado {
@@ -1459,26 +1481,24 @@ body {
     background: var(--verde-medio);
 }
 
+/* La foto ocupa su columna entera: sin aspect-ratio, se estira al alto que
+   marque la columna de datos. En celular la tarjeta se pone de pie y ahí sí
+   recupera una proporción fija (ver el bloque responsive). */
 .cuenta-img-box {
+    position: relative;
     width: 100%;
-    aspect-ratio: 16 / 9;
+    height: 100%;
     background: #e9e9e9;
-    border-radius: 10px;
     overflow: hidden;
 }
 
 .cuenta-img-box img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-}
-
-.cuenta-info {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    flex-grow: 1;
 }
 
 /* A dos líneas como mucho. No es estética: el título lo escribe Supabase y
@@ -1517,7 +1537,10 @@ body {
     color: var(--gris-texto);
 }
 
+/* margin-top:auto lo pega al fondo de la columna: con títulos de distinto
+   largo, los dos botones quedan a la misma altura. */
 .cuenta-cta {
+    margin-top: auto;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1527,7 +1550,7 @@ body {
     font-size: 0.88rem;
     letter-spacing: 0.4px;
     padding: 16px;
-    border-radius: 8px;
+    border-radius: 10px;
     text-decoration: none;
     transition: background-color 0.3s ease;
 }
@@ -1536,44 +1559,33 @@ body {
     background: var(--verde-oscuro);
 }
 
-/* Columna de texto al lado de la tarjeta */
-.destacada-aside {
-    display: flex;
-    flex-direction: column;
-    gap: 1.1rem;
-    max-width: 460px;
-}
+/* Pie de la sección. Sustituye a la vieja columna de texto lateral: ese sitio
+   ahora lo ocupa la segunda cuenta, así que lo que quedaba por decir baja aquí
+   en una sola línea.
 
-.destacada-aside-kicker {
-    font-weight: 700;
-    font-size: 0.72rem;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--verde-suave);
-}
-
-.destacada-aside-texto {
-    font-weight: 400;
-    font-size: 1rem;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.78);
-}
-
-.destacada-aside-cta {
+   La píldora solo sale en celular, donde el atajo del encabezado está
+   escondido y hace falta algo a mano del pulgar. En escritorio sobra, porque
+   arriba a la derecha ya está "Ver catálogo completo". */
+.destacada-pie {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-    margin-top: 0.6rem;
-    padding-top: 1.6rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    justify-content: center;
+    gap: 1.25rem;
 }
 
-.destacada-aside-num {
-    font-weight: 800;
-    font-size: 1.35rem;
-    letter-spacing: -0.5px;
+.destacada-pie-texto {
+    margin: 0;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
 }
+
+.destacada-pie-texto .acento-verde-claro { font-weight: 800; }
+
+.destacada-pie-btn { display: none; }
 
 /* La píldora verde del hero se pierde sobre verde: aquí se invierte */
 .destacada .btn-verde-pill {
@@ -1595,10 +1607,11 @@ body {
 /* ==========================================
    📱 RESPONSIVE - CUENTA DESTACADA (CELULAR)
    ==========================================
-   Aquí la columna única no es lo único que cambia: al vivir dentro del pin del
-   portal, TODO tiene que caber en una pantalla o se recorta. Por eso los
-   paddings, los huecos y la tarjeta van más apretados que en escritorio, y por
-   eso la foto pasa de 16/9 a 2/1. Con eso entra en un teléfono normal (844px
+   Aquí pasa LO MÁS IMPORTANTE de la sección en celular: se queda UNA SOLA
+   cuenta. Al vivir dentro del pin del portal todo tiene que caber en una
+   pantalla o se recorta, y dos tarjetas no entran; por eso el rótulo de atrás
+   (.corona-watermark) también esconde sus "s" y dice "CUENTA DESTACADA".
+   Con la tarjeta de pie y la foto en 16/9 entra en un teléfono normal (844px
    de alto); para los más bajos hay un bloque más abajo. */
 @media (max-width: 900px) {
 
@@ -1610,58 +1623,58 @@ body {
         padding: clamp(4.25rem, 10vh, 4.75rem) 1.25rem 1.5rem 1.25rem;
     }
 
-    .destacada-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.9rem;
-    }
+    .destacada-titulo { font-size: clamp(1.9rem, 11vw, 2.9rem); }
 
-    .destacada-titulo { font-size: clamp(1.9rem, 9vw, 2.6rem); }
+    /* Singular, porque abajo solo hay una cuenta. Mismo criterio (y mismo
+       truco) que .corona-watermark-plural. */
+    .destacada-titulo-plural { display: none; }
 
-    /* El enlace del encabezado sobra en celular: el CTA del aside, más abajo,
-       lleva al mismo sitio y queda a mano del pulgar. */
+    /* El enlace del encabezado sobra en celular: la píldora del pie lleva al
+       mismo sitio y queda a mano del pulgar. */
     .destacada-link { display: none; }
 
-    /* Una sola columna: primero la tarjeta, luego el texto y el CTA. */
     .destacada-cuerpo {
         grid-template-columns: minmax(0, 1fr);
         gap: 0.9rem;
     }
 
-    .destacada-aside {
-        max-width: 100%;
-        gap: 0.7rem;
-    }
+    /* 👈 LA REGLA QUE DEJA UNA SOLA CUENTA EN CELULAR. */
+    .cuenta-card-segunda { display: none; }
 
-    .destacada-aside-texto { font-size: 0.88rem; line-height: 1.5; }
-
-    .destacada-aside-cta {
-        justify-content: space-between;
-        gap: 0.8rem;
-        margin-top: 0;
-        padding-top: 0.9rem;
-    }
-
-    .destacada-aside-num { font-size: 1.15rem; }
-
-    .destacada .btn-verde-pill { padding: 12px 20px; font-size: 0.85rem; }
-
-    .cuenta-card-inner { padding: 12px; gap: 9px; }
-    /* Más panorámica que en escritorio: es lo que más alto ahorra sin tocar
-       ningún texto. */
-    .cuenta-img-box { aspect-ratio: 2 / 1; }
+    /* La tarjeta se pone de pie: la foto arriba y los datos debajo. Acostada
+       no cabría el texto en 350px de ancho. */
+    .cuenta-card { grid-template-columns: minmax(0, 1fr); }
+    .cuenta-img-box { aspect-ratio: 16 / 9; height: auto; }
+    .cuenta-card-inner { padding: 14px 16px 16px; gap: 9px; }
     .cuenta-mxn { font-size: 1.5rem; }
     .cuenta-titulo { font-size: 1rem; }
-    .cuenta-cta { padding: 12px; }
+    .cuenta-cta { padding: 13px; }
+
+    /* El pie se parte en dos filas y saca la píldora, que en escritorio no se
+       ve. A lo ancho, para que sea un blanco grande para el pulgar. */
+    .destacada-pie {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.8rem;
+    }
+
+    .destacada-pie-texto { font-size: 0.68rem; letter-spacing: 2.5px; }
+
+    .destacada-pie-btn {
+        display: inline-flex;
+        justify-content: center;
+        padding: 14px 20px;
+        font-size: 0.85rem;
+    }
 }
 
 /* ==========================================
    📱 TELÉFONOS BAJOS Y PANTALLAS CHATAS
    ==========================================
-   Por debajo de ~780px de alto ya no entra el párrafo largo del aside, y el
-   pin recorta por abajo: se cae ese párrafo y se aprieta lo demás. Lo que
-   NO se toca es la tarjeta (que es el contenido de verdad) ni el CTA al
-   catálogo. El mismo recorte vale para un escritorio con la ventana baja. */
+   Por debajo de ~780px de alto el pin recorta por abajo, así que se aprieta el
+   aire. Lo que NO se toca es la tarjeta (que es el contenido de verdad) ni el
+   camino al catálogo. El mismo recorte vale para un escritorio con la ventana
+   baja. */
 @media (max-height: 780px) {
 
     .destacada {
@@ -1669,53 +1682,52 @@ body {
         padding-top: clamp(4rem, 10vh, 5rem);
         padding-bottom: 1.25rem;
     }
-
-    .destacada-aside-texto { display: none; }
-    .destacada-aside-cta { padding-top: 0.8rem; }
 }
 
-/* Teléfonos de verdad pequeños (360x640 y parecidos). Dos cosas que solo
-   pasan ahí: "40 cuentas más" y la píldora ya no caben en la misma línea y se
-   parten en dos, y la marca de dos líneas se come el alto que falta. */
+/* Teléfonos de verdad pequeños (360x640 y parecidos): el titular de dos líneas
+   se come el alto que falta, así que baja de tamaño y el pie se aprieta. */
 @media (max-width: 380px) {
 
-    .destacada-aside-num { font-size: 1.05rem; }
-    .destacada-aside-cta { gap: 0.5rem; }
-    .destacada .btn-verde-pill { padding: 11px 16px; font-size: 0.8rem; }
+    .destacada-titulo { font-size: clamp(1.7rem, 10vw, 2.3rem); }
+    .destacada-pie-texto { font-size: 0.62rem; letter-spacing: 2px; }
+    .destacada-pie-btn { padding: 12px 16px; font-size: 0.8rem; }
 }
 
 @media (max-width: 900px) and (max-height: 700px) {
 
     .destacada { gap: 0.9rem; }
-    .destacada-titulo { font-size: clamp(1.6rem, 7.5vw, 2.1rem); }
-    .destacada-aside { gap: 0.5rem; }
-    .destacada-aside-cta { padding-top: 0.6rem; }
-    .cuenta-card-inner { padding: 10px; gap: 8px; }
-    .cuenta-img-box { aspect-ratio: 2.4 / 1; }
+    .destacada-titulo { font-size: clamp(1.6rem, 8.5vw, 2.2rem); }
+    /* Aquí el conteo sí sobra: lo que no puede faltar es la tarjeta y la
+       píldora al catálogo. */
+    .destacada-pie-texto { display: none; }
+    .cuenta-card-inner { padding: 12px 14px 14px; gap: 8px; }
+    /* Más panorámica: es lo que más alto ahorra sin tocar ningún texto. */
+    .cuenta-img-box { aspect-ratio: 2.2 / 1; }
     .cuenta-cta { padding: 11px; }
 }
 
-/* Y si además es un escritorio bajito (1366x768 y parecidos), lo que sobra no
-   es el párrafo sino el aire: ahí el párrafo se queda. */
+/* Y si es un escritorio bajito (1366x768 y parecidos), lo que sobra no son las
+   cuentas sino el aire: las dos tarjetas se quedan, el titular baja un punto y
+   la foto se acorta. */
 @media (min-width: 901px) and (max-height: 820px) {
 
     .destacada {
-        gap: 1.6rem;
+        gap: 1.3rem;
         padding: clamp(5rem, 9vh, 6.5rem) 3.5rem clamp(2rem, 5vh, 3rem) 3.5rem;
     }
 
-    .destacada-aside-texto { display: block; font-size: 0.95rem; line-height: 1.55; }
-    .destacada-titulo { font-size: clamp(1.8rem, 3.4vw, 2.8rem); }
-    .cuenta-card-inner { padding: 15px; gap: 10px; }
-    .cuenta-img-box { aspect-ratio: 2 / 1; }
+    .destacada-titulo { font-size: clamp(1.8rem, 5.6vw, 4.6rem); }
+    .cuenta-card-inner { padding: 16px 18px; gap: 8px; }
+    .cuenta-mxn { font-size: 1.6rem; }
 }
 
 /* ==========================================
    📱 RESPONSIVE - CUENTA DESTACADA (TABLET)
    ==========================================
-   Entre 601 y 900px sigue mandando la columna única, pero hay ancho de sobra:
-   la tarjeta y el texto se centran a un ancho cómodo de lectura. El alto sigue
-   siendo el de una pantalla, así que el aire se queda medido. */
+   Entre 601 y 900px sigue habiendo UNA sola cuenta (manda el bloque de arriba),
+   pero hay ancho de sobra: la tarjeta se centra a un ancho cómodo y recupera la
+   forma acostada, que a partir de 560px ya se lee bien. El alto sigue siendo el
+   de una pantalla, así que el aire se queda medido. */
 @media (min-width: 601px) and (max-width: 900px) {
 
     .destacada {
@@ -1724,8 +1736,21 @@ body {
     }
 
     .destacada-cuerpo { justify-items: center; }
-    .cuenta-card  { width: 100%; max-width: 560px; }
-    .destacada-aside { width: 100%; max-width: 560px; }
+
+    .cuenta-card {
+        width: 100%;
+        max-width: 620px;
+        grid-template-columns: minmax(0, 0.95fr) minmax(0, 1fr);
+    }
+
+    .cuenta-img-box { aspect-ratio: auto; height: 100%; }
+    .cuenta-card-inner { padding: 20px 22px; }
+
+    /* El pie sigue en dos filas como en celular, pero centrado y con la píldora
+       a su ancho: aquí sobra sitio y a lo ancho quedaría desproporcionada. */
+    .destacada-pie { align-items: center; }
+    .destacada-pie-texto { max-width: 46ch; }
+    .destacada-pie-btn { align-self: center; padding: 13px 24px; }
 }
 
 

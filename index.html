@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260916f">
+    <link rel="stylesheet" href="style.css?v=20260916g">
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -248,7 +248,7 @@
             </div>
 
             <!-- ⬆️ EL CONTENIDO DEL REPOSO (acto 2 del portal)
-                 La cuenta destacada. Vivía debajo, como sección propia en verde;
+                 Las cuentas destacadas. Vivían debajo, como sección propia en verde;
                  ahora entra aquí, sobre el negro que deja la corona al cerrar,
                  sin pedir ni un scroll más: es lo que pidió el cliente.
 
@@ -267,16 +267,16 @@
                  OJO con el alto: el pin mide una pantalla y recorta lo que
                  sobre, así que esto tiene que caber en 100vh. Por eso el celular
                  lleva su propia versión apretada en style.css. -->
-            <section class="destacada" id="cases" aria-label="Cuenta destacada">
+            <section class="destacada" id="cases" aria-label="Cuentas destacadas">
 
+                <!-- Fila de encabezado: el rótulo a la izquierda y el atajo al
+                     catálogo a la derecha. En celular el atajo se esconde y su
+                     trabajo lo hace la píldora del pie. -->
                 <div class="destacada-header">
-                    <div class="destacada-header-txt">
-                        <div class="destacada-eyebrow" data-reveal style="--n: 0;">
-                            <span class="eyebrow-punto"></span>
-                            <span class="eyebrow-linea"></span>
-                            <span class="eyebrow-texto">Lo más cotizado</span>
-                        </div>
-                        <h2 class="destacada-titulo" data-reveal style="--n: 1;">Cuenta<br>destacada</h2>
+                    <div class="destacada-eyebrow" data-reveal style="--n: 0;">
+                        <span class="eyebrow-punto"></span>
+                        <span class="eyebrow-linea"></span>
+                        <span class="eyebrow-texto">Lo más cotizado</span>
                     </div>
                     <a href="catalogo.html#cases" class="destacada-link" data-reveal style="--n: 2;">
                         Ver catálogo completo
@@ -284,55 +284,73 @@
                     </a>
                 </div>
 
+                <!-- El titular cruza el ancho entero, como la marca del hero.
+                     Las dos "s" van en <span> sueltos y se esconden en celular:
+                     el mismo truco de .corona-watermark-plural, y por la misma
+                     razón — ahí abajo solo entra UNA cuenta. -->
+                <h2 class="destacada-titulo" data-reveal style="--n: 1;">Cuenta<span class="destacada-titulo-plural">s</span> destacada<span class="destacada-titulo-plural">s</span></h2>
+
+                <span class="destacada-regla" data-reveal style="--n: 1;" aria-hidden="true"></span>
+
+                <!-- Las cuentas, acostadas: la foto manda a la izquierda y los
+                     datos acompañan a la derecha. En celular queda solo la
+                     primera (.cuenta-card-segunda se esconde). -->
                 <div class="destacada-cuerpo">
 
                     <article class="cuenta-card" id="cuentaDestacada" data-reveal style="--n: 3;">
+                        <div class="cuenta-img-box">
+                            <img id="destImg" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="">
+                        </div>
                         <div class="cuenta-card-inner">
-
-                            <div class="cuenta-card-top">
-                                <span class="cuenta-plataformas" id="destPlataformas">DISPONIBLE</span>
-                                <span class="cuenta-estado">
-                                    <span class="cuenta-estado-punto"></span>
-                                    Disponible
-                                </span>
+                            <span class="cuenta-estado">
+                                <span class="cuenta-estado-punto"></span>
+                                Disponible
+                            </span>
+                            <span class="cuenta-titulo" id="destTitulo">Cargando...</span>
+                            <span class="cuenta-plataformas" id="destPlataformas"></span>
+                            <div class="cuenta-precios">
+                                <span class="cuenta-mxn" id="destMxn"></span>
+                                <span class="cuenta-usd" id="destUsd"></span>
                             </div>
-
-                            <div class="cuenta-img-box">
-                                <img id="destImg" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="">
-                            </div>
-
-                            <div class="cuenta-info">
-                                <span class="cuenta-titulo" id="destTitulo">Cargando...</span>
-                                <div class="cuenta-precios">
-                                    <span class="cuenta-mxn" id="destMxn"></span>
-                                    <span class="cuenta-usd" id="destUsd"></span>
-                                </div>
-                            </div>
-
                             <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener" class="cuenta-cta">
                                 Comprar por Discord
                             </a>
-
                         </div>
                     </article>
 
-                    <div class="destacada-aside">
-                        <p class="destacada-aside-kicker" data-reveal style="--n: 4;">La más cotizada ahora mismo</p>
-                        <p class="destacada-aside-texto" data-reveal style="--n: 4;">
-                            Es la cuenta más cara del catálogo en este momento y se actualiza sola cada vez
-                            que entra una cuenta nueva a la tienda. Si buscas algo más a tu medida, el
-                            catálogo completo tiene filtros por precio, plataforma y skin.
-                        </p>
-                        <div class="destacada-aside-cta" data-reveal style="--n: 5;">
-                            <span class="destacada-aside-num"><span class="acento-verde-claro" id="destTotal">40</span> cuentas más</span>
-                            <a href="catalogo.html#cases" class="btn-verde-pill">
-                                Ver catálogo
-                                <span class="btn-verde-pill-icono" aria-hidden="true">+</span>
+                    <article class="cuenta-card cuenta-card-segunda" id="cuentaDestacada2" data-reveal style="--n: 4;">
+                        <div class="cuenta-img-box">
+                            <img id="dest2Img" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="">
+                        </div>
+                        <div class="cuenta-card-inner">
+                            <span class="cuenta-estado">
+                                <span class="cuenta-estado-punto"></span>
+                                Disponible
+                            </span>
+                            <span class="cuenta-titulo" id="dest2Titulo">Cargando...</span>
+                            <span class="cuenta-plataformas" id="dest2Plataformas"></span>
+                            <div class="cuenta-precios">
+                                <span class="cuenta-mxn" id="dest2Mxn"></span>
+                                <span class="cuenta-usd" id="dest2Usd"></span>
+                            </div>
+                            <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener" class="cuenta-cta">
+                                Comprar por Discord
                             </a>
                         </div>
-                    </div>
+                    </article>
 
                 </div>
+
+                <!-- Pie: el conteo, y en celular la píldora que sustituye al
+                     atajo del encabezado. Es la última pieza de la ola. -->
+                <div class="destacada-pie" data-reveal style="--n: 5;">
+                    <p class="destacada-pie-texto"><span class="acento-verde-claro" id="destTotal">40</span> cuentas más en el catálogo · entrega acompañada paso a paso</p>
+                    <a href="catalogo.html#cases" class="btn-verde-pill destacada-pie-btn">
+                        Ver catálogo completo
+                        <span class="btn-verde-pill-icono" aria-hidden="true">+</span>
+                    </a>
+                </div>
+
             </section>
 
             <div class="corona-pista" id="coronaPista">
@@ -496,14 +514,20 @@
             return found.join('');
         }
 
-        // 👑 CUENTA DESTACADA (la más cara del catálogo)
+        // 👑 CUENTAS DESTACADAS (las DOS más caras del catálogo)
+        //
+        // En escritorio se pintan las dos; en celular el CSS esconde la segunda
+        // (.cuenta-card-segunda) porque dentro del pin del portal no hay alto
+        // para ambas. Aquí siempre se piden las dos: es la misma petición, el
+        // límite sube de 1 a 2 y no cuesta una query extra.
+        //
         // forceRefresh=true salta el caché -- lo usa la suscripción Realtime para
         // que un cambio en Supabase se refleje al instante en vez de esperar a que
         // expire el caché de 5 minutos (que puede seguir "fresco" aunque los datos
         // ya hayan cambiado en la base).
         async function cargarCuentaDestacada(forceRefresh = false) {
             try {
-                let cuenta = null;
+                let cuentas = null;
                 let total = null;
 
                 // Intentar usar el caché si el usuario ya visitó el catálogo
@@ -515,41 +539,42 @@
                             if (Date.now() - cached.timestamp < 5 * 60 * 1000) {
                                 const ordenadas = [...cached.data]
                                     .sort((a, b) => Number(b.preciomxn) - Number(a.preciomxn));
-                                cuenta = ordenadas[0] || null;
+                                cuentas = ordenadas.slice(0, 2);
                                 total = cached.data.length;
                             }
                         }
                     } catch (e) {}
                 }
 
-                // Sin caché: una sola fila, y el conteo total viaja en la MISMA
+                // Sin caché: dos filas, y el conteo total viaja en la MISMA
                 // petición gracias a count:'exact', así que no cuesta una query extra.
-                if (!cuenta) {
+                if (!cuentas || !cuentas.length) {
                     const { data, count, error } = await _supabase
                         .from('Cuentas')
                         .select('titulo, preciomxn, preciousd, image_url, disponibilidad', { count: 'exact' })
                         .order('preciomxn', { ascending: false })
-                        .limit(1);
+                        .limit(2);
 
                     if (error) throw error;
-                    cuenta = (data || [])[0] || null;
+                    cuentas = data || [];
                     total = count;
                 }
 
-                if (!cuenta) return;
-                pintarCuentaDestacada(cuenta, total);
+                if (!cuentas.length) return;
+                pintarCuentasDestacadas(cuentas, total);
 
             } catch (err) {
-                console.error("Error al cargar la cuenta destacada de Supabase:", err);
+                console.error("Error al cargar las cuentas destacadas de Supabase:", err);
             }
         }
 
-        function pintarCuentaDestacada(cuenta, total) {
-            const titulo = document.getElementById('destTitulo');
-            const mxn = document.getElementById('destMxn');
-            const usd = document.getElementById('destUsd');
-            const img = document.getElementById('destImg');
-            const plataformas = document.getElementById('destPlataformas');
+        // Rellena UNA tarjeta. Los ids de la segunda llevan el prefijo "dest2".
+        function pintarTarjetaDestacada(prefijo, cuenta) {
+            const titulo = document.getElementById(prefijo + 'Titulo');
+            const mxn = document.getElementById(prefijo + 'Mxn');
+            const usd = document.getElementById(prefijo + 'Usd');
+            const img = document.getElementById(prefijo + 'Img');
+            const plataformas = document.getElementById(prefijo + 'Plataformas');
 
             // textContent no interpreta HTML, así que aquí no hace falta escapar.
             if (titulo) titulo.textContent = cuenta.titulo || 'Cuenta destacada';
@@ -564,11 +589,27 @@
                 img.src = cuenta.image_url;
                 img.alt = cuenta.titulo || 'Cuenta destacada de Anxie Store';
             }
+        }
 
-            // Conteo real de cuentas (sección 3; el hero ya no lleva contador)
+        function pintarCuentasDestacadas(cuentas, total) {
+            pintarTarjetaDestacada('dest', cuentas[0]);
+
+            // Si la tienda solo tiene una cuenta, la segunda tarjeta se retira
+            // del todo en vez de quedarse con "Cargando..." puesto.
+            const segunda = document.getElementById('cuentaDestacada2');
+            if (cuentas[1]) {
+                pintarTarjetaDestacada('dest2', cuentas[1]);
+            } else if (segunda) {
+                segunda.remove();
+            }
+
+            // Conteo real de cuentas: lo que queda DESPUÉS de las que se ven aquí,
+            // que son dos en escritorio y una sola en celular (el CSS esconde la
+            // segunda a partir de 900px).
             if (typeof total === 'number' && total > 0) {
                 const destTotal = document.getElementById('destTotal');
-                if (destTotal) destTotal.textContent = String(Math.max(total - 1, 0));
+                const visibles = (cuentas[1] && !window.matchMedia('(max-width: 900px)').matches) ? 2 : 1;
+                if (destTotal) destTotal.textContent = String(Math.max(total - visibles, 0));
             }
         }
 
@@ -733,7 +774,7 @@
         //   1. DESTAPADO — la corona crece hasta tragarse la pantalla, apagando
         //      el humo por el camino. Conserva sus 2.6 pantallas clavadas: la
         //      curva de la corona no se tocó nunca.
-        //   2. REPOSO    — el negro se sostiene con la cuenta destacada encima.
+        //   2. REPOSO    — el negro se sostiene con las cuentas destacadas encima.
         //      Es el tiempo que el visitante tiene para leer la tarjeta antes
         //      de que el pin suelte; si lo acortas, la ola apenas termina y la
         //      sección ya se fue.
