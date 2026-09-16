@@ -149,9 +149,10 @@ body {
 
    Cada tema usa para el panel un color que NO usa su píldora, así el morph se
    nota. Los tres contrastan contra el fondo de su sección:
-     claro  -> hero blanco y sección 4 blanca
-     verde  -> cuenta destacada y footer, los dos de fondo verde
-     oscuro -> el portal ya destapado (que es humo NEGRO, no verde) y legal.html
+     claro  -> hero blanco y sección 4 blanca   (píldora verde,  panel negro)
+     verde  -> fondos verdes                    (píldora blanca, panel negro)
+     oscuro -> el portal ya destapado (que es humo NEGRO, no verde), el footer
+               y legal.html                     (píldora blanca, panel verde)
 
    La tipografía es Arial y no la Montserrat del resto del sitio: es la del
    diseño original de la píldora y la letra por letra del roll se lee mejor
@@ -159,9 +160,9 @@ body {
    ========================================================================= */
 .menu {
     --menu-ease: cubic-bezier(0.22, 1, 0.36, 1);
-    --menu-bg: var(--tinta);
+    --menu-bg: var(--verde);
     --menu-fg: #ffffff;
-    --menu-panel: var(--verde);
+    --menu-panel: var(--tinta);
     --menu-panel-fg: #ffffff;
     /* Alto de la barra cerrada. Lo usan la píldora y el propio botón. */
     --menu-bar: 48px;
@@ -193,10 +194,14 @@ body {
     }
 }
 
+/* Sobre blanco: píldora verde de marca con letras blancas, y al abrir el panel
+   entra en negro. Antes era al revés (píldora negra, panel verde), pero el
+   verde quedó reservado para el panel del tema oscuro y tener dos panel verdes
+   hacía que el menú se viera igual en las dos mitades de la página. */
 .menu[data-theme="claro"] {
-    --menu-bg: var(--tinta);
+    --menu-bg: var(--verde);
     --menu-fg: #ffffff;
-    --menu-panel: var(--verde);
+    --menu-panel: var(--tinta);
     --menu-panel-fg: #ffffff;
 }
 
@@ -207,14 +212,19 @@ body {
     --menu-panel-fg: #ffffff;
 }
 
-/* El único tema que NO invierte píldora y panel: sobre negro, un panel negro
-   desaparecería contra el fondo. Va píldora verde de marca con letras blancas,
-   y al abrir el panel entra en blanco. */
+/* Sobre negro no puede entrar ninguno de los dos en negro, o desaparece contra
+   el fondo: píldora blanca con letras NEGRAS, y al abrir el panel entra en el
+   verde de marca. Es el espejo del tema claro, que es lo que hace que cruzar el
+   portal se sienta como darle la vuelta a la página.
+
+   Las letras van en negro y no en el verde de marca a propósito: el verde ya es
+   el color del panel de este tema, y sobre la píldora blanca se leía como si el
+   menú estuviera a medio abrir. */
 .menu[data-theme="oscuro"] {
-    --menu-bg: var(--verde);
-    --menu-fg: #ffffff;
-    --menu-panel: #ffffff;
-    --menu-panel-fg: var(--tinta);
+    --menu-bg: #ffffff;
+    --menu-fg: var(--tinta);
+    --menu-panel: var(--verde);
+    --menu-panel-fg: #ffffff;
 }
 
 .menu__shell {
@@ -840,20 +850,26 @@ body {
     justify-content: center;
 }
 
-/* Marca de agua tenue detrás de la corona. Va en z-index 1, o sea DEBAJO de
-   .corona-mask (z 4): la corona la tapa, que es justo lo que se quiere. Es la
-   única copia del logotipo que hay en la sección; dentro de la máscara no hay
-   texto. */
+/* Rótulo tenue detrás de la corona: "CUENTAS DESTACADAS". Va en z-index 1, o
+   sea DEBAJO de .corona-mask (z 4): la corona lo tapa, que es justo lo que se
+   quiere. Es el único texto que hay en la sección; dentro de la máscara no hay
+   nada escrito.
+
+   En PC va en UNA sola línea (nowrap) y por eso el tamaño es bastante menor que
+   el del logotipo que había antes: son 18 caracteres de ancho, así que el vw
+   está calculado para que quepan de borde a borde sin partirse. Si cambias el
+   texto, recalcula ese 7.6vw o se saldrá de la pantalla. */
 .corona-watermark {
     position: absolute;
     z-index: 1;
     font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
     font-weight: 800;
-    font-size: clamp(3.5rem, 13vw, 11rem);
+    font-size: clamp(2rem, 7.6vw, 9rem);
     line-height: 0.86;
     letter-spacing: -0.045em;
     text-align: center;
     text-transform: uppercase;
+    white-space: nowrap;
     color: rgba(17, 17, 17, 0.055);
     user-select: none;
     pointer-events: none;
@@ -1153,9 +1169,6 @@ body {
        tamaño de arranque de la corona lo baja el JS (tamanioReposoCorona). */
     .corona-portal { height: 480vh; }   /* 2.0 destapado + 0.8 reposo + 1 de solape + 1 del pin */
 
-    /* En celular el logotipo de fondo crece: a 13vw se quedaba en un sello
-       diminuto en medio de la pantalla. */
-    .corona-watermark { font-size: clamp(2.6rem, 19vw, 5.5rem); }
 
     .corona-esquina { width: 13px; height: 13px; }
     .esq-si, .esq-sd { top: 10px; }
@@ -1187,6 +1200,37 @@ body {
         justify-content: center;
         align-items: center;
     }
+}
+
+/* EL RÓTULO DEL PORTAL EN CELULAR — a 640px, no a los 900 de siempre.
+   De ancho no cabe "CUENTAS DESTACADAS" en una línea, y partirlo en dos
+   renglones pegados detrás de la corona tampoco se lee. Así que se abre:
+   CUENTA arriba, la corona en medio, DESTACADA abajo. No queda "detrás" como en
+   PC, pero es la misma idea adaptada al alto, que es lo que sobra aquí.
+
+   El corte va en 640 y no en 900 por dos motivos que apuntan al mismo sitio:
+   entre 640 y 900 la línea entera todavía cabe, y es justo ahí donde
+   tamanioReposoCorona() (index.html) sube la corona de 260 a 340 — el hueco de
+   abajo dejaría de cuadrar.
+
+   Ese hueco es el gap: 260px, el mismo tamaño de reposo que devuelve el JS por
+   debajo de 640. Son la misma cuenta escrita en dos sitios: si cambias uno,
+   cambia el otro o el texto se mete debajo de la silueta.
+
+   El plural se esconde porque a esta anchura solo entra UNA cuenta. */
+@media (max-width: 640px) {
+    .corona-watermark {
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 260px;
+        white-space: normal;
+        font-size: clamp(2rem, 15.5vw, 4.5rem);
+    }
+
+    .corona-watermark-plural { display: none; }
 }
 
 /* ==========================================
