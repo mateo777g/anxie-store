@@ -77,6 +77,11 @@ The pill is set in `Arial` on `.menu` itself, deliberately not the site's Montse
 Plus Jakarta Sans — it is the original design's face and the per-letter roll reads better in
 it. Keep that override scoped to `.menu`.
 
+On `index.html` the pill sits top-**right** (`.menu--derecha`, aligned with the hero card's
+edge, grows leftward when opened) — the client asked for it in September 2026. `legal.html`
+still has it centred. That modifier must stay above the 640px block in `style.css`, which
+takes over positioning on phones.
+
 `index.html` is the only page that switches theme: `actualizarMenu(tamCorona)` runs inside
 the crown-portal rAF loop, measures which section sits under the pill, and calls
 `window.anxieMenu.setTema(...)`. `menu.js` exposes nothing else.
@@ -122,6 +127,18 @@ The cache invariant: **any admin write must clear the cache.** `lilshop.html` do
 `index.html` uses both `<spline-viewer>` (five scenes, from unpkg) and `<model-viewer>` (`assets/chanti.glb`); `catalogo.html` uses `<spline-viewer>` only. Both pages duplicate two functions verbatim, `limpiarSplineViewer()` and `ocultarLogosSpline()`, which inject a `display:none` stylesheet into each viewer's shadow root and run a `MutationObserver` to keep the Spline watermark hidden as the component re-renders. Edits to that logic need to be applied in both files.
 
 Both pages also stop `wheel` events on `spline-viewer` at capture phase so 3D scenes don't hijack page scroll.
+
+### The smoke shader (`crearHumo()` in `index.html`)
+
+The last inline script builds a WebGL "smoke ring" shader through one factory,
+`crearHumo(canvas, opciones)`, used twice: for the crown portal (`#coronaShader`) and to
+fill the hero wordmark's letters (`#wordmarkHumo`). The wordmark canvas only covers the
+letters but draws as if it covered the whole `.hero-panel` (the `u_marco` uniform), so the
+letters are windows onto one card-sized ring. The letter-shaped cut-out is pure CSS —
+`screen` on a black-on-white text layer, then `multiply` on the `<h1>` against the card. That
+`multiply` only works because `.hero-marca` has **no** `z-index`; giving it one makes it a
+stacking context and a white box appears over the dot grid. Without WebGL (or with reduced
+motion) both canvases hide and the letters fall back to plain black.
 
 ## Conventions worth matching
 

@@ -57,12 +57,19 @@ body {
    que el componente DotPattern, pero sin SVG ni React) y enmascarada en
    radial, para que se vea densa detras de la marca y se desvanezca hacia los
    bordes de la tarjeta en vez de cortarse de golpe. */
+/* Columna de tres tramos: el ::before de arriba y el pie de abajo crecen
+   parejos (flex 1 los dos), así la marca queda al centro y la frase con el
+   botón se apoya en el fondo. El pie no baja de su contenido, así que en una
+   pantalla bajita es el ::before el que cede y la marca sube un poco, en vez
+   de empujar la tarjeta fuera de la pantalla.
+   Es flex y no grid a propósito: el hero solo tiene min-height, y con eso las
+   filas fr de un grid no reparten nada (la de arriba copiaba el alto del pie). */
 .hero-panel {
     position: relative;
     flex: 1 1 auto;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
     width: 100%;
     padding: 3rem 2.5rem;
     border: 1px solid rgba(17, 17, 17, 0.08);
@@ -74,6 +81,11 @@ body {
         0 1px 2px rgba(17, 17, 17, 0.04),
         0 30px 60px -34px rgba(17, 17, 17, 0.22);
     overflow: hidden;
+}
+
+.hero-panel::before {
+    content: '';
+    flex: 1 1 0;
 }
 
 .hero-dots {
@@ -176,6 +188,37 @@ body {
     pointer-events: none;
     animation: menu-in 520ms var(--menu-ease) both;
     animation-delay: calc(var(--n, 0) * 110ms);
+}
+
+/* Variante del index: la píldora va arriba a la DERECHA, alineada con el borde
+   de la tarjeta del hero (mismo 3.5rem que el padding de .hero-inner). Al estar
+   anclada por la derecha, al abrirse crece hacia la izquierda.
+   Tiene que ir ANTES del bloque de 640px: allí .menu vuelve a mandar con
+   right: 0 y su propia animación, y a igual especificidad gana el que va
+   después. */
+.menu--derecha {
+    left: auto;
+    right: 3.5rem;
+    animation-name: menu-in-lado;
+}
+
+/* Igual que menu-in pero sin el -50%: esta píldora no está centrada. */
+@keyframes menu-in-lado {
+    from {
+        opacity: 0;
+        filter: blur(10px);
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        filter: none;
+        transform: none;
+    }
+}
+
+/* Tablet: la tarjeta se pega a 1rem del borde y la píldora la sigue. */
+@media (min-width: 641px) and (max-width: 900px) {
+    .menu--derecha { right: 1rem; }
 }
 
 /* Entrada: baja desenfocada, primer paso de la ola de la portada (ver
@@ -659,36 +702,136 @@ body {
     text-transform: uppercase;
 }
 
-/* 👑 COLUMNA CENTRAL: MARCA + FRASE + ACCIONES */
+/* 👑 CENTRO DE LA TARJETA: MARCA + DATOS DE CONFIANZA */
+/* SIN z-index a propósito: con él esto sería su propio contexto de apilado y
+   el multiply de .hero-wordmark mezclaría contra la nada en vez de contra la
+   tarjeta, y el recuadro blanco de las letras taparía la tablita de puntos.
+   Sin él la marca igual queda encima de .hero-dots, porque va después. */
 .hero-marca {
+    position: relative;
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2rem;
+    gap: 1.75rem;
     width: 100%;
-    max-width: 980px;
+    max-width: 1180px;
     text-align: center;
 }
 
+/* --- La marca, rellena con el humo del portal -----------------------------
+   Tres capas y dos mezclas, sin máscaras ni SVG:
+     1. .hero-wordmark-humo: el canvas del shader, abajo de todo.
+     2. .hero-wordmark-texto: letras NEGRAS sobre fondo BLANCO, en "screen".
+        Screen con negro deja pasar lo de abajo (el humo) y con blanco da
+        blanco: queda el humo con forma de letras dentro de un recuadro blanco.
+     3. El h1 entero en "multiply" contra la tarjeta: el blanco del recuadro se
+        vuelve transparente (multiplicar por blanco no cambia nada) y la
+        tablita de puntos se sigue viendo alrededor de las letras.
+   isolation: isolate encierra la mezcla del paso 2 dentro del h1.
+   Si no hay WebGL el canvas se esconde, el screen no tiene nada debajo y las
+   letras quedan negras como siempre. */
 .hero-wordmark {
+    position: relative;
+    isolation: isolate;
+    mix-blend-mode: multiply;
     display: flex;
-    align-items: baseline;
     justify-content: center;
-    gap: clamp(8px, 1.25vw, 18px);
-    margin: 0;
+    /* El recuadro de las letras lleva un poco de aire (ver abajo) para que
+       ningún trazo se salga del humo; este margen se lo devuelve al layout. */
+    margin: -0.06em -0.03em;
     font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
     font-weight: 800;
-    font-size: clamp(3rem, 8.9vw, 8.2rem);
+    font-size: clamp(3rem, 10.2vw, 9.6rem);
     line-height: 0.88;
     letter-spacing: -0.045em;
     text-transform: uppercase;
     color: var(--tinta);
 }
 
-/* La frase que va debajo de la marca. En mayúsculas como la marca, para que
-   el bloque entero se lea como una sola pieza. */
+.hero-wordmark-humo {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.hero-wordmark-texto {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: clamp(8px, 1.25vw, 18px);
+    padding: 0.06em 0.03em;
+    background: #ffffff;
+    color: #000000;
+    mix-blend-mode: screen;
+}
+
+/* Los dos datos de confianza, separados por una rayita vertical. Van en gris
+   de la familia del rótulo "CUENTAS DESTACADAS" del portal, pero más oscuro:
+   aquel 5.5% de opacidad solo se lee porque las letras son enormes, a este
+   tamaño desaparecía. */
+.hero-datos {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--gris-tenue);
+}
+
+.hero-dato {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    padding: 0 1.6rem;
+}
+
+.hero-dato + .hero-dato {
+    border-left: 2px solid rgba(17, 17, 17, 0.16);
+}
+
+.hero-dato-valor {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.15rem, 1.6vw, 1.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+}
+
+.hero-dato-etiqueta {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: clamp(0.62rem, 0.8vw, 0.75rem);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+/* 📝 ABAJO A LA IZQUIERDA: FRASE + BOTÓN */
+.hero-pie {
+    position: relative;
+    z-index: 1;
+    flex: 1 0 0;
+    align-self: flex-start;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding-top: 2rem;
+    text-align: left;
+}
+
+/* La frase. En mayúsculas como la marca, para que la tarjeta entera se lea
+   como una sola pieza. */
 .hero-texto {
-    max-width: 62ch;
+    max-width: 60ch;
     margin: 0;
     font-weight: 600;
     font-size: clamp(0.78rem, 1.05vw, 0.95rem);
@@ -698,19 +841,16 @@ body {
     color: var(--tinta);
 }
 
-/* Las dos acciones, en fila y centradas bajo la frase */
+/* La acción, bajo la frase y alineada a su izquierda */
 .hero-botones {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     flex-wrap: wrap;
     gap: 1rem;
 }
 
-/* Aquí los dos botones comparten alto para que la fila no quede despareja:
-   el de Discord trae menos padding vertical que la píldora sólida. */
-.hero-botones .btn-verde-pill,
-.hero-botones .btn-discord-linea {
+.hero-botones .btn-verde-pill {
     align-self: center;
     height: 56px;
     padding: 0 30px;
@@ -1042,6 +1182,13 @@ body {
         border-radius: 16px;
     }
 
+    /* Aquí marca y pie van juntos al centro: el aire lo reparten el ::before
+       y este ::after, y el pie deja de crecer. */
+    .hero-panel::after {
+        content: '';
+        flex: 1 1 0;
+    }
+
     /* La tablita de puntos: rejilla un poco mas apretada y mascara mas alta,
        porque en vertical la elipse ancha dejaba la marca casi sin puntos. */
     .hero-dots {
@@ -1054,13 +1201,27 @@ body {
     .eyebrow-linea { width: 34px; }
     .eyebrow-texto { font-size: 0.6rem; letter-spacing: 3.5px; }
 
-    .hero-marca { gap: 1.6rem; }
+    .hero-marca { gap: 1.4rem; }
+
+    .hero-dato { padding: 0 1.1rem; }
+
+    /* En celular la frase y el botón bajan pegados a la marca y centrados,
+       como antes: abajo a la izquierda en una tarjeta angosta quedaba cojo. */
+    .hero-pie {
+        flex: 0 0 auto;
+        width: 100%;
+        align-self: stretch;
+        align-items: center;
+        gap: 1.4rem;
+        text-align: center;
+    }
 
     .hero-wordmark {
-        font-size: clamp(2.4rem, 12.8vw, 3.4rem);
-        gap: 8px;
+        font-size: clamp(2.6rem, 14vw, 3.8rem);
         letter-spacing: -0.035em;
     }
+
+    .hero-wordmark-texto { gap: 8px; }
 
     .hero-texto {
         font-size: 0.72rem;
@@ -1068,7 +1229,7 @@ body {
         letter-spacing: 0.08em;
     }
 
-    /* Los dos botones se apilan a todo lo ancho */
+    /* El botón va a todo lo ancho */
     .hero-botones {
         width: 100%;
         flex-direction: column;
@@ -1076,8 +1237,7 @@ body {
         gap: 0.85rem;
     }
 
-    .hero-botones .btn-verde-pill,
-    .hero-botones .btn-discord-linea {
+    .hero-botones .btn-verde-pill {
         /* stretch pisa el align-self: center de escritorio: apilados van a
            todo el ancho, no centrados y angostos. */
         align-self: stretch;
