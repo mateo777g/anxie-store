@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260915m">
+    <link rel="stylesheet" href="style.css?v=20260915v">
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -115,18 +115,18 @@
                 <!-- 👑 MARCA + FRASE + ACCIONES, todo en una columna centrada -->
                 <div class="hero-marca">
 
-                    <h1 class="hero-wordmark">
+                    <h1 class="hero-wordmark" data-reveal style="--n: 1;">
                         <span>Anxie</span>
                         <span>Store</span>
                     </h1>
 
-                    <p class="hero-texto">
+                    <p class="hero-texto" data-reveal style="--n: 2;">
                         Cuentas de videojuegos con <span class="acento-verde">entrega acompañada</span>.
                         Elige la tuya en el <span class="acento-verde">catálogo</span>, escríbenos y te
                         guiamos <span class="acento-verde">paso a paso</span> hasta que esté en tus manos.
                     </p>
 
-                    <div class="hero-botones">
+                    <div class="hero-botones" data-reveal style="--n: 3;">
                         <a href="catalogo.html#cases" class="btn-verde-pill">
                             Ver catálogo
                             <span class="btn-verde-pill-icono" aria-hidden="true">&rarr;</span>
@@ -160,20 +160,21 @@
               detrás ya solo queda negro. Ese solape es lo que lo hace sentir un
               portal — el apagado no es un tramo aparte al que llegas después de
               ver el círculo entero.
-           2. REPOSO    — el negro se sostiene una pantalla antes de soltar hacia
-              la sección 3. Ese tramo es el escenario del contenido que va a
-              entrar aquí; hoy está vacío a propósito.
+           2. REPOSO    — el negro se sostiene y encima de él entra la cuenta
+              destacada, en ola escalonada. Ese contenido ya no es una sección
+              aparte: vive aquí dentro, así que el portal paga lo que costó y el
+              visitante no tiene que scrollear hasta otra sección para ver algo.
          El reparto lo hace tramosPortal() abajo y la altura que lo aloja está en
          .corona-portal (style.css): son la misma cuenta escrita en dos sitios,
          cámbialas juntas. Cuándo se apaga el humo NO se decide ahí sino en
          APAGADO_INICIO / APAGADO_FIN, que van contra el tamaño de la corona.
 
-         AQUÍ DENTRO NO VA CONTENIDO, a propósito. Cuando la cuenta destacada
-         vivía enmascarada había que medir en JS el hueco que dejaba la maqueta
-         para que la corona en reposo no pisara la tarjeta, y eso se rompía con
-         cada cambio de layout y en cada pantalla rara. Ahora la corona reposa
-         centrada y ya está; el contenido vive en la sección 3, en flujo normal.
-         El tamaño lo escribe actualizarCorona() abajo.
+         El contenido NO va enmascarado ni mide huecos en JS: es una capa suelta
+         por encima de .corona-mask, centrada, que aparece cuando la corona ya
+         tapó la pantalla. Aquella versión vieja que sí medía el hueco para que
+         la corona en reposo no pisara la tarjeta se rompía con cada cambio de
+         layout; ésta no mide nada porque para cuando se ve sólo hay negro
+         detrás. El tamaño de la corona lo escribe actualizarCorona() abajo.
          ========================================================== -->
     <div class="corona-portal" id="coronaPortal">
         <div class="corona-pin">
@@ -238,6 +239,94 @@
 
             </div>
 
+            <!-- ⬆️ EL CONTENIDO DEL REPOSO (acto 2 del portal)
+                 La cuenta destacada. Vivía debajo, como sección propia en verde;
+                 ahora entra aquí, sobre el negro que deja la corona al cerrar,
+                 sin pedir ni un scroll más: es lo que pidió el cliente.
+
+                 Va POR ENCIMA de .corona-mask (z 4) o el velo negro se lo come,
+                 y por debajo de la pista de scroll (z 6), que para cuando esto
+                 aparece ya se fue hace rato.
+
+                 Entra en ola escalonada, la misma del hero: cada pieza baja
+                 desenfocada detrás de la anterior según su --n. Quien la
+                 dispara es pintarCorona(), poniendo .is-revealed en el momento
+                 en que la corona termina de tapar la pantalla. No es un
+                 scrub: arranca sola y se reproduce entera aunque dejes de
+                 scrollear. Si vuelves a subir se retira, porque por encima del
+                 humo no pinta nada.
+
+                 OJO con el alto: el pin mide una pantalla y recorta lo que
+                 sobre, así que esto tiene que caber en 100vh. Por eso el celular
+                 lleva su propia versión apretada en style.css. -->
+            <section class="destacada" id="cases" aria-label="Cuenta destacada">
+
+                <div class="destacada-header">
+                    <div class="destacada-header-txt">
+                        <div class="destacada-eyebrow" data-reveal style="--n: 0;">
+                            <span class="eyebrow-punto"></span>
+                            <span class="eyebrow-linea"></span>
+                            <span class="eyebrow-texto">Lo más cotizado</span>
+                        </div>
+                        <h2 class="destacada-titulo" data-reveal style="--n: 1;">Cuenta<br>destacada</h2>
+                    </div>
+                    <a href="catalogo.html#cases" class="destacada-link" data-reveal style="--n: 2;">
+                        Ver catálogo completo
+                        <span class="destacada-link-flecha" aria-hidden="true">&rarr;</span>
+                    </a>
+                </div>
+
+                <div class="destacada-cuerpo">
+
+                    <article class="cuenta-card" id="cuentaDestacada" data-reveal style="--n: 3;">
+                        <div class="cuenta-card-inner">
+
+                            <div class="cuenta-card-top">
+                                <span class="cuenta-plataformas" id="destPlataformas">DISPONIBLE</span>
+                                <span class="cuenta-estado">
+                                    <span class="cuenta-estado-punto"></span>
+                                    Disponible
+                                </span>
+                            </div>
+
+                            <div class="cuenta-img-box">
+                                <img id="destImg" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="">
+                            </div>
+
+                            <div class="cuenta-info">
+                                <span class="cuenta-titulo" id="destTitulo">Cargando...</span>
+                                <div class="cuenta-precios">
+                                    <span class="cuenta-mxn" id="destMxn"></span>
+                                    <span class="cuenta-usd" id="destUsd"></span>
+                                </div>
+                            </div>
+
+                            <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener" class="cuenta-cta">
+                                Comprar por Discord
+                            </a>
+
+                        </div>
+                    </article>
+
+                    <div class="destacada-aside">
+                        <p class="destacada-aside-kicker" data-reveal style="--n: 4;">La más cotizada ahora mismo</p>
+                        <p class="destacada-aside-texto" data-reveal style="--n: 4;">
+                            Es la cuenta más cara del catálogo en este momento y se actualiza sola cada vez
+                            que entra una cuenta nueva a la tienda. Si buscas algo más a tu medida, el
+                            catálogo completo tiene filtros por precio, plataforma y skin.
+                        </p>
+                        <div class="destacada-aside-cta" data-reveal style="--n: 5;">
+                            <span class="destacada-aside-num"><span class="acento-verde-claro" id="destTotal">40</span> cuentas más</span>
+                            <a href="catalogo.html#cases" class="btn-verde-pill">
+                                Ver catálogo
+                                <span class="btn-verde-pill-icono" aria-hidden="true">+</span>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
             <div class="corona-pista" id="coronaPista">
                 <span>Scroll</span>
                 <span class="corona-pista-flecha"></span>
@@ -245,81 +334,6 @@
 
         </div>
     </div>
-
-    <!-- ==========================================================
-         SECCIÓN 3: CUENTA DESTACADA
-         Antes vivía enmascarada dentro del portal; ahora es una sección normal
-         del flujo, con su verde plano, y aparece cuando la corona ya terminó de
-         destapar. Al estar en flujo puede crecer y hacer scroll si hace falta,
-         así que ya no hay que recortar textos para que quepan en un viewport.
-         ========================================================== -->
-    <section class="destacada" id="cases">
-
-        <div class="destacada-header">
-            <div class="destacada-header-txt">
-                <div class="destacada-eyebrow">
-                    <span class="eyebrow-punto"></span>
-                    <span class="eyebrow-linea"></span>
-                    <span class="eyebrow-texto">Lo más cotizado</span>
-                </div>
-                <h2 class="destacada-titulo">Cuenta<br>destacada</h2>
-            </div>
-            <a href="catalogo.html#cases" class="destacada-link">
-                Ver catálogo completo
-                <span class="destacada-link-flecha" aria-hidden="true">&rarr;</span>
-            </a>
-        </div>
-
-        <div class="destacada-cuerpo">
-
-            <article class="cuenta-card" id="cuentaDestacada">
-                <div class="cuenta-card-inner">
-
-                    <div class="cuenta-card-top">
-                        <span class="cuenta-plataformas" id="destPlataformas">DISPONIBLE</span>
-                        <span class="cuenta-estado">
-                            <span class="cuenta-estado-punto"></span>
-                            Disponible
-                        </span>
-                    </div>
-
-                    <div class="cuenta-img-box">
-                        <img id="destImg" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="">
-                    </div>
-
-                    <div class="cuenta-info">
-                        <span class="cuenta-titulo" id="destTitulo">Cargando...</span>
-                        <div class="cuenta-precios">
-                            <span class="cuenta-mxn" id="destMxn"></span>
-                            <span class="cuenta-usd" id="destUsd"></span>
-                        </div>
-                    </div>
-
-                    <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener" class="cuenta-cta">
-                        Comprar por Discord
-                    </a>
-
-                </div>
-            </article>
-
-            <div class="destacada-aside">
-                <p class="destacada-aside-kicker">La más cotizada ahora mismo</p>
-                <p class="destacada-aside-texto">
-                    Es la cuenta más cara del catálogo en este momento y se actualiza sola cada vez
-                    que entra una cuenta nueva a la tienda. Si buscas algo más a tu medida, el
-                    catálogo completo tiene filtros por precio, plataforma y skin.
-                </p>
-                <div class="destacada-aside-cta">
-                    <span class="destacada-aside-num"><span class="acento-verde-claro" id="destTotal">40</span> cuentas más</span>
-                    <a href="catalogo.html#cases" class="btn-verde-pill">
-                        Ver catálogo
-                        <span class="btn-verde-pill-icono" aria-hidden="true">+</span>
-                    </a>
-                </div>
-            </div>
-
-        </div>
-    </section>
 
     <!-- SECCIÓN 4: POR QUÉ ANXIE STORE & DISCORD -->
     <div class="seccion-tres-scroll-wrapper" id="features">
@@ -705,15 +719,21 @@
         //   1. DESTAPADO — la corona crece hasta tragarse la pantalla, apagando
         //      el humo por el camino. Conserva sus 2.6 pantallas clavadas: la
         //      curva de la corona no se tocó nunca.
-        //   2. REPOSO    — el negro se sostiene. Este tramo es el escenario
-        //      donde entrará el contenido de la sección; si lo acortas, el
-        //      negro se ve un suspiro y el pin suelta hacia la sección 3.
+        //   2. REPOSO    — el negro se sostiene con la cuenta destacada encima.
+        //      Es el tiempo que el visitante tiene para leer la tarjeta antes
+        //      de que el pin suelte; si lo acortas, la ola apenas termina y la
+        //      sección ya se fue.
+        // En escritorio son 1.5 pantallas porque el contenido aparece casi al
+        // final del destapado (la corona tapa al 97% de su recorrido). En
+        // celular basta con 0.8: ahí la corona tapa la pantalla a media curva,
+        // así que el contenido ya lleva casi una pantalla de sobra en negro
+        // antes de que empiece este tramo.
         // La altura del wrapper en el CSS tiene que ser la suma + 1 pantalla
-        // (la que ocupa el pin): 2.6+1.0+1 = 4.6 → 460vh en escritorio,
+        // (la que ocupa el pin): 2.6+1.5+1 = 5.1 → 510vh en escritorio,
         // 2.0+0.8+1 = 3.8 → 380vh por debajo de 900px.
         function tramosPortal() {
             return window.innerWidth > 900
-                ? { destapado: 2.6, reposo: 1.0 }
+                ? { destapado: 2.6, reposo: 1.5 }
                 : { destapado: 2.0, reposo: 0.8 };
         }
 
@@ -760,6 +780,7 @@
             const cierre = document.getElementById('coronaCierre');
             const pista = document.getElementById('coronaPista');
             const apagado = document.getElementById('coronaApagado');
+            const contenido = document.getElementById('cases');
 
             const anchoVentana = window.innerWidth;
             const altoVentana = altoViewport();
@@ -833,6 +854,24 @@
 
             // La pista de "scroll" se va en cuanto la corona empieza a crecer
             if (pista) pista.style.opacity = Math.max(0, 1 - pDestapado * 6).toFixed(3);
+
+            // 🎭 LA OLA DE LA CUENTA DESTACADA
+            // Se dispara cuando la corona ya es MÁS GRANDE que lo que hace falta
+            // para tapar la pantalla (tam >= cobertura), o sea cuando detrás del
+            // contenido solo queda negro. No sirve mirar el velo del humo: ese
+            // apaga lo que hay DENTRO de la silueta, y mientras la silueta no
+            // haya cerrado, fuera de ella sigue habiendo blanco — el contenido
+            // caería encima de una corona negra sobre papel blanco.
+            //
+            // El momento cae solo en su sitio en cada pantalla: en escritorio la
+            // corona tapa al ~97% del destapado y en celular a media curva,
+            // porque la pantalla es más chica y la silueta la cubre antes.
+            //
+            // La clase se pone Y SE QUITA: si el visitante vuelve a subir, el
+            // contenido se retira antes de que reaparezca el humo. Bajando otra
+            // vez la ola se repite, que es justo lo que se quiere de algo que
+            // "aparece solo".
+            if (contenido) contenido.classList.toggle('is-revealed', tam >= cobertura);
         }
 
         // 🔽 COLOR DEL MENÚ PÍLDORA
@@ -866,8 +905,9 @@
                 tema = tamCorona < altoViewport() * 1.6 ? 'claro' : 'oscuro';
             }
 
-            // Secciones de fondo verde: la cuenta destacada y el footer.
-            if (bajoLaBarra(document.getElementById('cases'))) tema = 'verde';
+            // Secciones de fondo verde. La cuenta destacada ya no cuenta: se mudó
+            // dentro del portal y ahora va sobre negro, así que el tema lo
+            // decide el bloque de arriba (oscuro en cuanto la corona tapa).
             if (bajoLaBarra(document.querySelector('.footer-social'))) tema = 'verde';
 
             window.anxieMenu.setTema(tema);
