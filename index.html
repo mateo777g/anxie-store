@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260916g">
+    <link rel="stylesheet" href="style.css?v=20260916i">
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -365,47 +365,105 @@
     <div class="seccion-tres-scroll-wrapper" id="features">
         <section class="seccion-tres">
             <div class="seccion-tres-container">
-                
-                <!-- 👈 COLUMNA IZQUIERDA: ¿Por qué Anxie Store? -->
+
+                <!-- 👈 COLUMNA IZQUIERDA: ¿Por qué Anxie Store? + las tres razones -->
                 <div class="seccion-tres-left">
                     <div class="seccion-tres-info" id="s3Left">
+
+                        <div class="s3-eyebrow">
+                            <span class="eyebrow-punto"></span>
+                            <span class="eyebrow-linea"></span>
+                            <span class="eyebrow-texto">Confianza</span>
+                        </div>
+
                         <h2 class="seccion-tres-title-alt">
                             ¿POR QUÉ<br>ANXIE STORE?
                         </h2>
+
                         <p class="seccion-tres-description">
-                            Con 2 años de experiencia y más de 700 referencias, en AnxieStore priorizamos tu confianza y una atención personalizada. Buscamos ofrecerte un servicio cercano, seguro y diferente. Podrás encontrar nuestras referencias en Discord.
+                            Con 2 años de experiencia y más de <strong class="acento-verde">700 referencias</strong>,
+                            priorizamos <strong class="acento-verde">tu confianza</strong> y una atención personalizada.
+                            Un servicio cercano, seguro y <strong class="acento-verde">diferente</strong>.
                         </p>
-                    </div>
 
-                    <!-- Hueco del modelo 3D: se quitó el spline-viewer, pero el div
-                         se queda vacío para que la sección siga midiendo lo mismo. -->
-                    <div class="seccion-tres-model-left" aria-hidden="true"></div>
+                        <!-- Las tres razones. Cada una: icono en cuadro verde suave,
+                             título y una línea que la explica. -->
+                        <ul class="s3-razones">
 
-                    <!-- 📱 IMAGEN 2D DE WUMPUS (Visible SOLO en Celulares) -->
-                    <div class="seccion-tres-model-mobile">
-                        <img src="assets/discordcelular.png" alt="Wumpus Anxie Store" class="wumpus-mobile-img">
+                            <li class="s3-razon">
+                                <span class="s3-razon-icono" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 3 4.5 6v5.2c0 4.5 3.1 8.7 7.5 9.8 4.4-1.1 7.5-5.3 7.5-9.8V6z"/>
+                                        <path d="m9 12 2.1 2.1L15.3 10"/>
+                                    </svg>
+                                </span>
+                                <div class="s3-razon-texto">
+                                    <h3 class="s3-razon-titulo">Entrega acompañada</h3>
+                                    <p class="s3-razon-desc">Te guiamos en el cambio de correo y contraseña <strong class="acento-verde">hasta que la cuenta sea tuya</strong>.</p>
+                                </div>
+                            </li>
+
+                            <li class="s3-razon">
+                                <span class="s3-razon-icono" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20.5 12.5c0 4-3.8 7.2-8.5 7.2a9.9 9.9 0 0 1-2.6-.34L4.2 21l1.2-3.7a6.8 6.8 0 0 1-2.4-5.1c0-4 3.8-7.2 8.5-7.2s9 3.2 9 7.5Z"/>
+                                        <path d="M8.6 12h.01M12 12h.01M15.4 12h.01"/>
+                                    </svg>
+                                </span>
+                                <div class="s3-razon-texto">
+                                    <h3 class="s3-razon-titulo">+700 referencias públicas</h3>
+                                    <p class="s3-razon-desc">Todas visibles en el <strong class="acento-verde">canal de reseñas</strong> del Discord, no capturas sueltas.</p>
+                                </div>
+                            </li>
+
+                            <li class="s3-razon">
+                                <span class="s3-razon-icono" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="8.4"/>
+                                        <path d="M12 7.3V12l3.1 1.9"/>
+                                    </svg>
+                                </span>
+                                <div class="s3-razon-texto">
+                                    <h3 class="s3-razon-titulo">2 años respondiendo el mismo día</h3>
+                                    <p class="s3-razon-desc">Abres ticket, te contestamos. <strong class="acento-verde">Sin bots</strong> ni formularios eternos.</p>
+                                </div>
+                            </li>
+
+                        </ul>
                     </div>
                 </div>
 
-                <!-- 👉 COLUMNA DERECHA: Mascot Mono Discord + Título + Botón -->
+                <!-- 👉 COLUMNA DERECHA: la tarjeta negra del Discord -->
                 <div class="seccion-tres-right">
-                    
-                    <!-- Hueco del modelo 3D: se quitó el spline-viewer, pero el div
-                         se queda vacío para que la sección siga midiendo lo mismo. -->
-                    <div class="seccion-tres-model-right" aria-hidden="true"></div>
-
                     <div class="seccion-tres-content" id="s3Right">
-                        <h2 class="seccion-tres-title">
-                            ÚNETE AL<br>SERVIDOR<br>DE DISCORD
-                        </h2>
-                        <div class="seccion-tres-buttons">
-                            <a href="https://discord.gg/YuTzCPu3tS" target="_blank" class="btn-animated btn-s3">
-                                <span class="btn-animated-inner">
-                                    Unirse al Discord
-                                    <span class="btn-icon">+</span>
-                                </span>
+                        <article class="s3-discord">
+
+                            <span class="s3-discord-icono" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20.5 11.8c0 3.9-3.8 7.1-8.5 7.1a9.9 9.9 0 0 1-2.6-.34L4.2 20.3l1.2-3.7a6.8 6.8 0 0 1-2.4-5.1c0-3.9 3.8-7.1 8.5-7.1s9 3.2 9 7.4Z"/>
+                                </svg>
+                            </span>
+
+                            <h2 class="seccion-tres-title">
+                                ÚNETE AL <br>SERVIDOR DE <br>DISCORD
+                            </h2>
+
+                            <p class="s3-discord-texto">
+                                Ahí está todo: el catálogo actualizado, las referencias de cada venta
+                                y el ticket para comprar o resolver dudas.
+                            </p>
+
+                            <div class="s3-discord-chips">
+                                <span class="s3-chip">Tickets 24/7</span>
+                                <span class="s3-chip">Reseñas reales</span>
+                            </div>
+
+                            <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener" class="s3-discord-cta">
+                                Unirse al Discord
+                                <span class="s3-discord-cta-icono" aria-hidden="true">+</span>
                             </a>
-                        </div>
+
+                        </article>
                     </div>
                 </div>
 
