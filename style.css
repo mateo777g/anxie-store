@@ -24,6 +24,10 @@ body {
     --verde-vivo: #57C97E;
     --verde-suave: #6FBF8C;
     --tinta: #111111;
+    /* El negro del sitio. Es el mismo COLORES[0] del shader de humo, o sea el
+       fondo de la seccion 2; el footer lo reutiliza para que no se vea el
+       escalon entre uno y otro. */
+    --negro: #101010;
     --gris-texto: #5a5a5a;
     --gris-tenue: #8a8a8a;
 }
@@ -815,10 +819,10 @@ body {
     height: 610vh;
     background-color: #ffffff;
 
-    /* El negro al que se apaga el humo. Es el mismo #101010 que el shader usa
-       de fondo (COLORES[0] en index.html), así que el anillo se apaga hacia su
-       propio negro y no hacia uno ajeno que se notaría como un corte. */
-    --corona-negro: #101010;
+    /* El negro al que se apaga el humo. Es el --negro de la paleta, que sale del
+       propio shader (COLORES[0] en index.html), así que el anillo se apaga hacia
+       su propio negro y no hacia uno ajeno que se notaría como un corte. */
+    --corona-negro: var(--negro);
 
     z-index: 11;
 }
@@ -1839,22 +1843,6 @@ body {
     justify-content: flex-end; 
 }
 
-/* 🔻 SOMBRA DE TRANSICIÓN AL FOOTER */
-.seccion-tres-bottom-shadow {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 120px;
-    pointer-events: none;
-    z-index: 15;
-    background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(0, 0, 0, 0.4) 100%
-    );
-}
-
 /* 📱 RESPONSIVE (MÓVILES) - AQUÍ ACHICAMOS Y ESCONDEMOS */
 @media (max-width: 900px) {
     /* 🔴 4. SECCIÓN DISCORD (AJUSTE PARA CELULAR) */
@@ -1946,58 +1934,97 @@ body {
 }
 
 /* ==========================================
-   FOOTER / BARRA INFERIOR DE REDES SOCIALES
-   ========================================== */
+   FOOTER
+   ==========================================
+   Columna centrada: atajos -> redes -> franja rayada -> copyright.
+   Lo comparten index, catalogo y legal, y los tres usan el MISMO markup
+   (solo cambian los href de "Inicio" y "Contacto" segun la pagina).
+   El <footer> conserva la clase .footer-social porque actualizarMenu() en
+   index.html la busca por ese nombre para ponerle el tema 'oscuro' a la
+   pildora. */
 .footer-social {
     position: relative;
     z-index: 30;
     width: 100%;
-    /* Negro. Lo comparten index, catalogo y legal. */
-    background-color: #000000;
-    padding: 2rem 1rem 1.5rem 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    /* El mismo negro de la sección 2 (--negro), no #000: contra el #101010 del
+       portal, un footer en negro puro se notaba como un escalón. Lo comparten
+       index, catalogo y legal. */
+    background-color: var(--negro);
+    padding: 3rem 0 2rem 0;
+    /* La franja rayada va a sangre: nada puede desbordar en horizontal. */
+    overflow: hidden;
 }
 
-.footer-container {
+.footer-top {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    gap: 2.25rem;
     width: 100%;
     max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem 3rem 1rem;
 }
 
-.social-spline-wrapper {
-    width: 100%;
-    max-width: 500px;
-    height: 160px;
+/* ====== ATAJOS DEL FOOTER ====== */
+.footer-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem 1.25rem;
+}
+
+.footer-nav-link {
+    position: relative;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.72);
+    text-decoration: none;
+    padding: 0.5rem 0.9rem;
+    border-radius: 10px;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+/* La pastilla del hover crece desde el centro (::before va detras del texto,
+   por eso el <span> del markup lleva position: relative). */
+.footer-nav-link::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.10);
+    opacity: 0;
+    transform: scale(0.6);
+    transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.25), opacity 0.25s ease;
+}
+
+.footer-nav-link span {
+    position: relative;
+    z-index: 1;
+}
+
+.footer-nav-link:hover {
+    color: #ffffff;
+    transform: scale(1.05);
+}
+
+.footer-nav-link:hover::before {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.footer-nav-link:active {
+    transform: scale(0.95);
+}
+
+/* ====== REDES SOCIALES ====== */
+.footer-redes {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.social-spline-wrapper spline-viewer {
-    width: 100%;
-    height: 100%;
-}
-
-/* 📱 ÍCONOS REDES SOCIALES MÓVIL (CÁPSULA MODERNA) */
-.footer-mobile-social {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    gap: 22px;
-    /* Sobre el footer negro un #222 no se ve: el borde pasa a blanco translúcido. */
-    background-color: #121212;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    padding: 12px 26px;
-    border-radius: 50px;
-    margin: 10px auto 15px auto;
-    width: fit-content;
+    gap: 1.75rem;
 }
 
 .footer-social-link {
@@ -2014,53 +2041,83 @@ body {
     transform: scale(1.1);
 }
 
+/* ====== FRANJA RAYADA DE SEPARACION ======
+   Rayas diagonales a 45 grados que se desplazan despacio en bucle. El paso de
+   la animacion (200px) es multiplo exacto del mosaico (10px), asi el loop no
+   pega saltos. */
+.footer-franja {
+    width: 100%;
+    height: 48px;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+    background-image: repeating-linear-gradient(
+        315deg,
+        rgba(255, 255, 255, 0.16) 0,
+        rgba(255, 255, 255, 0.16) 1px,
+        transparent 0,
+        transparent 50%
+    );
+    background-size: 10px 10px;
+    animation: footerFranjaDeriva 20s linear infinite;
+}
+
+@keyframes footerFranjaDeriva {
+    from { background-position: 0 0; }
+    to   { background-position: 200px 0; }
+}
+
+/* ====== COPYRIGHT ====== */
+.footer-bottom {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem 0 1rem;
+    text-align: center;
+}
+
 .footer-copy {
     font-family: 'Montserrat', sans-serif;
     font-size: 0.8rem;
-    /* Blanco translúcido y no un gris fijo: aguanta igual el footer negro
+    /* Blanco translucido y no un gris fijo: aguanta igual el footer negro
        y cualquier fondo oscuro que se le ponga. */
     color: rgba(255, 255, 255, 0.55);
     text-align: center;
     letter-spacing: 0.5px;
 }
 
-/* ====== ENLACE LEGAL DEL FOOTER ====== */
-.footer-legal-link {
-    color: rgba(255, 255, 255, 0.55);            /* = .footer-copy */
-    text-decoration: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-    transition: color 0.3s ease, border-color 0.3s ease;
-}
-
-.footer-legal-link:hover {
-    color: #FF0000;                              /* rojo de la marca */
-    border-bottom-color: #FF0000;
-}
-
-/* ====== LÍNEA DE MARCAS Y NO AFILIACIÓN EN EL FOOTER ====== */
-.footer-marcas {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.42);
-    text-align: center;
-    letter-spacing: 0.3px;
-    line-height: 1.5;
-    max-width: 620px;
-    margin: 0 auto;
-}
-
 /* 📱 RESPONSIVE FOOTER */
 @media (max-width: 900px) {
-    .social-spline-wrapper {
-        display: none !important;
+    .footer-social {
+        padding: 2.5rem 0 1.5rem 0;
     }
 
-    .footer-mobile-social {
-        display: flex !important;
+    .footer-top {
+        gap: 1.75rem;
+        padding-bottom: 2.25rem;
     }
 
-    .footer-marcas {
-        font-size: 0.65rem;
-        padding: 0 0.5rem;
+    .footer-nav {
+        gap: 0.25rem 0.5rem;
+    }
+
+    .footer-nav-link {
+        font-size: 0.9rem;
+        padding: 0.45rem 0.65rem;
+    }
+
+    .footer-redes {
+        gap: 1.4rem;
+    }
+
+    .footer-franja {
+        height: 36px;
+    }
+
+    .footer-bottom {
+        padding-top: 1.5rem;
+    }
+
+    .footer-copy {
+        font-size: 0.72rem;
     }
 }
