@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260915h">
+    <link rel="stylesheet" href="style.css?v=20260915k">
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -104,32 +104,42 @@
 
         <div class="hero-inner">
 
-            <!-- 👑 MARCA + FRASE + ACCIONES, todo en una columna centrada -->
-            <div class="hero-marca">
+            <!-- 🔲 TARJETA DEL HERO
+                 El marco blanco con borde fino, sombra suave y la tablita de
+                 puntos dentro. La tablita (.hero-dots) va primero para quedar
+                 por debajo de la marca. -->
+            <div class="hero-panel">
 
-                <h1 class="hero-wordmark">
-                    <span>Anxie</span>
-                    <span>Store</span>
-                </h1>
+                <div class="hero-dots" aria-hidden="true"></div>
 
-                <p class="hero-texto">
-                    Cuentas de videojuegos con <span class="acento-verde">entrega acompañada</span>.
-                    Elige la tuya en el <span class="acento-verde">catálogo</span>, escríbenos y te
-                    guiamos <span class="acento-verde">paso a paso</span> hasta que esté en tus manos.
-                </p>
+                <!-- 👑 MARCA + FRASE + ACCIONES, todo en una columna centrada -->
+                <div class="hero-marca">
 
-                <div class="hero-botones">
-                    <a href="catalogo.html#cases" class="btn-verde-pill">
-                        Ver catálogo
-                        <span class="btn-verde-pill-icono" aria-hidden="true">&rarr;</span>
-                    </a>
-                    <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener" class="btn-discord-linea">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M4 5h16v11H8l-4 4Z"></path>
-                            <path d="M9 10.5h.01M15 10.5h.01"></path>
-                        </svg>
-                        Únete al Discord
-                    </a>
+                    <h1 class="hero-wordmark">
+                        <span>Anxie</span>
+                        <span>Store</span>
+                    </h1>
+
+                    <p class="hero-texto">
+                        Cuentas de videojuegos con <span class="acento-verde">entrega acompañada</span>.
+                        Elige la tuya en el <span class="acento-verde">catálogo</span>, escríbenos y te
+                        guiamos <span class="acento-verde">paso a paso</span> hasta que esté en tus manos.
+                    </p>
+
+                    <div class="hero-botones">
+                        <a href="catalogo.html#cases" class="btn-verde-pill">
+                            Ver catálogo
+                            <span class="btn-verde-pill-icono" aria-hidden="true">&rarr;</span>
+                        </a>
+                        <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener" class="btn-discord-linea">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M4 5h16v11H8l-4 4Z"></path>
+                                <path d="M9 10.5h.01M15 10.5h.01"></path>
+                            </svg>
+                            Únete al Discord
+                        </a>
+                    </div>
+
                 </div>
 
             </div>

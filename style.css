@@ -46,6 +46,43 @@ body {
     z-index: 10;
 }
 
+/* --- Tarjeta del hero + su tablita de puntos ------------------------------
+   El contenido del hero vive dentro de un marco blanco con borde fino y
+   sombra suave, separado de los bordes de la pantalla. Dentro va la rejilla
+   de puntos de 16px, pintada con un radial-gradient repetido (mismo patron
+   que el componente DotPattern, pero sin SVG ni React) y enmascarada en
+   radial, para que se vea densa detras de la marca y se desvanezca hacia los
+   bordes de la tarjeta en vez de cortarse de golpe. */
+.hero-panel {
+    position: relative;
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 3rem 2.5rem;
+    border: 1px solid rgba(17, 17, 17, 0.08);
+    border-radius: 20px;
+    background: #ffffff;
+    /* Sombra baja y muy abierta: la tarjeta tiene que flotar apenas, no
+       despegarse del fondo blanco. */
+    box-shadow:
+        0 1px 2px rgba(17, 17, 17, 0.04),
+        0 30px 60px -34px rgba(17, 17, 17, 0.22);
+    overflow: hidden;
+}
+
+.hero-dots {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image: radial-gradient(circle at 1px 1px, rgba(17, 17, 17, 0.20) 1px, transparent 0);
+    background-size: 16px 16px;
+    -webkit-mask-image: radial-gradient(ellipse 62% 58% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.55) 48%, transparent 80%);
+    mask-image: radial-gradient(ellipse 62% 58% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.55) 48%, transparent 80%);
+}
+
 /* =========================================================================
    🟢 MENÚ PÍLDORA (.menu) — reemplaza a la navbar vieja
    =========================================================================
@@ -520,14 +557,16 @@ body {
 
 /* --- Rejilla interna: una sola columna centrada en la pantalla --- */
 .hero-inner {
+    position: relative;
+    z-index: 1;
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    /* Padding simetrico para que el bloque quede centrado de verdad; el de
-       arriba ademas deja libre la pildora del menu. */
-    padding: 7.5rem 3.5rem;
+    /* Este padding es el margen que deja ver el blanco alrededor de la
+       tarjeta; el de arriba ademas deja libre la pildora del menu. */
+    padding: 7.5rem 3.5rem 4.5rem;
 }
 
 .acento-verde { color: var(--verde); }
@@ -861,13 +900,13 @@ body {
     font-size: 0.68rem;
     letter-spacing: 4px;
     text-transform: uppercase;
-    color: var(--verde);
+    color: var(--tinta);
 }
 
 .corona-pista-flecha {
     width: 1px;
     height: 34px;
-    background: linear-gradient(to bottom, var(--verde), rgba(28, 78, 47, 0));
+    background: linear-gradient(to bottom, var(--tinta), rgba(17, 17, 17, 0));
     animation: coronaPistaBaja 1.8s ease-in-out infinite;
 }
 
@@ -955,7 +994,22 @@ body {
 
     /* 🟩 1.5. SECCIÓN 1 EN CELULAR (hero claro) */
     .hero-inner {
-        padding: 5.5rem 1.25rem;
+        padding: 5.5rem 1rem 2.5rem;
+    }
+
+    /* La tarjeta se pega mas a los bordes y baja la esquina: con el margen de
+       escritorio en un telefono no quedaba ancho util para la marca. */
+    .hero-panel {
+        padding: 2.5rem 1.15rem;
+        border-radius: 16px;
+    }
+
+    /* La tablita de puntos: rejilla un poco mas apretada y mascara mas alta,
+       porque en vertical la elipse ancha dejaba la marca casi sin puntos. */
+    .hero-dots {
+        background-size: 13px 13px;
+        -webkit-mask-image: radial-gradient(ellipse 85% 48% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.55) 48%, transparent 82%);
+        mask-image: radial-gradient(ellipse 85% 48% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.55) 48%, transparent 82%);
     }
 
     .eyebrow-punto { width: 8px; height: 8px; }
