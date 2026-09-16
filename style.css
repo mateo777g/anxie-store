@@ -741,17 +741,34 @@ body {
    Orden de capas dentro de .corona-pin:
      fondo blanco (lo que tapa)  ->  marca de agua (z 1)
      ->  esquinas "bajas" (z 2)  ->  cierre verde (z 3)
-     ->  .corona-mask con el lienzo verde (z 4)  ->  pista de scroll (z 6) */
+     ->  .corona-mask con el lienzo verde (z 4)  ->  pista de scroll (z 6)
+
+   El portal va en TRES ACTOS, y el reparto lo hace pintarCorona() en
+   index.html; aquí solo se escribe cuánto scroll hay para repartir:
+     1. DESTAPADO (2.6 pantallas) — la corona crece hasta tragarse todo.
+     2. APAGADO   (1.2 pantallas) — el humo se apaga hacia negro liso.
+     3. REPOSO    (1.0 pantalla)  — el negro se sostiene. Aquí va a entrar el
+        contenido de la sección.
+   Si cambias la altura de abajo, cambia también los números de tramosPortal()
+   en index.html: son las dos mitades de la misma cuenta. */
 
 .corona-portal {
     position: relative;
     width: 100%;
-    /* 360vh de wrapper = 260vh de scroll con la capa pineada, exactamente el
-       recorrido de la maqueta de referencia. La corona termina de destapar al
-       88%; en lo que queda el lienzo sigue haciendo zoom, así que el respiro
-       antes de soltar hacia la sección 3 no se siente parado. */
-    height: 360vh;
+    /* 580vh de wrapper = 480vh de scroll con la capa pineada, repartidos en
+       2.6 + 1.2 + 1.0 pantallas (los tres actos) más la pantalla que ocupa el
+       pin. El acto 1 conserva sus 260vh exactos, que son el recorrido de la
+       maqueta de referencia: la corona termina de destapar al 88% de ESE tramo
+       y en lo que le queda el lienzo sigue haciendo zoom, así que el respiro
+       antes de que arranque el apagado no se siente parado. */
+    height: 580vh;
     background-color: #ffffff;
+
+    /* El negro al que se apaga el humo. Es el mismo #101010 que el shader usa
+       de fondo (COLORES[0] en index.html), así que el anillo se apaga hacia su
+       propio negro y no hacia uno ajeno que se notaría como un corte. */
+    --corona-negro: #101010;
+
     z-index: 11;
 }
 
@@ -847,8 +864,26 @@ body {
     pointer-events: none;
 }
 
+/* 🌑 EL VELO DEL APAGADO (acto 2)
+   Cuelga DENTRO de .corona-mask, detrás de las marcas de encuadre "altas" y
+   por delante del lienzo: tapa el humo pero no las esquinas blancas, que
+   tienen que seguir leyéndose sobre el negro. Al ir dentro de la máscara, en
+   el acto 1 no se ve ni asomo de él.
+   La opacidad la escribe pintarCorona() fotograma a fotograma; igual que la
+   máscara, aquí NO va transition (el bucle de rAF ya suaviza, y los dos
+   suavizados a la vez se pisan). */
+.corona-apagado {
+    position: absolute;
+    inset: 0;
+    background-color: var(--corona-negro);
+    opacity: 0;
+    pointer-events: none;
+}
+
 /* Cierre en verde plano: rellena lo que la silueta deje suelto en el último
-   tramo (alguna esquina, según la proporción de la pantalla). */
+   tramo (alguna esquina, según la proporción de la pantalla). En el acto 2 el
+   JS le cambia el color a --corona-negro, porque a esas alturas una esquina
+   suelta en verde cantaría. */
 .corona-cierre {
     position: absolute;
     inset: 0;
@@ -1059,7 +1094,7 @@ body {
     /* 👑 PORTAL DE LA CORONA EN CELULAR
        Menos recorrido de scroll: el dedo cansa más rápido que la rueda. El
        tamaño de arranque de la corona lo baja el JS (tamanioReposoCorona). */
-    .corona-portal { height: 300vh; }
+    .corona-portal { height: 480vh; }   /* 2.0 + 1.0 + 0.8 actos + 1 del pin */
 
     /* En celular el logotipo de fondo crece: a 13vw se quedaba en un sello
        diminuto en medio de la pantalla. */

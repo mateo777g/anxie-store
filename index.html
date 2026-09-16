@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260915k">
+    <link rel="stylesheet" href="style.css?v=20260915l">
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -150,11 +150,20 @@
 
     <!-- ==========================================================
          SECCIÓN 2: PORTAL DE LA CORONA
-         Una sola cosa y nada más: la transición. El wrapper mide varias
-         pantallas, la capa de dentro se queda pegada (sticky) y la silueta de
-         assets/corona-silueta.svg se usa como máscara CSS sobre un lienzo verde
-         plano. Al scrollear crece su mask-size hasta tragarse la pantalla y
-         suelta hacia la sección 3.
+         La transición, en TRES ACTOS seguidos. El wrapper mide varias pantallas
+         y la capa de dentro se queda pegada (sticky) mientras pasan:
+           1. DESTAPADO — la silueta de assets/corona-silueta.svg hace de máscara
+              CSS sobre el lienzo, y su mask-size crece con el scroll hasta que
+              se traga la pantalla entera. Debajo hay un shader de humo.
+           2. APAGADO   — sigues scrolleando y el humo se apaga: el velo
+              .corona-apagado sube a opaco y la sección queda en negro liso, solo
+              con las marcas de encuadre blancas en las esquinas.
+           3. REPOSO    — el negro se sostiene una pantalla más antes de soltar
+              hacia la sección 3. Ese tramo es el escenario del contenido que va
+              a entrar aquí; hoy está vacío a propósito.
+         El reparto de los tres tramos lo hace tramosPortal() abajo, y la altura
+         que los aloja está en .corona-portal (style.css): son la misma cuenta
+         escrita en dos sitios, cámbialas juntas.
 
          AQUÍ DENTRO NO VA CONTENIDO, a propósito. Cuando la cuenta destacada
          vivía enmascarada había que medir en JS el hueco que dejaba la maqueta
@@ -203,6 +212,18 @@
                 <div class="corona-lienzo">
                     <canvas class="corona-shader" id="coronaShader" aria-hidden="true"></canvas>
                 </div>
+
+                <!-- 🌑 APAGADO DEL HUMO (acto 2 del portal)
+                     Va justo aquí, entre el lienzo y las marcas de encuadre, a
+                     propósito: tapa el humo pero NO las esquinas blancas, que
+                     tienen que seguir leyéndose sobre el negro. Al estar DENTRO
+                     de la máscara solo pinta donde la corona ya destapó, así que
+                     en el acto 1 no existe.
+                     El color es el mismo #101010 del fondo del shader
+                     (COLORES[0]), o sea que el humo se apaga hacia su propio
+                     negro y no hacia uno ajeno. La opacidad la escribe
+                     pintarCorona(). -->
+                <div class="corona-apagado" id="coronaApagado" aria-hidden="true"></div>
 
                 <!-- Marcas de encuadre, mitad de arriba: van DENTRO de la
                      máscara, así que cada esquina pasa de negra a blanca justo
@@ -657,7 +678,54 @@
         // el tamaño ya responde al scroll en vez de perseguirlo.
         const CORONA_RETARDO = 0.14;
 
-        // Cuánto llevas del portal, de 0 a 1. null si todavía no se puede medir.
+        // Zoom EXTRA que el lienzo hace mientras el humo se apaga (acto 2). Si
+        // el zoom se congelara justo al acabar el destapado, el apagado se
+        // sentiría como bajarle el brillo a una foto quieta; con este pelín de
+        // más el humo se te sigue viniendo encima mientras se va.
+        const CORONA_ZOOM_APAGADO = 0.08;
+
+        // 🎬 LOS TRES ACTOS DEL PORTAL
+        // El recorrido pineado se reparte en tres tramos seguidos, medidos en
+        // PANTALLAS DE ALTO para que duren lo mismo en cualquier monitor:
+        //   1. DESTAPADO — la corona crece hasta tragarse la pantalla. Es el de
+        //      siempre y conserva sus 2.6 pantallas clavadas: la curva no se
+        //      tocó, solo se le puso algo detrás.
+        //   2. APAGADO   — sigues scrolleando y el anillo de humo se apaga hacia
+        //      el negro del propio shader. La sección queda en negro liso con
+        //      las marcas de encuadre blancas.
+        //   3. REPOSO    — el negro se sostiene. Este tramo es el escenario
+        //      donde entrará el contenido de la sección; si lo acortas, el
+        //      negro se ve un suspiro y el pin suelta hacia la sección 3.
+        // La altura del wrapper en el CSS tiene que ser la suma + 1 pantalla
+        // (la que ocupa el pin): 2.6+1.2+1.0+1 = 5.8 → 580vh en escritorio,
+        // 2.0+1.0+0.8+1 = 4.8 → 480vh por debajo de 900px.
+        function tramosPortal() {
+            return window.innerWidth > 900
+                ? { destapado: 2.6, apagado: 1.2 }
+                : { destapado: 2.0, apagado: 1.0 };
+        }
+
+        // Alto scrolleable del portal, cacheado por progresoCorona(). Se guarda
+        // para que pintarCorona() reparta los actos sin volver a pedir el rect
+        // en mitad del fotograma.
+        let _portalRecorrido = 0;
+
+        // Dónde cae el final de cada acto dentro del progreso 0..1 del portal.
+        // Se calcula contra el recorrido REAL medido y no contra los vh escritos
+        // en el CSS, así que si mañana cambia la altura del wrapper los tramos
+        // siguen durando las mismas pantallas.
+        function repartoPortal() {
+            const vp = altoViewport();
+            const t = tramosPortal();
+            const total = Math.max(1, _portalRecorrido);
+            return {
+                finDestapado: Math.min(1, (t.destapado * vp) / total),
+                finApagado: Math.min(1, ((t.destapado + t.apagado) * vp) / total)
+            };
+        }
+
+        // Cuánto llevas del portal ENTERO (los tres actos), de 0 a 1. null si
+        // todavía no se puede medir.
         function progresoCorona() {
             const portal = document.getElementById('coronaPortal');
             if (!portal) return null;
@@ -665,6 +733,8 @@
             const rect = portal.getBoundingClientRect();
             const recorrido = rect.height - altoViewport();
             if (recorrido <= 0) return null;
+
+            _portalRecorrido = recorrido;
 
             return Math.min(1, Math.max(0, -rect.top / recorrido));
         }
@@ -682,9 +752,27 @@
             const lienzo = document.querySelector('.corona-lienzo');
             const cierre = document.getElementById('coronaCierre');
             const pista = document.getElementById('coronaPista');
+            const apagado = document.getElementById('coronaApagado');
 
             const anchoVentana = window.innerWidth;
             const altoVentana = altoViewport();
+
+            // Progreso DENTRO de cada acto. El del destapado es exactamente el
+            // que la curva de la corona ha usado siempre: al repartir el
+            // recorrido el acto 1 conserva sus 2.6 pantallas, así que la
+            // animación de la corona se siente idéntica a antes.
+            const reparto = repartoPortal();
+            const pDestapado = reparto.finDestapado > 0
+                ? Math.min(1, progreso / reparto.finDestapado)
+                : 1;
+            const tramoApagado = reparto.finApagado - reparto.finDestapado;
+            const pApagado = tramoApagado > 0
+                ? Math.min(1, Math.max(0, (progreso - reparto.finDestapado) / tramoApagado))
+                : (progreso > reparto.finDestapado ? 1 : 0);
+
+            // Suavizado en S para el velo: el humo no se apaga a ritmo
+            // constante, entra y sale despacio. Lineal se siente a fader.
+            const velo = pApagado * pApagado * (3 - 2 * pApagado);
 
             // La curva de la maqueta, tal cual: arranque + progreso^2.3 * 4500.
             // El exponente es lo que hace que casi no se mueva al principio (da
@@ -695,7 +783,7 @@
             // Redondeado a píxel entero. Con decimales el navegador re-rasteriza
             // la máscara SVG a un tamaño distinto en CADA fotograma y los bordes
             // de las puntas hierven; a píxel entero se queda quieta.
-            const tam = Math.round(reposo + Math.pow(progreso, 2.3) * crecimiento);
+            const tam = Math.round(reposo + Math.pow(pDestapado, 2.3) * crecimiento);
 
             const pantalla = Math.max(anchoVentana, altoVentana);
             // Red de seguridad, no parte de la animación: en la maqueta no existe
@@ -712,16 +800,33 @@
                 mask.style.setProperty('--corona-tam', `${tam}px`);
             }
 
-            // El zoom del fondo corre el recorrido ENTERO, también el respiro
-            // final: es lo que mantiene viva la última parte.
+            // El zoom del fondo corre el acto 1 ENTERO, también su respiro
+            // final, y se estira un poco más durante el apagado: es lo que
+            // mantiene viva la última parte.
             if (lienzo) {
-                lienzo.style.setProperty('--corona-zoom', (1 + progreso * CORONA_ZOOM).toFixed(4));
+                const zoom = 1 + pDestapado * CORONA_ZOOM + pApagado * CORONA_ZOOM_APAGADO;
+                lienzo.style.setProperty('--corona-zoom', zoom.toFixed(4));
             }
 
-            if (cierre) cierre.style.opacity = cerrando.toFixed(3);
+            // 🌑 ACTO 2: el velo que apaga el humo.
+            if (apagado) apagado.style.opacity = velo.toFixed(3);
+
+            if (cierre) {
+                cierre.style.opacity = cerrando.toFixed(3);
+                // Red de seguridad, igual que la opacidad: si en una pantalla de
+                // proporción rara la silueta dejara una esquina suelta, en el
+                // acto 2 esa esquina tiene que ser negra y no verde. Va detrás
+                // de la máscara, así que el cambio seco no se ve nunca.
+                cierre.style.backgroundColor = pApagado > 0 ? 'var(--corona-negro)' : '';
+            }
+
+            // Con el velo del todo opaco el shader está dibujando humo que no ve
+            // nadie, y el portal sigue en pantalla durante todo el acto 3. Se le
+            // avisa para que pare de quemar GPU.
+            if (window.anxieHumo) window.anxieHumo.setTapado(velo > 0.995);
 
             // La pista de "scroll" se va en cuanto la corona empieza a crecer
-            if (pista) pista.style.opacity = Math.max(0, 1 - progreso * 6).toFixed(3);
+            if (pista) pista.style.opacity = Math.max(0, 1 - pDestapado * 6).toFixed(3);
         }
 
         // 🔽 COLOR DEL MENÚ PÍLDORA
@@ -1295,6 +1400,10 @@ void main() {
         let raf = 0;
         let vivo = true;
         let enPantalla = true;
+        // El portal tapa el canvas con un velo negro en su acto 2 y luego se
+        // queda otro tramo entero en pantalla. Mientras el velo esté opaco esto
+        // vale true y aquí no se dibuja nada. Lo escribe window.anxieHumo.
+        let tapado = false;
         let pestaniaVisible = document.visibilityState === 'visible';
         const arranque = performance.now();
 
@@ -1317,7 +1426,7 @@ void main() {
         }
 
         function pedirFotograma() {
-            if (vivo && enPantalla && pestaniaVisible && raf === 0) {
+            if (vivo && enPantalla && pestaniaVisible && !tapado && raf === 0) {
                 raf = requestAnimationFrame(dibujar);
             }
         }
@@ -1328,7 +1437,7 @@ void main() {
 
         function dibujar(ahora) {
             raf = 0;
-            if (!vivo || !enPantalla || !pestaniaVisible) return;
+            if (!vivo || !enPantalla || !pestaniaVisible || tapado) return;
             ajustarTamanio();
             gl.uniform4f(uni.scene, canvas.width, canvas.height,
                          ((ahora - arranque) / 1000) * U.timeScale, U.colorCount);
@@ -1374,6 +1483,21 @@ void main() {
             pararFotograma();
             esconder();
         });
+
+        // 🔌 LO ÚNICO QUE ESTE BLOQUE EXPONE
+        // pintarCorona() (el JS del portal, más arriba) llama a setTapado(true)
+        // en cuanto el velo del apagado queda opaco, y a setTapado(false) si
+        // vuelves a subir y el humo tiene que reaparecer. Sin esto el shader
+        // seguiría quemando GPU detrás de un negro liso durante dos pantallas
+        // de scroll.
+        window.anxieHumo = {
+            setTapado: function (valor) {
+                valor = !!valor;
+                if (valor === tapado) return;
+                tapado = valor;
+                if (tapado) pararFotograma(); else pedirFotograma();
+            }
+        };
 
         ajustarTamanio();
         pedirFotograma();
