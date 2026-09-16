@@ -518,38 +518,22 @@ body {
     }
 }
 
-/* --- Rejilla interna: promesa arriba, marca al centro, acciones abajo --- */
+/* --- Rejilla interna: una sola columna centrada en la pantalla --- */
 .hero-inner {
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    gap: 2rem;
-    padding: 7.5rem 3.5rem 0 3.5rem;
-}
-
-/* 🟩 PROMESA (esquina superior izquierda) */
-.hero-promesa {
-    display: flex;
-    flex-direction: column;
-    gap: 1.15rem;
-}
-
-.hero-headline {
-    font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
-    font-weight: 800;
-    font-size: clamp(1.9rem, 3.6vw, 3.3rem);
-    line-height: 1.04;
-    letter-spacing: -0.035em;
-    text-transform: uppercase;
-    color: var(--tinta);
+    justify-content: center;
+    align-items: center;
+    /* Padding simetrico para que el bloque quede centrado de verdad; el de
+       arriba ademas deja libre la pildora del menu. */
+    padding: 7.5rem 3.5rem;
 }
 
 .acento-verde { color: var(--verde); }
 .acento-verde-claro { color: var(--verde-suave); }
 
 /* Línea "● ── TIENDA DE CUENTAS" (se reutiliza en la sección 2) */
-.hero-eyebrow,
 .destacada-eyebrow {
     display: flex;
     align-items: center;
@@ -578,117 +562,65 @@ body {
     text-transform: uppercase;
 }
 
-/* 👑 MARCA CENTRAL + PRUEBA SOCIAL */
+/* 👑 COLUMNA CENTRAL: MARCA + FRASE + ACCIONES */
 .hero-marca {
-    align-self: center;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.4rem;
+    gap: 2rem;
+    width: 100%;
+    max-width: 980px;
+    text-align: center;
 }
 
 .hero-wordmark {
     display: flex;
     align-items: baseline;
+    justify-content: center;
     gap: clamp(8px, 1.25vw, 18px);
+    margin: 0;
     font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
     font-weight: 800;
     font-size: clamp(3rem, 8.9vw, 8.2rem);
     line-height: 0.88;
     letter-spacing: -0.045em;
     text-transform: uppercase;
+    color: var(--tinta);
 }
 
-.wordmark-verde { color: var(--verde); }
-.wordmark-negro { color: #000000; }
+/* La frase que va debajo de la marca. En mayúsculas como la marca, para que
+   el bloque entero se lea como una sola pieza. */
+.hero-texto {
+    max-width: 62ch;
+    margin: 0;
+    font-weight: 600;
+    font-size: clamp(0.78rem, 1.05vw, 0.95rem);
+    line-height: 1.75;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--tinta);
+}
 
-.hero-stats {
+/* Las dos acciones, en fila y centradas bajo la frase */
+.hero-botones {
     display: flex;
     align-items: center;
-    gap: 1.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
-.hero-stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-}
-
-.hero-stat-num {
-    font-weight: 800;
-    font-size: 1.35rem;
-    letter-spacing: -0.4px;
-}
-
-.hero-stat-label {
-    font-weight: 600;
-    font-size: 0.68rem;
-    letter-spacing: 1.8px;
-    text-transform: uppercase;
-    color: var(--gris-tenue);
-}
-
-.hero-stat-sep {
-    width: 1px;
-    height: 34px;
-    background: #e2e2e2;
-}
-
-/* 🎯 ACCIONES (las dos esquinas de abajo) */
-.hero-acciones {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 2.5rem;
-    padding-bottom: 2.2rem;
-}
-
-.hero-acciones-izq {
-    display: flex;
-    flex-direction: column;
-    gap: 0.9rem;
-    max-width: 430px;
-}
-
-.hero-acciones-texto {
-    font-weight: 400;
-    font-size: 0.93rem;
-    line-height: 1.5;
-    color: var(--gris-texto);
-}
-
-.hero-acciones-der {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.9rem;
-}
-
-.hero-conteo {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 2px;
-}
-
-.hero-conteo-label {
-    font-weight: 600;
-    font-size: 0.68rem;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--gris-tenue);
-}
-
-.hero-conteo-num {
-    font-weight: 800;
-    font-size: 1.85rem;
-    letter-spacing: -0.8px;
+/* Aquí los dos botones comparten alto para que la fila no quede despareja:
+   el de Discord trae menos padding vertical que la píldora sólida. */
+.hero-botones .btn-verde-pill,
+.hero-botones .btn-discord-linea {
+    align-self: center;
+    height: 56px;
+    padding: 0 30px;
 }
 
 /* 🟢 BOTÓN DE CONTORNO VERDE (Discord) */
 .btn-discord-linea {
-    align-self: flex-start;
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -751,32 +683,6 @@ body {
 }
 
 .btn-verde-pill:hover .btn-verde-pill-icono { transform: translateX(3px); }
-
-/* ⬛ FRANJA NEGRA DE PLATAFORMAS (cierra el hero) */
-.hero-plataformas {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 1.6rem;
-    min-height: 64px;
-    padding: 0 3.5rem;
-    background: #000000;
-    color: #ffffff;
-    font-weight: 700;
-    font-size: 0.72rem;
-    letter-spacing: 2.6px;
-    text-transform: uppercase;
-}
-
-.franja-punto {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--verde-medio);
-    flex-shrink: 0;
-}
 
 /* ==========================================
    👑 SECCIÓN 2: PORTAL DE LA CORONA
@@ -1049,23 +955,14 @@ body {
 
     /* 🟩 1.5. SECCIÓN 1 EN CELULAR (hero claro) */
     .hero-inner {
-        padding: 5.5rem 1.25rem 0 1.25rem;
-        gap: 1.5rem;
-    }
-
-    .hero-promesa { gap: 1rem; }
-
-    .hero-headline {
-        font-size: clamp(1.65rem, 8.2vw, 2.1rem);
-        line-height: 1.05;
-        letter-spacing: -0.025em;
+        padding: 5.5rem 1.25rem;
     }
 
     .eyebrow-punto { width: 8px; height: 8px; }
     .eyebrow-linea { width: 34px; }
     .eyebrow-texto { font-size: 0.6rem; letter-spacing: 3.5px; }
 
-    .hero-marca { gap: 1rem; }
+    .hero-marca { gap: 1.6rem; }
 
     .hero-wordmark {
         font-size: clamp(2.4rem, 12.8vw, 3.4rem);
@@ -1073,45 +970,27 @@ body {
         letter-spacing: -0.035em;
     }
 
-    .hero-stats { gap: 1.25rem; }
-    .hero-stat-num { font-size: 1.1rem; }
-    .hero-stat-label { font-size: 0.6rem; letter-spacing: 1.4px; }
-    .hero-stat-sep { height: 28px; }
+    .hero-texto {
+        font-size: 0.72rem;
+        line-height: 1.85;
+        letter-spacing: 0.08em;
+    }
 
-    /* Las dos esquinas se vuelven una columna de botones a todo lo ancho */
-    .hero-acciones {
+    /* Los dos botones se apilan a todo lo ancho */
+    .hero-botones {
+        width: 100%;
         flex-direction: column;
         align-items: stretch;
         gap: 0.85rem;
-        padding-bottom: 1.4rem;
     }
 
-    .hero-acciones-izq {
-        order: 2;
-        max-width: 100%;
-        gap: 0.75rem;
-    }
-
-    .hero-acciones-der {
-        order: 1;
-        align-items: stretch;
-        gap: 0.85rem;
-    }
-
-    .hero-conteo {
-        order: -1;
-        flex-direction: row;
-        align-items: baseline;
-        justify-content: space-between;
-        width: 100%;
-    }
-
-    .hero-conteo-label { font-size: 0.6rem; letter-spacing: 2.4px; }
-    .hero-conteo-num { font-size: 1.45rem; }
-
-    .hero-acciones-texto {
-        font-size: 0.82rem;
-        text-align: center;
+    .hero-botones .btn-verde-pill,
+    .hero-botones .btn-discord-linea {
+        /* stretch pisa el align-self: center de escritorio: apilados van a
+           todo el ancho, no centrados y angostos. */
+        align-self: stretch;
+        height: 52px;
+        padding: 0 1.5rem;
     }
 
     .btn-discord-linea,
@@ -1122,16 +1001,6 @@ body {
         padding: 0 1.5rem;
         font-size: 0.92rem;
     }
-
-    .hero-plataformas {
-        gap: 0.85rem;
-        min-height: 56px;
-        padding: 0.6rem 1rem;
-        font-size: 0.6rem;
-        letter-spacing: 2px;
-    }
-
-    .franja-punto { width: 4px; height: 4px; }
 
     /* 👑 PORTAL DE LA CORONA EN CELULAR
        Menos recorrido de scroll: el dedo cansa más rápido que la rueda. El
@@ -1215,8 +1084,8 @@ body {
     gap: 1rem;
 }
 
-/* La línea "● ── LO MÁS COTIZADO" hereda de .hero-eyebrow, pero aquí va sobre
-   verde: el --verde-medio de la maqueta no se leía, sube a --verde-suave */
+/* La línea "● ── LO MÁS COTIZADO" aquí va sobre verde: el --verde-medio de
+   la maqueta no se leía, sube a --verde-suave */
 .destacada-eyebrow .eyebrow-punto,
 .destacada-eyebrow .eyebrow-linea { background: var(--verde-suave); }
 .destacada-eyebrow .eyebrow-texto { color: var(--verde-suave); }
