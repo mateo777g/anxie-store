@@ -63,13 +63,15 @@ Its four colours are CSS variables driven by `data-theme` on `.menu`:
 
 | theme | pill | open panel | used on |
 |---|---|---|---|
-| `claro` | black, white text | green | index hero and section 4 (white) |
-| `verde` | white, green text | black | `#cases` and the footer (green) |
-| `oscuro` | green, white text | white | the uncovered crown portal, and `legal.html` (black) |
+| `claro` | green, white text | black | index hero and section 4 (white) |
+| `verde` | white, green text | black | green backgrounds (unused on `index.html` today) |
+| `oscuro` | white, black text | green | the uncovered crown portal, the footer, and `legal.html` (black) |
 
-`oscuro` is the only theme that does not swap pill and panel colours — over black, a black
-panel would vanish into the background. Note the portal reveals the **black** smoke shader,
-not the flat green it used to; a theme picked from the old green assumption will be wrong.
+`claro` and `oscuro` are exact mirrors of each other — that swap is what makes crossing the
+portal feel like flipping the page over. Neither of them may use black for *both* pill and
+panel: over the black side the panel would vanish into the background. Note the portal
+reveals the **black** smoke shader, not the flat green it used to; a theme picked from the
+old green assumption will be wrong.
 
 The pill is set in `Arial` on `.menu` itself, deliberately not the site's Montserrat /
 Plus Jakarta Sans — it is the original design's face and the per-letter roll reads better in

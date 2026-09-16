@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260916d">
+    <link rel="stylesheet" href="style.css?v=20260916f">
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -179,12 +179,20 @@
     <div class="corona-portal" id="coronaPortal">
         <div class="corona-pin">
 
-            <!-- Marca de agua del lado blanco. Dice lo mismo y va en la misma
-                 posición que la del lienzo, así que la corona no destapa "otra
-                 cosa": invierte el mismo logotipo de gris sobre blanco a blanco
-                 sobre verde. El lienzo hace zoom y esta no, y ese desfase es el
-                 que da la sensación de profundidad. -->
-            <span class="corona-watermark" aria-hidden="true">Anxie<br>Store</span>
+            <!-- Marca de agua del lado blanco: el rótulo de la sección. El
+                 lienzo hace zoom y esta no, y ese desfase es el que da la
+                 sensación de profundidad.
+
+                 Las dos palabras van en <span> sueltos, y la "s" del plural en
+                 uno propio, porque el rótulo cambia de forma según la pantalla:
+                   · En PC es UNA sola línea, "CUENTAS DESTACADAS", con la
+                     corona por delante.
+                   · En celular no cabe de ancho, así que se parte en dos
+                     bloques (CUENTA arriba, DESTACADA abajo) con el hueco de la
+                     corona en medio, y las "s" se esconden porque ahí solo
+                     entra una cuenta. Todo eso lo hace el CSS; aquí solo está
+                     el texto marcado para poder hacerlo. -->
+            <span class="corona-watermark" aria-hidden="true"><span class="corona-watermark-linea">Cuenta<span class="corona-watermark-plural">s</span></span> <span class="corona-watermark-linea">Destacada<span class="corona-watermark-plural">s</span></span></span>
 
             <!-- Marcas de encuadre, mitad de abajo: van DEBAJO de la capa
                  enmascarada, así que el verde se las va tragando. -->
@@ -887,9 +895,9 @@
         // que pasa de blanco a verde -> sección 3 verde -> sección 4 blanca ->
         // footer verde oscuro), así que hay que mirar qué sección queda debajo
         // de la píldora y no en qué punto del scroll vamos.
-        //   tema "claro"  = píldora negra,  para fondos blancos.
-        //   tema "verde"  = píldora blanca, para fondos verdes.
-        //   tema "oscuro" = píldora verde,  para fondos negros.
+        //   tema "claro"  = píldora verde  + panel negro, para fondos blancos.
+        //   tema "verde"  = píldora blanca + panel negro, para fondos verdes.
+        //   tema "oscuro" = píldora blanca + panel verde, para fondos negros.
         // Quien pinta es menu.js; aquí solo se decide cuál toca.
         function actualizarMenu(tamCorona) {
             if (!window.anxieMenu) return;
@@ -919,7 +927,7 @@
             if (bajoLaBarra(document.getElementById('features'))) tema = 'claro';
 
             // El footer: ya no es verde sino negro, así que 'oscuro' (píldora
-            // verde, panel blanco) es el único tema que no se pierde encima de
+            // blanca, panel verde) es el único tema que no se pierde encima de
             // él. La cuenta destacada no cuenta: se mudó dentro del portal y el
             // tema lo decide el bloque de arriba.
             if (bajoLaBarra(document.querySelector('.footer-social'))) tema = 'oscuro';
