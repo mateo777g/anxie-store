@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260915e">
+    <link rel="stylesheet" href="style.css?v=20260915h">
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -94,49 +94,35 @@
 
     <!-- ==========================================================
          SECCIÓN 1: HERO CLARO
-         Sin intro y sin Spline: entra directo a la promesa, la marca y las
-         dos acciones. El scroll-jacking ya no vive aquí, vive en el portal
-         de la corona que va justo debajo.
+         Una sola columna centrada: marca, una frase y las dos acciones.
+         Ni titular de esquina ni estadísticas ni franja de plataformas: eso
+         se quitó a propósito, el hero dice una cosa y ofrece dos caminos.
+         El scroll-jacking no vive aquí, vive en el portal de la corona que
+         va justo debajo.
          ========================================================== -->
     <header class="hero" id="home">
 
         <div class="hero-inner">
 
-            <!-- 🟩 PROMESA -->
-            <div class="hero-promesa">
-                <h1 class="hero-headline">
-                    Adquiere ya tus cuentas<br>de <span class="acento-verde">videojuegos.</span>
-                </h1>
-                <div class="hero-eyebrow">
-                    <span class="eyebrow-punto"></span>
-                    <span class="eyebrow-linea"></span>
-                    <span class="eyebrow-texto">Tienda de cuentas</span>
-                </div>
-            </div>
-
-            <!-- 👑 MARCA CENTRAL + PRUEBA SOCIAL -->
+            <!-- 👑 MARCA + FRASE + ACCIONES, todo en una columna centrada -->
             <div class="hero-marca">
-                <div class="hero-wordmark">
-                    <span class="wordmark-verde">Anxie</span>
-                    <span class="wordmark-negro">Store</span>
-                </div>
-                <div class="hero-stats">
-                    <div class="hero-stat">
-                        <span class="hero-stat-num">2 años</span>
-                        <span class="hero-stat-label">Vendiendo</span>
-                    </div>
-                    <span class="hero-stat-sep"></span>
-                    <div class="hero-stat">
-                        <span class="hero-stat-num acento-verde">+700</span>
-                        <span class="hero-stat-label">Referencias</span>
-                    </div>
-                </div>
-            </div>
 
-            <!-- 🎯 ACCIONES -->
-            <div class="hero-acciones">
+                <h1 class="hero-wordmark">
+                    <span>Anxie</span>
+                    <span>Store</span>
+                </h1>
 
-                <div class="hero-acciones-izq">
+                <p class="hero-texto">
+                    Cuentas de videojuegos con <span class="acento-verde">entrega acompañada</span>.
+                    Elige la tuya en el <span class="acento-verde">catálogo</span>, escríbenos y te
+                    guiamos <span class="acento-verde">paso a paso</span> hasta que esté en tus manos.
+                </p>
+
+                <div class="hero-botones">
+                    <a href="catalogo.html#cases" class="btn-verde-pill">
+                        Ver catálogo
+                        <span class="btn-verde-pill-icono" aria-hidden="true">&rarr;</span>
+                    </a>
                     <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener" class="btn-discord-linea">
                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M4 5h16v11H8l-4 4Z"></path>
@@ -144,37 +130,10 @@
                         </svg>
                         Únete al Discord
                     </a>
-                    <p class="hero-acciones-texto">
-                        Únete a nuestra comunidad de Discord, resuelve dudas y adquiere tu cuenta.
-                    </p>
-                </div>
-
-                <div class="hero-acciones-der">
-                    <div class="hero-conteo">
-                        <span class="hero-conteo-label">En el catálogo</span>
-                        <span class="hero-conteo-num"><span class="acento-verde" id="heroConteo">+40</span> cuentas</span>
-                    </div>
-                    <a href="catalogo.html#cases" class="btn-verde-pill">
-                        Ver catálogo
-                        <span class="btn-verde-pill-icono" aria-hidden="true">&rarr;</span>
-                    </a>
                 </div>
 
             </div>
 
-        </div>
-
-        <!-- ⬛ FRANJA DE PLATAFORMAS -->
-        <div class="hero-plataformas">
-            <span>PC</span>
-            <span class="franja-punto"></span>
-            <span>Xbox</span>
-            <span class="franja-punto"></span>
-            <span>PlayStation</span>
-            <span class="franja-punto"></span>
-            <span>Nintendo Switch</span>
-            <span class="franja-punto"></span>
-            <span>Entrega acompañada</span>
         </div>
 
     </header>
@@ -544,11 +503,9 @@
                 img.alt = cuenta.titulo || 'Cuenta destacada de Anxie Store';
             }
 
-            // Conteo real de cuentas (hero y sección 3)
+            // Conteo real de cuentas (sección 3; el hero ya no lleva contador)
             if (typeof total === 'number' && total > 0) {
-                const heroConteo = document.getElementById('heroConteo');
                 const destTotal = document.getElementById('destTotal');
-                if (heroConteo) heroConteo.textContent = `+${total}`;
                 if (destTotal) destTotal.textContent = String(Math.max(total - 1, 0));
             }
         }
