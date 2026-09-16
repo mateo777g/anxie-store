@@ -803,15 +803,16 @@ body {
 .corona-portal {
     position: relative;
     width: 100%;
-    /* 510vh de wrapper = 410vh de scroll con la capa pineada, repartidos en
-       2.6 + 1.5 pantallas (los dos actos) más la pantalla que ocupa el pin. El
+    /* 610vh de wrapper = 510vh de scroll con la capa pineada, repartidos en
+       2.6 destapado + 1.5 reposo + 1 de SOLAPE (los dos actos y el tramo en que
+       la sección 4 sube por encima), más la pantalla que ocupa el pin. El
        destapado conserva sus 260vh exactos, que son el recorrido de la maqueta
        de referencia; el apagado del humo no pide scroll propio porque va montado
-       encima de él. El reposo subió de 1.0 a 1.5 al meterle la cuenta destacada:
-       es el rato que queda para leerla antes de que el pin suelte. Aun así la
-       página es MÁS CORTA que antes, porque la sección verde de 100vh que había
-       debajo desapareció. */
-    height: 510vh;
+       encima de él. El reposo son 1.5 pantallas para leer la cuenta destacada.
+       OJO: la pantalla de solape NO alarga la página, porque la sección 4 se
+       sube con margin-top: -100vh y se come justo esa pantalla. Si tocas este
+       número, toca el margen negativo igual. */
+    height: 610vh;
     background-color: #ffffff;
 
     /* El negro al que se apaga el humo. Es el mismo #101010 que el shader usa
@@ -1146,7 +1147,7 @@ body {
     /* 👑 PORTAL DE LA CORONA EN CELULAR
        Menos recorrido de scroll: el dedo cansa más rápido que la rueda. El
        tamaño de arranque de la corona lo baja el JS (tamanioReposoCorona). */
-    .corona-portal { height: 380vh; }   /* 2.0 destapado + 0.8 reposo + 1 del pin */
+    .corona-portal { height: 480vh; }   /* 2.0 destapado + 0.8 reposo + 1 de solape + 1 del pin */
 
     /* En celular el logotipo de fondo crece: a 13vw se quedaba en un sello
        diminuto en medio de la pantalla. */
@@ -1686,18 +1687,49 @@ body {
    Las clases siguen llamándose .seccion-tres (y el wrapper sigue siendo
    #features, que es a donde apunta el enlace "Contacto" del menú): solo
    cambió de número al mudarse la cuenta destacada a la sección 3. */
+
+/* ------------------------------------------------------------------------
+   TRANSICIÓN SECCIÓN 3 -> 4: la sección blanca SUBE POR ENCIMA del portal.
+
+   Es la pila de paneles pegajosos: el portal negro se queda quieto (su
+   .corona-pin es sticky y le sobra una pantalla de solape) y la sección
+   blanca le pasa por encima PLANA, con las esquinas de arriba redondeadas,
+   como una hoja que se le apoya encima. No hay JS: lo hace el sticky de
+   arriba más el margen negativo de acá abajo.
+
+   Esto NO toca la corona ni el pin: el portal ni se entera, solo se le pasa
+   algo por encima.
+   ------------------------------------------------------------------------ */
 .seccion-tres-scroll-wrapper {
     position: relative;
-    width: 100vw;
+    /* 100% y NO 100vw: 100vw incluye el ancho de la barra de scroll, así que
+       con barra clásica el panel medía 15px más de lo que se ve y el
+       `overflow-x: hidden` del body le comía justo la esquina redondeada de la
+       DERECHA (la izquierda, al estar en x=0, se veía bien). Lo mismo para
+       .seccion-tres aquí abajo. */
+    width: 100%;
     min-height: 100vh;
     min-height: 100svh;
     background-color: #ffffff;
+    /* Se sube una pantalla entera para pasar POR ENCIMA del último tramo del
+       portal, que todavía está pineado (.corona-pin). Esa pantalla se la
+       agregamos al alto de .corona-portal, así que la página mide lo mismo que
+       antes: solo cambia quién ocupa ese tramo. z-index 25 > 11 del portal. */
+    margin-top: -100vh;
+    /* Las esquinas que despegan el panel del negro de atrás. Van en el
+       WRAPPER y no en .seccion-tres: el wrapper es quien pinta el blanco, así
+       que si el radio fuera solo del hijo se vería el rectángulo blanco del
+       padre asomando por las esquinas y se perdería el efecto. */
+    border-top-left-radius: 28px;
+    border-top-right-radius: 28px;
+    /* Recorta el contenido a las esquinas redondeadas. */
+    overflow: hidden;
     z-index: 25;
 }
 
 .seccion-tres {
     position: relative;
-    width: 100vw;
+    width: 100%;
     min-height: 100vh;
     background-color: #ffffff;
     display: flex;
@@ -1758,17 +1790,11 @@ body {
     max-width: 480px;
 }
 
+/* Los dos modelos 3D se quitaron; los divs siguen ahí, vacíos, solo para que
+   la sección conserve exactamente el alto que tenía con ellos. */
 .seccion-tres-model-left {
     width: 100%;
     height: 380px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.seccion-tres-model-left spline-viewer {
-    width: 100%;
-    height: 100%;
 }
 
 /* Ocultamos el modelo chiquito en PC por defecto */
@@ -1788,14 +1814,6 @@ body {
 .seccion-tres-model-right {
     width: 100%;
     height: 380px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.seccion-tres-model-right spline-viewer {
-    width: 100%;
-    height: 100%;
 }
 
 .seccion-tres-content {
@@ -1840,6 +1858,12 @@ body {
 /* 📱 RESPONSIVE (MÓVILES) - AQUÍ ACHICAMOS Y ESCONDEMOS */
 @media (max-width: 900px) {
     /* 🔴 4. SECCIÓN DISCORD (AJUSTE PARA CELULAR) */
+    /* Esquinas un poco más chicas: a 390px de ancho, 28px se comía el título. */
+    .seccion-tres-scroll-wrapper {
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+    }
+
     .seccion-tres { 
         padding: 4rem 1.5rem 6.5rem 1.5rem !important; /* Aumentamos el espacio inferior a 6.5rem para que el botón respire */
         min-height: auto; 
@@ -1928,15 +1952,14 @@ body {
     position: relative;
     z-index: 30;
     width: 100%;
-    /* Verde oscuro en vez de negro: la página cierra dentro de la paleta
-       del rediseño. Lo comparten index, catalogo y legal. */
-    background-color: var(--verde-oscuro);
+    /* Negro. Lo comparten index, catalogo y legal. */
+    background-color: #000000;
     padding: 2rem 1rem 1.5rem 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .footer-container {
@@ -1968,8 +1991,9 @@ body {
     align-items: center;
     justify-content: center;
     gap: 22px;
+    /* Sobre el footer negro un #222 no se ve: el borde pasa a blanco translúcido. */
     background-color: #121212;
-    border: 1px solid #222222;
+    border: 1px solid rgba(255, 255, 255, 0.14);
     padding: 12px 26px;
     border-radius: 50px;
     margin: 10px auto 15px auto;
@@ -1993,8 +2017,8 @@ body {
 .footer-copy {
     font-family: 'Montserrat', sans-serif;
     font-size: 0.8rem;
-    /* Blanco translúcido y no un gris fijo: el footer ya no es negro sino
-       verde oscuro, y un #555 encima se lee embarrado. */
+    /* Blanco translúcido y no un gris fijo: aguanta igual el footer negro
+       y cualquier fondo oscuro que se le ponga. */
     color: rgba(255, 255, 255, 0.55);
     text-align: center;
     letter-spacing: 0.5px;

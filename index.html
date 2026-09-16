@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260915v">
+    <link rel="stylesheet" href="style.css?v=20260916a">
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -351,10 +351,9 @@
                         </p>
                     </div>
 
-                    <!-- Modelo Original 3D (Visible SOLO en PC) -->
-                    <div class="seccion-tres-model-left">
-                        <spline-viewer url="https://prod.spline.design/Jp-A6ubDqiAveFPY/scene.splinecode"></spline-viewer>
-                    </div>
+                    <!-- Hueco del modelo 3D: se quitó el spline-viewer, pero el div
+                         se queda vacío para que la sección siga midiendo lo mismo. -->
+                    <div class="seccion-tres-model-left" aria-hidden="true"></div>
 
                     <!-- 📱 IMAGEN 2D DE WUMPUS (Visible SOLO en Celulares) -->
                     <div class="seccion-tres-model-mobile">
@@ -365,10 +364,9 @@
                 <!-- 👉 COLUMNA DERECHA: Mascot Mono Discord + Título + Botón -->
                 <div class="seccion-tres-right">
                     
-                    <!-- Modelo Original (Visible solo en PC) -->
-                    <div class="seccion-tres-model-right">
-                        <spline-viewer url="https://prod.spline.design/HFQiKc5wRilijMuJ/scene.splinecode"></spline-viewer>
-                    </div>
+                    <!-- Hueco del modelo 3D: se quitó el spline-viewer, pero el div
+                         se queda vacío para que la sección siga midiendo lo mismo. -->
+                    <div class="seccion-tres-model-right" aria-hidden="true"></div>
 
                     <div class="seccion-tres-content" id="s3Right">
                         <h2 class="seccion-tres-title">
@@ -728,9 +726,11 @@
         // celular basta con 0.8: ahí la corona tapa la pantalla a media curva,
         // así que el contenido ya lleva casi una pantalla de sobra en negro
         // antes de que empiece este tramo.
-        // La altura del wrapper en el CSS tiene que ser la suma + 1 pantalla
-        // (la que ocupa el pin): 2.6+1.5+1 = 5.1 → 510vh en escritorio,
-        // 2.0+0.8+1 = 3.8 → 380vh por debajo de 900px.
+        // La altura del wrapper en el CSS tiene que ser la suma + 1 pantalla de
+        // SOLAPE (la que la sección 4 le pasa por encima estando el pin todavía
+        // pegado) + 1 pantalla del pin: 2.6+1.5+1+1 = 6.1 → 610vh en escritorio,
+        // 2.0+0.8+1+1 = 4.8 → 480vh por debajo de 900px. El solape no alarga la
+        // página porque la sección 4 se sube con margin-top: -100vh.
         function tramosPortal() {
             return window.innerWidth > 900
                 ? { destapado: 2.6, reposo: 1.5 }
@@ -905,10 +905,16 @@
                 tema = tamCorona < altoViewport() * 1.6 ? 'claro' : 'oscuro';
             }
 
-            // Secciones de fondo verde. La cuenta destacada ya no cuenta: se mudó
-            // dentro del portal y ahora va sobre negro, así que el tema lo
-            // decide el bloque de arriba (oscuro en cuanto la corona tapa).
-            if (bajoLaBarra(document.querySelector('.footer-social'))) tema = 'verde';
+            // La sección 4 es blanca y va POR ENCIMA del portal (z 25 vs 11).
+            // Durante el solape los dos están bajo la barra a la vez, así que
+            // esta comprobación va después: gana quien se ve.
+            if (bajoLaBarra(document.getElementById('features'))) tema = 'claro';
+
+            // El footer: ya no es verde sino negro, así que 'oscuro' (píldora
+            // verde, panel blanco) es el único tema que no se pierde encima de
+            // él. La cuenta destacada no cuenta: se mudó dentro del portal y el
+            // tema lo decide el bloque de arriba.
+            if (bajoLaBarra(document.querySelector('.footer-social'))) tema = 'oscuro';
 
             window.anxieMenu.setTema(tema);
         }
