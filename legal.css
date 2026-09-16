@@ -22,13 +22,6 @@ body {
     color: var(--legal-texto);
 }
 
-/* Forzamos la píldora de íconos 2D siempre visible (PC y celular): esta
-   página no carga spline-viewer para mantenerse liviana, así que no hay
-   alternativa 3D de escritorio que mostrar en su lugar. */
-.footer-mobile-social {
-    display: flex !important;
-}
-
 /* ====== CONTENIDO PRINCIPAL ====== */
 .legal-main {
     display: flex;
