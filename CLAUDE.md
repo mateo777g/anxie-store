@@ -77,10 +77,13 @@ The pill is set in `Arial` on `.menu` itself, deliberately not the site's Montse
 Plus Jakarta Sans — it is the original design's face and the per-letter roll reads better in
 it. Keep that override scoped to `.menu`.
 
-On `index.html` the pill sits top-**right** (`.menu--derecha`, aligned with the hero card's
-edge, grows leftward when opened) — the client asked for it in September 2026. `legal.html`
-still has it centred. That modifier must stay above the 640px block in `style.css`, which
-takes over positioning on phones.
+On `index.html` the pill is centred but sits *inside* the hero card, in the empty
+`.hero-menu-hueco` slot above the wordmark (`.menu--hero`, September 2026). It stays
+`position: fixed`; a small inline script writes `--menu-top` = the slot's top, clamped to
+20px, so it scrolls up with the card and then sticks like `position: sticky`. `legal.html`
+has it at the plain top centre. The modifier must stay above the 640px block in
+`style.css`, which takes over positioning on phones (there the pill stays top-right and the
+slot is hidden).
 
 `index.html` is the only page that switches theme: `actualizarMenu(tamCorona)` runs inside
 the crown-portal rAF loop, measures which section sits under the pill, and calls
@@ -137,7 +140,7 @@ letters but draws as if it covered the whole `.hero-panel` (the `u_marco` unifor
 letters are windows onto one card-sized ring. The letter-shaped cut-out is pure CSS —
 `screen` on a black-on-white text layer, then `multiply` on the `<h1>` against the card. That
 `multiply` only works because `.hero-marca` has **no** `z-index`; giving it one makes it a
-stacking context and a white box appears over the dot grid. Without WebGL (or with reduced
+stacking context and the letters stop blending against the page. Without WebGL (or with reduced
 motion) both canvases hide and the letters fall back to plain black.
 
 ## Conventions worth matching
