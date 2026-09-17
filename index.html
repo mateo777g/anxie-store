@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260916k">
+    <link rel="stylesheet" href="style.css?v=20260916q">
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -30,16 +30,18 @@
 
     <!--
         🟢 MENÚ PÍLDORA (reemplazó a la navbar vieja).
-        Píldora fija arriba a la DERECHA (.menu--derecha; legal.html la sigue
-        teniendo al centro). Cerrada muestra "Menú" + hamburguesa; al abrirse
-        se estira hacia la izquierda y un círculo baja desde arriba pintando el
-        panel. En celular se convierte en un panel lateral de alto completo.
+        Píldora fija al centro, pero en la portada va encajada en la tarjeta
+        del hero, justo encima de la marca (.menu--hero: su top lo escribe el
+        JS siguiendo a .hero-menu-hueco, y al subir la página se queda pegada
+        arriba). Cerrada muestra "Menú" + hamburguesa; al abrirse se estira y
+        un círculo baja desde arriba pintando el panel. En celular se convierte
+        en un panel lateral de alto completo, anclado a la derecha.
 
         El color lo cambia el JS según la sección que tenga debajo
         (data-theme = claro | verde). Arranca en "claro" porque el hero es
         blanco. Ver el bloque MENÚ PÍLDORA de style.css y menu.js.
     -->
-    <nav class="menu menu--derecha" data-theme="claro" aria-label="Menú principal">
+    <nav class="menu menu--hero" data-theme="claro" aria-label="Menú principal">
         <div class="menu__shell">
             <!-- El círculo que "moja" el panel al abrir. Va detrás del texto. -->
             <span class="menu__circle" aria-hidden="true"></span>
@@ -95,9 +97,10 @@
 
     <!-- ==========================================================
          SECCIÓN 1: HERO CLARO
-         La marca al centro de la tarjeta con dos datos de confianza debajo
-         (años vendiendo y referencias), y abajo a la izquierda la frase y el
-         botón al catálogo. El Discord ya no va aquí: lo lleva la sección 3.
+         Todo en una columna al centro, sobre blanco liso (como la sección 2):
+         el hueco de la píldora del menú, la marca, los dos datos de confianza
+         (años vendiendo y referencias), la frase y el botón al catálogo. El
+         Discord ya no va aquí: lo lleva la sección 3.
          El scroll-jacking no vive aquí, vive en el portal de la corona que
          va justo debajo.
          ========================================================== -->
@@ -105,16 +108,19 @@
 
         <div class="hero-inner">
 
-            <!-- 🔲 TARJETA DEL HERO
-                 El marco blanco con borde fino, sombra suave y la tablita de
-                 puntos dentro. La tablita (.hero-dots) va primero para quedar
-                 por debajo de la marca. -->
-            <div class="hero-panel">
-
-                <div class="hero-dots" aria-hidden="true"></div>
+            <!-- 🔲 CAJA DEL HERO
+                 Ya no se ve como tarjeta (sin borde, sin sombra, sin fondo
+                 propio): solo ordena la columna, y el humo de la marca la
+                 sigue usando como marco. -->
+            <div class="hero-panel" id="heroPanel">
 
                 <!-- 👑 MARCA + DATOS DE CONFIANZA, al centro de la tarjeta -->
                 <div class="hero-marca">
+
+                    <!-- El sitio de la píldora del menú. Está vacío: la píldora
+                         es fija (tiene que seguir a mano al bajar) y el JS la
+                         pone encima de este hueco mientras se ve. -->
+                    <div class="hero-menu-hueco" id="heroMenuHueco" aria-hidden="true"></div>
 
                     <!-- Las letras van rellenas con el humo del portal: el
                          canvas dibuja el humo y .hero-wordmark-texto lo recorta
@@ -141,7 +147,7 @@
 
                 </div>
 
-                <!-- 📝 FRASE + ACCIÓN, abajo a la izquierda de la tarjeta -->
+                <!-- 📝 FRASE + ACCIÓN, centradas bajo los datos -->
                 <div class="hero-pie">
 
                     <p class="hero-texto" data-reveal style="--n: 3;">
@@ -151,9 +157,13 @@
                     </p>
 
                     <div class="hero-botones" data-reveal style="--n: 4;">
-                        <a href="catalogo.html#cases" class="btn-verde-pill">
-                            Ver catálogo
-                            <span class="btn-verde-pill-icono" aria-hidden="true">&rarr;</span>
+                        <a href="catalogo.html#cases" class="btn-hero">
+                            <span>Ver catálogo</span>
+                            <!-- La flecha de lucide (ArrowRight), como en el diseño -->
+                            <svg class="btn-hero-flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M5 12h14" />
+                                <path d="m12 5 7 7-7 7" />
+                            </svg>
                         </a>
                     </div>
 
@@ -1811,6 +1821,50 @@ void main() {
                 }
             }
         }
+    })();
+    </script>
+
+    <!-- ==========================================================
+         🧭 LA PÍLDORA DEL MENÚ, ENCAJADA EN EL HERO
+         ==========================================================
+         La píldora es position: fixed (tiene que seguir a mano en toda la
+         página), pero en la portada su sitio es el hueco de encima de la
+         marca. Así que aquí solo se le escribe el top: el del hueco mientras
+         se ve, y nunca menos de 20px. Al bajar, sube con la tarjeta hasta
+         pegarse arriba y ahí se queda, como un sticky.
+         En celular (hasta 640px) el CSS ignora --menu-top: allí la píldora
+         vive arriba a la derecha y se abre como panel lateral.
+         ========================================================== -->
+    <script>
+    (function () {
+        'use strict';
+
+        const menu = document.querySelector('.menu--hero');
+        const hueco = document.getElementById('heroMenuHueco');
+        if (!menu || !hueco) return;
+
+        const TOPE = 20;
+        let pedido = false;
+
+        function colocar() {
+            pedido = false;
+            const top = Math.max(TOPE, Math.round(hueco.getBoundingClientRect().top));
+            menu.style.setProperty('--menu-top', top + 'px');
+        }
+
+        function pedir() {
+            if (pedido) return;
+            pedido = true;
+            requestAnimationFrame(colocar);
+        }
+
+        colocar();
+        window.addEventListener('scroll', pedir, { passive: true });
+        window.addEventListener('resize', pedir);
+        // La tipografía de la marca cambia su alto al cargar, y con él dónde
+        // cae el hueco.
+        if (window.ResizeObserver) new ResizeObserver(pedir).observe(document.getElementById('heroPanel'));
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(pedir);
     })();
     </script>
 

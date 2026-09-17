@@ -50,20 +50,15 @@ body {
     z-index: 10;
 }
 
-/* --- Tarjeta del hero + su tablita de puntos ------------------------------
-   El contenido del hero vive dentro de un marco blanco con borde fino y
-   sombra suave, separado de los bordes de la pantalla. Dentro va la rejilla
-   de puntos de 16px, pintada con un radial-gradient repetido (mismo patron
-   que el componente DotPattern, pero sin SVG ni React) y enmascarada en
-   radial, para que se vea densa detras de la marca y se desvanezca hacia los
-   bordes de la tarjeta en vez de cortarse de golpe. */
-/* Columna de tres tramos: el ::before de arriba y el pie de abajo crecen
-   parejos (flex 1 los dos), así la marca queda al centro y la frase con el
-   botón se apoya en el fondo. El pie no baja de su contenido, así que en una
-   pantalla bajita es el ::before el que cede y la marca sube un poco, en vez
-   de empujar la tarjeta fuera de la pantalla.
+/* --- Caja del hero ---------------------------------------------------------
+   Blanco liso, como la sección 2: ya no hay tarjeta (ni borde, ni sombra, ni
+   fondo de manchas). La caja solo ordena el contenido.
+   Columna centrada: el ::before de arriba y el ::after de abajo crecen
+   parejos (flex 1 los dos) y reparten el aire, así todo el bloque (menú,
+   marca, datos, frase y botón) queda al centro. En una pantalla bajita son
+   ellos los que ceden, en vez de empujar el contenido fuera de la pantalla.
    Es flex y no grid a propósito: el hero solo tiene min-height, y con eso las
-   filas fr de un grid no reparten nada (la de arriba copiaba el alto del pie). */
+   filas fr de un grid no reparten nada. */
 .hero-panel {
     position: relative;
     flex: 1 1 auto;
@@ -72,31 +67,12 @@ body {
     align-items: center;
     width: 100%;
     padding: 3rem 2.5rem;
-    border: 1px solid rgba(17, 17, 17, 0.08);
-    border-radius: 20px;
-    background: #ffffff;
-    /* Sombra baja y muy abierta: la tarjeta tiene que flotar apenas, no
-       despegarse del fondo blanco. */
-    box-shadow:
-        0 1px 2px rgba(17, 17, 17, 0.04),
-        0 30px 60px -34px rgba(17, 17, 17, 0.22);
-    overflow: hidden;
 }
 
-.hero-panel::before {
+.hero-panel::before,
+.hero-panel::after {
     content: '';
     flex: 1 1 0;
-}
-
-.hero-dots {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    background-image: radial-gradient(circle at 1px 1px, rgba(17, 17, 17, 0.20) 1px, transparent 0);
-    background-size: 16px 16px;
-    -webkit-mask-image: radial-gradient(ellipse 62% 58% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.55) 48%, transparent 80%);
-    mask-image: radial-gradient(ellipse 62% 58% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.55) 48%, transparent 80%);
 }
 
 /* --- Entrada escalonada de la portada -------------------------------------
@@ -190,35 +166,14 @@ body {
     animation-delay: calc(var(--n, 0) * 110ms);
 }
 
-/* Variante del index: la píldora va arriba a la DERECHA, alineada con el borde
-   de la tarjeta del hero (mismo 3.5rem que el padding de .hero-inner). Al estar
-   anclada por la derecha, al abrirse crece hacia la izquierda.
+/* Variante del index: la píldora sigue centrada, pero su top lo escribe el JS
+   (--menu-top) para que caiga en el hueco de encima de la marca del hero, y
+   al bajar se queda pegada a 20px (ver el script "LA PÍLDORA DEL MENÚ" de
+   index.html).
    Tiene que ir ANTES del bloque de 640px: allí .menu vuelve a mandar con
-   right: 0 y su propia animación, y a igual especificidad gana el que va
-   después. */
-.menu--derecha {
-    left: auto;
-    right: 3.5rem;
-    animation-name: menu-in-lado;
-}
-
-/* Igual que menu-in pero sin el -50%: esta píldora no está centrada. */
-@keyframes menu-in-lado {
-    from {
-        opacity: 0;
-        filter: blur(10px);
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        filter: none;
-        transform: none;
-    }
-}
-
-/* Tablet: la tarjeta se pega a 1rem del borde y la píldora la sigue. */
-@media (min-width: 641px) and (max-width: 900px) {
-    .menu--derecha { right: 1rem; }
+   top: 0, y a igual especificidad gana el que va después. */
+.menu--hero {
+    top: var(--menu-top, 20px);
 }
 
 /* Entrada: baja desenfocada, primer paso de la ola de la portada (ver
@@ -665,9 +620,9 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    /* Este padding es el margen que deja ver el blanco alrededor de la
-       tarjeta; el de arriba ademas deja libre la pildora del menu. */
-    padding: 7.5rem 3.5rem 4.5rem;
+    /* Margen alrededor del contenido. Arriba no reserva la píldora: va
+       dentro de la columna, en .hero-menu-hueco. */
+    padding: 3.5rem 3.5rem 4.5rem;
 }
 
 .acento-verde { color: var(--verde); }
@@ -705,8 +660,7 @@ body {
 /* 👑 CENTRO DE LA TARJETA: MARCA + DATOS DE CONFIANZA */
 /* SIN z-index a propósito: con él esto sería su propio contexto de apilado y
    el multiply de .hero-wordmark mezclaría contra la nada en vez de contra la
-   tarjeta, y el recuadro blanco de las letras taparía la tablita de puntos.
-   Sin él la marca igual queda encima de .hero-dots, porque va después. */
+   fondo blanco del hero. */
 .hero-marca {
     position: relative;
     flex: 0 0 auto;
@@ -717,6 +671,15 @@ body {
     width: 100%;
     max-width: 1180px;
     text-align: center;
+}
+
+/* El sitio de la píldora (48px = --menu-bar de escritorio). El margen de
+   abajo suma al gap de .hero-marca los 2rem que el diseño deja entre la
+   etiqueta y el titular. */
+.hero-menu-hueco {
+    flex: 0 0 auto;
+    height: 48px;
+    margin-bottom: 0.25rem;
 }
 
 /* --- La marca, rellena con el humo del portal -----------------------------
@@ -813,48 +776,75 @@ body {
     text-transform: uppercase;
 }
 
-/* 📝 ABAJO A LA IZQUIERDA: FRASE + BOTÓN */
+/* 📝 BAJO LOS DATOS: FRASE + BOTÓN, centrados como en el diseño */
 .hero-pie {
     position: relative;
     z-index: 1;
-    flex: 1 0 0;
-    align-self: flex-start;
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    align-items: flex-start;
-    gap: 1.5rem;
-    padding-top: 2rem;
-    text-align: left;
+    align-items: center;
+    gap: 3rem;
+    padding-top: 2.5rem;
+    text-align: center;
 }
 
-/* La frase. En mayúsculas como la marca, para que la tarjeta entera se lea
-   como una sola pieza. */
+/* La frase: en caja normal y gris, como la bajada del diseño. */
 .hero-texto {
-    max-width: 60ch;
+    max-width: 42rem;
     margin: 0;
-    font-weight: 600;
-    font-size: clamp(0.78rem, 1.05vw, 0.95rem);
-    line-height: 1.75;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--tinta);
+    font-weight: 500;
+    font-size: clamp(1rem, 1.35vw, 1.2rem);
+    line-height: 1.65;
+    color: var(--gris-texto);
 }
 
-/* La acción, bajo la frase y alineada a su izquierda */
 .hero-botones {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     flex-wrap: wrap;
     gap: 1rem;
 }
 
-.hero-botones .btn-verde-pill {
-    align-self: center;
+/* 🟢 EL BOTÓN DEL HERO — el "Start Typing" del diseño en verde: al pasar el
+   cursor crece un 5%, le sale un anillo verde tenue y la flecha avanza; al
+   pulsarlo se hunde. */
+.btn-hero {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
     height: 56px;
-    padding: 0 30px;
+    padding: 0 48px;
+    border-radius: 999px;
+    background: var(--verde);
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    white-space: nowrap;
+    box-shadow: 0 0 0 0 rgba(28, 78, 47, 0.2);
+    transition: background-color 300ms ease, transform 300ms ease, box-shadow 300ms ease;
 }
+
+.btn-hero:hover {
+    background: rgba(28, 78, 47, 0.9);
+    transform: scale(1.05);
+    box-shadow: 0 0 0 4px rgba(28, 78, 47, 0.2);
+}
+
+.btn-hero:active { transform: scale(0.95); }
+
+.btn-hero-flecha {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    transition: transform 300ms ease;
+}
+
+.btn-hero:hover .btn-hero-flecha { transform: translateX(4px); }
 
 /* 🟢 BOTÓN DE CONTORNO VERDE (Discord) */
 .btn-discord-linea {
@@ -1172,29 +1162,13 @@ body {
 
     /* 🟩 1.5. SECCIÓN 1 EN CELULAR (hero claro) */
     .hero-inner {
-        padding: 5.5rem 1rem 2.5rem;
+        padding: 1rem 1rem 2.5rem;
     }
 
-    /* La tarjeta se pega mas a los bordes y baja la esquina: con el margen de
-       escritorio en un telefono no quedaba ancho util para la marca. */
+    /* Con el margen de escritorio en un telefono no quedaba ancho util para
+       la marca. */
     .hero-panel {
         padding: 2.5rem 1.15rem;
-        border-radius: 16px;
-    }
-
-    /* Aquí marca y pie van juntos al centro: el aire lo reparten el ::before
-       y este ::after, y el pie deja de crecer. */
-    .hero-panel::after {
-        content: '';
-        flex: 1 1 0;
-    }
-
-    /* La tablita de puntos: rejilla un poco mas apretada y mascara mas alta,
-       porque en vertical la elipse ancha dejaba la marca casi sin puntos. */
-    .hero-dots {
-        background-size: 13px 13px;
-        -webkit-mask-image: radial-gradient(ellipse 85% 48% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.55) 48%, transparent 82%);
-        mask-image: radial-gradient(ellipse 85% 48% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.55) 48%, transparent 82%);
     }
 
     .eyebrow-punto { width: 8px; height: 8px; }
@@ -1205,15 +1179,11 @@ body {
 
     .hero-dato { padding: 0 1.1rem; }
 
-    /* En celular la frase y el botón bajan pegados a la marca y centrados,
-       como antes: abajo a la izquierda en una tarjeta angosta quedaba cojo. */
     .hero-pie {
-        flex: 0 0 auto;
         width: 100%;
         align-self: stretch;
-        align-items: center;
-        gap: 1.4rem;
-        text-align: center;
+        gap: 2rem;
+        padding-top: 2rem;
     }
 
     .hero-wordmark {
@@ -1224,23 +1194,11 @@ body {
     .hero-wordmark-texto { gap: 8px; }
 
     .hero-texto {
-        font-size: 0.72rem;
-        line-height: 1.85;
-        letter-spacing: 0.08em;
+        font-size: 0.95rem;
+        line-height: 1.6;
     }
 
-    /* El botón va a todo lo ancho */
-    .hero-botones {
-        width: 100%;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.85rem;
-    }
-
-    .hero-botones .btn-verde-pill {
-        /* stretch pisa el align-self: center de escritorio: apilados van a
-           todo el ancho, no centrados y angostos. */
-        align-self: stretch;
+    .btn-hero {
         height: 52px;
         padding: 0 1.5rem;
     }
@@ -1304,6 +1262,20 @@ body {
     }
 
     .corona-watermark-plural { display: none; }
+
+    /* La píldora del hero: aquí va arriba a la derecha y se abre como panel
+       lateral, así que el hueco de encima de la marca sobra, y arriba de la
+       tarjeta hay que dejarle su sitio. */
+    .hero-menu-hueco { display: none; }
+
+    .hero-inner { padding-top: 4.5rem; }
+
+    /* El botón va a todo lo ancho */
+    .hero-botones {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
 
 /* ==========================================
@@ -1505,11 +1477,32 @@ body {
 }
 
 .cuenta-card-inner {
+    position: relative;
+    /* isolate: el ::before de puntos va en z-index -1 y así queda encima del
+       blanco de esta columna pero debajo del texto, sin tener que subir de
+       capa a cada hijo. */
+    isolation: isolate;
     background: #ffffff;
     padding: 20px 22px;
     display: flex;
     flex-direction: column;
     gap: 9px;
+}
+
+/* La tablita de puntos que tenía antes la tarjeta del hero. Solo en la
+   columna de datos: la foto la taparía. La elipse de la máscara es ancha
+   porque la columna es apaisada y bajita, y con una más cerrada casi no
+   quedaban puntos. */
+.cuenta-card-inner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: radial-gradient(circle at 1px 1px, rgba(17, 17, 17, 0.20) 1px, transparent 0);
+    background-size: 16px 16px;
+    -webkit-mask-image: radial-gradient(ellipse 75% 70% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.55) 48%, transparent 85%);
+    mask-image: radial-gradient(ellipse 75% 70% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.55) 48%, transparent 85%);
 }
 
 /* Plataformas: el badge oscuro de pastilla se cambia por una línea suelta.
