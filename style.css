@@ -34,8 +34,21 @@ body {
 
 /* ==========================================
    SECCIÓN 1: HERO CLARO (sin intro, sin Spline)
-   ========================================== */
+   ==========================================
+   Composición a lo cartel: fondo BLANCO liso, la marca de agua gigante en gris
+   casi blanco, la skin recortada apoyada en el borde derecho y la columna de
+   texto abajo a la izquierda. Casi todo se coloca en absoluto dentro de
+   .hero-cuerpo, y el apilado NO se hace con z-index sino con el orden del DOM
+   (ver el comentario del cuerpo en index.html): el multiply de la marca se
+   rompe en cuanto algún ancestro suyo abre un contexto de apilado. */
 .hero {
+    /* El margen lateral del cartel. Lo comparten la barra de arriba, la
+       columna de texto y los datos, y la skin lo usa en negativo para
+       salirse por la derecha. */
+    --hero-margen: clamp(1.25rem, 6.6vw, 6rem);
+    /* El ancho de la skin. Va aquí arriba porque .hero-skin lo necesita dos
+       veces: para el width y para calcular cuánto tiene que hundirse. */
+    --skin-ancho: min(92vw, 1380px);
     position: relative;
     width: 100%;
     min-height: 100vh;
@@ -47,32 +60,62 @@ body {
     background-color: #ffffff;
     color: var(--tinta);
     overflow: hidden;
+    /* Este z-index es el contexto de apilado CONTRA EL QUE se mezcla la marca.
+       Es el único de la sección; no añadas más por debajo. */
     z-index: 10;
 }
 
 /* --- Caja del hero ---------------------------------------------------------
-   Blanco liso, como la sección 2: ya no hay tarjeta (ni borde, ni sombra, ni
-   fondo de manchas). La caja solo ordena el contenido.
-   Columna centrada: el ::before de arriba y el ::after de abajo crecen
-   parejos (flex 1 los dos) y reparten el aire, así todo el bloque (menú,
-   marca, datos, frase y botón) queda al centro. En una pantalla bajita son
-   ellos los que ceden, en vez de empujar el contenido fuera de la pantalla.
-   Es flex y no grid a propósito: el hero solo tiene min-height, y con eso las
-   filas fr de un grid no reparten nada. */
+   Dos filas: la barra de arriba, que mide lo que mide, y el cuerpo, que se
+   queda con todo el resto del alto. Sigue siendo el marco que mide el humo de
+   la marca (medirMarco en index.html), así que su tamaño es el del cartel
+   entero. */
 .hero-panel {
     position: relative;
     flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: grid;
+    grid-template-rows: auto 1fr;
     width: 100%;
-    padding: 3rem 2.5rem;
 }
 
-.hero-panel::before,
-.hero-panel::after {
-    content: '';
-    flex: 1 1 0;
+/* --- La barra de arriba ----------------------------------------------------
+   Etiqueta a la izquierda, el hueco de la píldora al centro y el año a la
+   derecha. Las dos columnas laterales son 1fr iguales para que el hueco del
+   medio caiga en el centro exacto de la pantalla, que es donde la píldora se
+   planta (va fija con left: 50%). */
+.hero-barra {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 1rem;
+}
+
+.hero-barra .destacada-eyebrow {
+    justify-self: start;
+    /* Sin esto parte en dos renglones en cuanto la pantalla se angosta y se
+       mete debajo de la marca. */
+    white-space: nowrap;
+}
+
+.hero-barra-meta {
+    justify-self: end;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gris-tenue);
+    white-space: nowrap;
+}
+
+/* --- El cuerpo: el lienzo --------------------------------------------------
+   Todo lo que va dentro se posiciona en absoluto menos la columna de texto,
+   que es la que da el alto mínimo. Sin z-index en ninguno: mandan el orden del
+   DOM y los `position` (ver index.html). */
+.hero-cuerpo {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-width: 0;
 }
 
 /* --- Entrada escalonada de la portada -------------------------------------
@@ -611,18 +654,19 @@ body {
     }
 }
 
-/* --- Rejilla interna: una sola columna centrada en la pantalla --- */
+/* --- Rejilla interna: el margen del cartel ---------------------------------
+   SIN z-index a propósito. Antes lo llevaba, y daba igual porque todo el hero
+   era blanco liso; ahora que debajo de la marca hay marca de agua y skin, ese
+   z-index encerraría el multiply de las letras en su propio contexto de
+   apilado y alrededor de ellas aparecería el recuadro blanco. */
 .hero-inner {
     position: relative;
-    z-index: 1;
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    /* Margen alrededor del contenido. Arriba no reserva la píldora: va
-       dentro de la columna, en .hero-menu-hueco. */
-    padding: 3.5rem 3.5rem 4.5rem;
+    /* Arriba solo 20px: es donde se planta la píldora del menú, y la barra se
+       centra con ella. Abajo nada, la skin se apoya en el borde. */
+    padding: 20px var(--hero-margen) 0;
 }
 
 .acento-verde { color: var(--verde); }
@@ -657,29 +701,157 @@ body {
     text-transform: uppercase;
 }
 
-/* 👑 CENTRO DE LA TARJETA: MARCA + DATOS DE CONFIANZA */
-/* SIN z-index a propósito: con él esto sería su propio contexto de apilado y
-   el multiply de .hero-wordmark mezclaría contra la nada en vez de contra la
-   fondo blanco del hero. */
-.hero-marca {
-    position: relative;
-    flex: 0 0 auto;
+/* 🩶 LA MARCA DE AGUA GIGANTE ------------------------------------------------
+   "ANXIE" arriba y "STORE" más abajo, en gris casi blanco y tan grandes que
+   cada línea se sale por su lado: la primera por la izquierda, la segunda por
+   la derecha (.hero se come lo que sobra con su overflow: hidden). Los
+   márgenes negativos van en vw porque el tamaño de letra también, y así el
+   trozo que se sale es siempre el mismo por mucho que cambie la pantalla.
+
+   SIN z-index: se pinta debajo de todo por ir la primera en el DOM. */
+.hero-fondo-marca {
+    position: absolute;
+    inset: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 1.75rem;
-    width: 100%;
-    max-width: 1180px;
-    text-align: center;
+    pointer-events: none;
+    user-select: none;
+    font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: clamp(5rem, 15vw, 13rem);
+    line-height: 0.82;
+    letter-spacing: -0.045em;
+    text-transform: uppercase;
+    color: #ebebeb;
 }
 
-/* El sitio de la píldora (48px = --menu-bar de escritorio). El margen de
-   abajo suma al gap de .hero-marca los 2rem que el diseño deja entre la
-   etiqueta y el titular. */
+.hero-fondo-linea {
+    display: block;
+    white-space: nowrap;
+}
+
+.hero-fondo-linea--a {
+    align-self: flex-start;
+    /* En em y no en vw: el desborde tiene que seguir al tamaño de la letra,
+       que está topado, o en pantalla ancha se despegaba del borde. */
+    margin-left: -0.5em;
+}
+
+/* "STORE" cae más abajo, a la altura del pecho de la skin, y se va casi entera
+   por el borde derecho: en el diseño solo asoman las últimas letras. */
+.hero-fondo-linea--b {
+    align-self: flex-end;
+    margin-top: clamp(3.5rem, 18vh, 10rem);
+    margin-right: -1.9em;
+}
+
+/* ✳️ ADORNOS -----------------------------------------------------------------
+   Tramas de puntos y cruces. Puro fondo, sin marcado dentro. */
+.hero-puntos {
+    position: absolute;
+    width: clamp(90px, 11vw, 160px);
+    height: clamp(45px, 5.5vw, 80px);
+    background-image: radial-gradient(#cfcfcf 1.5px, transparent 1.6px);
+    background-size: 16px 16px;
+    pointer-events: none;
+}
+
+.hero-puntos--izq { top: 24%; left: 0; }
+.hero-puntos--der { top: 20%; right: clamp(1rem, 3vw, 3rem); }
+
+/* Las cruces son dos rayitas cruzadas hechas con los pseudoelementos. */
+.hero-cruz {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    pointer-events: none;
+}
+
+.hero-cruz::before,
+.hero-cruz::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background: var(--gris-tenue);
+    transform: translate(-50%, -50%);
+}
+
+.hero-cruz::before { width: 100%; height: 2px; }
+.hero-cruz::after { width: 2px; height: 100%; }
+
+.hero-cruz--alta { top: 4%; right: clamp(4rem, 22vw, 20rem); }
+.hero-cruz--baja { top: 33%; left: clamp(14rem, 33%, 30rem); }
+
+/* 🖤 LA SKIN -----------------------------------------------------------------
+   Apoyada en el borde de abajo y saliéndose por la derecha hasta comerse el
+   margen del cartel. El SVG ya trae su propio degradado de corte abajo, así
+   que no hace falta ninguna máscara aquí: se deshace sola contra el blanco.
+
+   Va DEBAJO de la columna de texto (orden del DOM): los dedos cruzan por
+   encima de la frase, pero la frase se sigue leyendo porque la mano es clara
+   justo ahí. */
+.hero-skin {
+    position: absolute;
+    right: calc(-1 * var(--hero-margen));
+    /* Colgada de ARRIBA, no apoyada abajo. Es lo que mantiene la cabeza a la
+       altura del diseño: apoyada en bottom, una pantalla más alta la hundía
+       hasta el centro, porque el alto de la imagen no cambia pero el de la
+       sección sí. Lo que sobre por abajo se lo come el overflow de .hero. */
+    top: clamp(2.5rem, 12vh, 7rem);
+    bottom: auto;
+    width: var(--skin-ancho);
+    height: auto;
+    /* DOS apagados que se cruzan (mask-composite: intersect), porque el SVG
+       viene demasiado opaco por los dos lados que importan:
+
+       ABAJO — el dibujo termina EN SECO en el 86.9% de su viewBox (ahí corta
+       el recorte de la silueta), y encima a media opacidad, así que ese filo
+       se veía cruzando la pantalla. El apagado llega a transparente ANTES, en
+       el 87%, y el filo no llega a verse nunca. No bajes ese 87%. De paso
+       aclara la pierna, que si no tapaba los dos datos.
+
+       IZQUIERDA — la mano llega hasta la columna de texto y la base de los
+       dedos es oscura: encima de ella la frase no se leía. Este segundo
+       apagado la deja de fantasma en ese tramo, que es como está en el
+       diseño, donde lo que cruza la frase son las yemas y llegan casi
+       blancas. */
+    --skin-apagado-abajo: linear-gradient(to bottom, #000 58%, rgba(0, 0, 0, 0.5) 76%, transparent 87%);
+    --skin-apagado-izq: linear-gradient(to right, transparent 4%, rgba(0, 0, 0, 0.3) 18%, rgba(0, 0, 0, 0.75) 30%, #000 42%);
+    -webkit-mask-image: var(--skin-apagado-abajo), var(--skin-apagado-izq);
+    -webkit-mask-composite: source-in;
+    mask-image: var(--skin-apagado-abajo), var(--skin-apagado-izq);
+    mask-composite: intersect;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* ✍️ LA COLUMNA DE TEXTO ------------------------------------------------------
+   Marca, frase y botón, alineados a la izquierda y apoyados en la parte baja
+   del cartel (el align-items: flex-end del cuerpo).
+
+   SIN z-index: ver el comentario de .hero-inner. Es el único hijo del cuerpo
+   que NO va en absoluto, así que es el que le da el alto mínimo a la
+   sección. */
+.hero-columna {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2.25rem;
+    width: 100%;
+    max-width: 24rem;
+    padding-bottom: clamp(3rem, 11vh, 7rem);
+    text-align: left;
+}
+
+/* El sitio de la píldora (48px = --menu-bar de escritorio) dentro de la barra
+   de arriba. Está vacío: solo reserva el alto para que la etiqueta y el año
+   queden centrados con la píldora, y para que el JS sepa a qué altura
+   plantarla. */
 .hero-menu-hueco {
-    flex: 0 0 auto;
+    width: 180px;
     height: 48px;
-    margin-bottom: 0.25rem;
 }
 
 /* --- La marca, rellena con el humo del portal -----------------------------
@@ -688,25 +860,28 @@ body {
      2. .hero-wordmark-texto: letras NEGRAS sobre fondo BLANCO, en "screen".
         Screen con negro deja pasar lo de abajo (el humo) y con blanco da
         blanco: queda el humo con forma de letras dentro de un recuadro blanco.
-     3. El h1 entero en "multiply" contra la tarjeta: el blanco del recuadro se
-        vuelve transparente (multiplicar por blanco no cambia nada) y la
-        tablita de puntos se sigue viendo alrededor de las letras.
+     3. El h1 entero en "multiply" contra la página: el blanco del recuadro se
+        vuelve transparente (multiplicar por blanco no cambia nada), así que la
+        marca de agua y la skin se siguen viendo alrededor de las letras.
    isolation: isolate encierra la mezcla del paso 2 dentro del h1.
    Si no hay WebGL el canvas se esconde, el screen no tiene nada debajo y las
-   letras quedan negras como siempre. */
+   letras quedan negras como siempre.
+
+   OJO: ningún ancestro de esto puede abrir un contexto de apilado (z-index,
+   transform, filter, opacity < 1...) o el paso 3 mezcla contra la nada y se ve
+   el recuadro blanco tapando el fondo. */
 .hero-wordmark {
     position: relative;
     isolation: isolate;
     mix-blend-mode: multiply;
     display: flex;
-    justify-content: center;
     /* El recuadro de las letras lleva un poco de aire (ver abajo) para que
        ningún trazo se salga del humo; este margen se lo devuelve al layout. */
     margin: -0.06em -0.03em;
     font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
     font-weight: 800;
-    font-size: clamp(3rem, 10.2vw, 9.6rem);
-    line-height: 0.88;
+    font-size: clamp(2.6rem, 8.4vw, 7.5rem);
+    line-height: 0.95;
     letter-spacing: -0.045em;
     text-transform: uppercase;
     color: var(--tinta);
@@ -721,40 +896,64 @@ body {
     height: 100%;
 }
 
+/* Las dos palabras, una debajo de otra y pegadas a la izquierda. */
 .hero-wordmark-texto {
     position: relative;
     z-index: 1;
     display: flex;
-    align-items: baseline;
-    justify-content: center;
-    gap: clamp(8px, 1.25vw, 18px);
+    flex-direction: column;
+    align-items: flex-start;
     padding: 0.06em 0.03em;
     background: #ffffff;
     color: #000000;
     mix-blend-mode: screen;
 }
 
-/* Los dos datos de confianza, separados por una rayita vertical. Van en gris
-   de la familia del rótulo "CUENTAS DESTACADAS" del portal, pero más oscuro:
-   aquel 5.5% de opacidad solo se lee porque las letras son enormes, a este
-   tamaño desaparecía. */
+/* La frase: en caja normal y gris, como la bajada del diseño. */
+.hero-texto {
+    margin: 0;
+    font-weight: 500;
+    font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+    line-height: 1.65;
+    /* Más oscuro que el --gris-texto del resto del sitio a propósito: aquí la
+       mano le pasa por encima en gris claro y con el tono de siempre la frase
+       se perdía. */
+    color: #3d3d3d;
+}
+
+.hero-botones {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+/* 📊 LOS DOS DATOS DE CONFIANZA ----------------------------------------------
+   Abajo a la derecha, separados por una rayita vertical. Caen sobre el tramo
+   de la skin que su propio degradado ya está apagando, así que se leen en
+   negro sin necesidad de tapar nada.
+   Van DESPUÉS de la skin en el DOM para quedar por encima de ella. */
 .hero-datos {
+    position: absolute;
+    right: 0;
+    bottom: clamp(2.5rem, 8vh, 5.5rem);
     display: flex;
     align-items: stretch;
-    justify-content: center;
     margin: 0;
     padding: 0;
     list-style: none;
-    color: var(--gris-tenue);
+    color: var(--tinta);
 }
 
 .hero-dato {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.15rem;
+    gap: 0.3rem;
     padding: 0 1.6rem;
 }
+
+.hero-dato:last-child { padding-right: 0; }
 
 .hero-dato + .hero-dato {
     border-left: 2px solid rgba(17, 17, 17, 0.16);
@@ -763,48 +962,40 @@ body {
 .hero-dato-valor {
     font-family: 'Montserrat', sans-serif;
     font-weight: 700;
-    font-size: clamp(1.15rem, 1.6vw, 1.5rem);
+    font-size: clamp(1.4rem, 2.4vw, 2.2rem);
     line-height: 1.1;
     letter-spacing: -0.01em;
 }
 
 .hero-dato-etiqueta {
     font-family: 'Montserrat', sans-serif;
-    font-weight: 500;
+    font-weight: 600;
     font-size: clamp(0.62rem, 0.8vw, 0.75rem);
     letter-spacing: 0.16em;
     text-transform: uppercase;
+    color: var(--gris-tenue);
 }
 
-/* 📝 BAJO LOS DATOS: FRASE + BOTÓN, centrados como en el diseño */
-.hero-pie {
-    position: relative;
-    z-index: 1;
-    flex: 0 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3rem;
-    padding-top: 2.5rem;
-    text-align: center;
+/* ➤ LAS DOS FLECHAS ----------------------------------------------------------
+   Los dos triángulos negros del diseño. Van las últimas en el DOM, así que se
+   pintan encima de todo, la skin incluida. */
+.hero-flecha {
+    position: absolute;
+    display: block;
+    fill: var(--tinta);
+    pointer-events: none;
 }
 
-/* La frase: en caja normal y gris, como la bajada del diseño. */
-.hero-texto {
-    max-width: 42rem;
-    margin: 0;
-    font-weight: 500;
-    font-size: clamp(1rem, 1.35vw, 1.2rem);
-    line-height: 1.65;
-    color: var(--gris-texto);
+.hero-flecha--der {
+    top: 30%;
+    right: clamp(1.5rem, 12vw, 11rem);
+    width: clamp(60px, 9vw, 125px);
 }
 
-.hero-botones {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 1rem;
+.hero-flecha--izq {
+    bottom: 7%;
+    right: clamp(9rem, 44vw, 42rem);
+    width: clamp(48px, 6.6vw, 92px);
 }
 
 /* 🟢 EL BOTÓN DEL HERO — el "Start Typing" del diseño en verde: al pasar el
@@ -1160,42 +1351,89 @@ body {
 
 @media (max-width: 900px) {
 
-    /* 🟩 1.5. SECCIÓN 1 EN CELULAR (hero claro) */
-    .hero-inner {
-        padding: 1rem 1rem 2.5rem;
+    /* 🟩 1.5. SECCIÓN 1 EN CELULAR (hero claro)
+       El cartel de escritorio no cabe en un teléfono: la skin se comería la
+       frase entera. Así que se desarma en vertical — texto arriba, datos y
+       skin debajo — y los adornos que solo funcionan repartidos por un lienzo
+       ancho (las cruces y las flechas) se van.
+
+       El reorden va con `order` sobre el flex del cuerpo, no moviendo el
+       marcado: en el DOM la skin tiene que seguir ANTES de la marca para que
+       el multiply de las letras la encuentre debajo. */
+    .hero-panel { row-gap: 1.75rem; }
+
+    .hero-cuerpo {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 2rem;
     }
 
-    /* Con el margen de escritorio en un telefono no quedaba ancho util para
-       la marca. */
-    .hero-panel {
-        padding: 2.5rem 1.15rem;
+    .hero-columna {
+        order: 1;
+        max-width: none;
+        gap: 1.5rem;
+        padding-bottom: 0;
     }
+
+    .hero-datos { order: 2; }
+
+    .hero-skin { order: 3; }
 
     .eyebrow-punto { width: 8px; height: 8px; }
     .eyebrow-linea { width: 34px; }
     .eyebrow-texto { font-size: 0.6rem; letter-spacing: 3.5px; }
 
-    .hero-marca { gap: 1.4rem; }
+    .hero-barra-meta { font-size: 0.6rem; letter-spacing: 3.5px; }
 
-    .hero-dato { padding: 0 1.1rem; }
+    /* La marca de agua se va entera: en una pantalla angosta no hay dónde
+       ponerla que no sea justo detrás de la marca de verdad, y ahí las dos se
+       estorban. */
+    .hero-fondo-marca { display: none; }
 
-    .hero-pie {
-        width: 100%;
-        align-self: stretch;
-        gap: 2rem;
-        padding-top: 2rem;
-    }
+    .hero-cruz,
+    .hero-flecha { display: none; }
+
+    /* La trama de la izquierda se va: sin la marca de agua detrás cae justo
+       encima de la marca de verdad. */
+    .hero-puntos--izq { display: none; }
+
+    .hero-puntos--der { top: 2%; }
 
     .hero-wordmark {
-        font-size: clamp(2.6rem, 14vw, 3.8rem);
+        font-size: clamp(2.6rem, 14vw, 4.4rem);
         letter-spacing: -0.035em;
     }
-
-    .hero-wordmark-texto { gap: 8px; }
 
     .hero-texto {
         font-size: 0.95rem;
         line-height: 1.6;
+    }
+
+    /* Los datos dejan de flotar abajo a la derecha y pasan a una fila normal
+       debajo del botón. */
+    .hero-datos {
+        position: static;
+        justify-content: flex-start;
+    }
+
+    .hero-dato {
+        align-items: flex-start;
+        padding: 0 1.3rem;
+    }
+
+    .hero-dato:first-child { padding-left: 0; }
+
+    /* La skin se apoya en el borde de abajo y se sale un poco por los dos
+       lados, que es lo que la mantiene grande sin empujar nada. */
+    .hero-skin {
+        position: static;
+        width: 142%;
+        /* margin-top: auto la empuja al borde de abajo cuando sobra alto, en
+           vez de dejar un hueco blanco debajo. */
+        margin: auto -21% 0;
+        /* Aquí la skin va DEBAJO del texto, no al lado, así que el apagado
+           lateral solo se comía la mano. Se anula dejándolo opaco. */
+        --skin-apagado-izq: linear-gradient(to right, #000, #000);
     }
 
     .btn-hero {
@@ -1264,11 +1502,16 @@ body {
     .corona-watermark-plural { display: none; }
 
     /* La píldora del hero: aquí va arriba a la derecha y se abre como panel
-       lateral, así que el hueco de encima de la marca sobra, y arriba de la
-       tarjeta hay que dejarle su sitio. */
+       lateral, así que el hueco del centro de la barra sobra, y el año de la
+       derecha caería justo debajo de ella. */
     .hero-menu-hueco { display: none; }
 
-    .hero-inner { padding-top: 4.5rem; }
+    .hero-barra-meta { display: none; }
+
+    /* La etiqueta comparte renglón con la píldora, que aquí vive arriba a la
+       derecha: se acorta para no llegar a tocarla. */
+    .eyebrow-linea { width: 22px; }
+    .eyebrow-texto { font-size: 0.55rem; letter-spacing: 2.5px; }
 
     /* El botón va a todo lo ancho */
     .hero-botones {
@@ -1276,6 +1519,8 @@ body {
         flex-direction: column;
         align-items: stretch;
     }
+
+    .btn-hero { width: 100%; }
 }
 
 /* ==========================================
@@ -1392,11 +1637,14 @@ body {
     gap: 2.5rem;
 }
 
-/* La línea "● ── LO MÁS COTIZADO" aquí va sobre verde: el --verde-medio de
-   la maqueta no se leía, sube a --verde-suave */
-.destacada-eyebrow .eyebrow-punto,
-.destacada-eyebrow .eyebrow-linea { background: var(--verde-suave); }
-.destacada-eyebrow .eyebrow-texto { color: var(--verde-suave); }
+/* La línea "● ── LO MÁS COTIZADO" aquí va sobre el negro del portal: el
+   --verde-medio de la maqueta no se leía, sube a --verde-suave.
+   Va ANIDADA bajo .destacada a propósito: la línea es la misma pieza que usa
+   la barra del hero, y sin acotar esto la teñía de verde también allí, sobre
+   blanco. */
+.destacada .eyebrow-punto,
+.destacada .eyebrow-linea { background: var(--verde-suave); }
+.destacada .eyebrow-texto { color: var(--verde-suave); }
 
 /* El titular cruza el ancho entero, a la escala de la marca del hero: es lo
    que ata esta sección con la portada. */

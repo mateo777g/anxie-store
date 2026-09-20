@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260916q">
+    <link rel="stylesheet" href="style.css?v=20260919a">
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -109,32 +109,105 @@
         <div class="hero-inner">
 
             <!-- 🔲 CAJA DEL HERO
-                 Ya no se ve como tarjeta (sin borde, sin sombra, sin fondo
-                 propio): solo ordena la columna, y el humo de la marca la
-                 sigue usando como marco. -->
+                 Dos filas: la barra de arriba (etiqueta, hueco de la píldora y
+                 el año) y el cuerpo, que es el lienzo donde todo lo demás se
+                 coloca en absoluto. Sigue siendo el marco que mide el humo de
+                 la marca (u_marco), así que no le pongas z-index: rompería el
+                 multiply de las letras. -->
             <div class="hero-panel" id="heroPanel">
 
-                <!-- 👑 MARCA + DATOS DE CONFIANZA, al centro de la tarjeta -->
-                <div class="hero-marca">
+                <!-- 🔝 BARRA DE ARRIBA -->
+                <div class="hero-barra">
+
+                    <div class="destacada-eyebrow" data-reveal style="--n: 1;">
+                        <span class="eyebrow-punto" aria-hidden="true"></span>
+                        <span class="eyebrow-linea" aria-hidden="true"></span>
+                        <span class="eyebrow-texto">Tienda de cuentas</span>
+                    </div>
 
                     <!-- El sitio de la píldora del menú. Está vacío: la píldora
                          es fija (tiene que seguir a mano al bajar) y el JS la
                          pone encima de este hueco mientras se ve. -->
                     <div class="hero-menu-hueco" id="heroMenuHueco" aria-hidden="true"></div>
 
-                    <!-- Las letras van rellenas con el humo del portal: el
-                         canvas dibuja el humo y .hero-wordmark-texto lo recorta
-                         con su forma (ver style.css). El texto sigue siendo
-                         texto para buscadores y lectores de pantalla. -->
-                    <h1 class="hero-wordmark" data-reveal style="--n: 1;">
-                        <canvas class="hero-wordmark-humo" id="wordmarkHumo" aria-hidden="true"></canvas>
-                        <span class="hero-wordmark-texto">
-                            <span>Anxie</span>
-                            <span>Store</span>
-                        </span>
-                    </h1>
+                    <span class="hero-barra-meta" data-reveal style="--n: 1;">2026 — Fortnite</span>
 
-                    <ul class="hero-datos" data-reveal style="--n: 2;">
+                </div>
+
+                <!-- 🎨 EL CUERPO
+                     ORDEN DEL DOM = ORDEN DE PINTADO, y es a propósito: aquí
+                     NADIE lleva z-index. La marca se mezcla en multiply contra
+                     lo que haya debajo de ella (ver .hero-wordmark en
+                     style.css) y cualquier z-index en el camino la encerraría
+                     en su propio contexto de apilado y la rompería. Así que
+                     las capas se apilan por el orden en que están escritas:
+                     marca de agua -> adornos -> skin -> texto -> datos ->
+                     flechas. -->
+                <div class="hero-cuerpo">
+
+                    <!-- 🩶 LA MARCA DE AGUA GIGANTE
+                         "ANXIE" arriba saliéndose por la izquierda y "STORE"
+                         más abajo saliéndose por la derecha, en gris casi
+                         blanco. Es decoración pura (aria-hidden): el título de
+                         verdad es el h1 de abajo. -->
+                    <div class="hero-fondo-marca" aria-hidden="true">
+                        <span class="hero-fondo-linea hero-fondo-linea--a">Anxie</span>
+                        <span class="hero-fondo-linea hero-fondo-linea--b">Store</span>
+                    </div>
+
+                    <!-- ✳️ ADORNOS: dos tramas de puntos y dos cruces -->
+                    <span class="hero-puntos hero-puntos--izq" aria-hidden="true"></span>
+                    <span class="hero-puntos hero-puntos--der" aria-hidden="true"></span>
+                    <span class="hero-cruz hero-cruz--alta" aria-hidden="true"></span>
+                    <span class="hero-cruz hero-cruz--baja" aria-hidden="true"></span>
+
+                    <!-- 🖤 LA SKIN
+                         El SVG ya trae su propio degradado de corte abajo, por
+                         eso se apoya en el borde inferior y se deshace sola.
+                         Va antes del texto para quedar DEBAJO de el: los dedos
+                         cruzan por encima de la frase y asi la frase se
+                         sigue leyendo. -->
+                    <img class="hero-skin" src="assets/skin-pexi-vector.svg" alt="" aria-hidden="true" decoding="async" fetchpriority="high">
+
+                    <!-- ✍️ LA COLUMNA DE TEXTO, pegada abajo a la izquierda.
+                         SIN z-index (ver el comentario del cuerpo). -->
+                    <div class="hero-columna">
+
+                        <!-- Las letras van rellenas con el humo del portal: el
+                             canvas dibuja el humo y .hero-wordmark-texto lo recorta
+                             con su forma (ver style.css). El texto sigue siendo
+                             texto para buscadores y lectores de pantalla. -->
+                        <h1 class="hero-wordmark" data-reveal style="--n: 2;">
+                            <canvas class="hero-wordmark-humo" id="wordmarkHumo" aria-hidden="true"></canvas>
+                            <span class="hero-wordmark-texto">
+                                <span>Anxie</span>
+                                <span>Store</span>
+                            </span>
+                        </h1>
+
+                        <p class="hero-texto" data-reveal style="--n: 3;">
+                            Cuentas de videojuegos con <span class="acento-verde">entrega acompañada</span>.
+                            Elige la tuya en el <span class="acento-verde">catálogo</span>, escríbenos y te
+                            guiamos <span class="acento-verde">paso a paso</span> hasta que esté en tus manos.
+                        </p>
+
+                        <div class="hero-botones" data-reveal style="--n: 4;">
+                            <a href="catalogo.html#cases" class="btn-hero">
+                                <span>Ver catálogo</span>
+                                <!-- La flecha de lucide (ArrowRight), como en el diseño -->
+                                <svg class="btn-hero-flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M5 12h14" />
+                                    <path d="m12 5 7 7-7 7" />
+                                </svg>
+                            </a>
+                        </div>
+
+                    </div>
+
+                    <!-- 📊 LOS DOS DATOS DE CONFIANZA, abajo a la derecha,
+                         apoyados sobre la parte de la skin que ya se esta
+                         desvaneciendo. -->
+                    <ul class="hero-datos" data-reveal style="--n: 4;">
                         <li class="hero-dato">
                             <span class="hero-dato-valor">2 años</span>
                             <span class="hero-dato-etiqueta">Vendiendo</span>
@@ -145,27 +218,14 @@
                         </li>
                     </ul>
 
-                </div>
-
-                <!-- 📝 FRASE + ACCIÓN, centradas bajo los datos -->
-                <div class="hero-pie">
-
-                    <p class="hero-texto" data-reveal style="--n: 3;">
-                        Cuentas de videojuegos con <span class="acento-verde">entrega acompañada</span>.
-                        Elige la tuya en el <span class="acento-verde">catálogo</span>, escríbenos y te
-                        guiamos <span class="acento-verde">paso a paso</span> hasta que esté en tus manos.
-                    </p>
-
-                    <div class="hero-botones" data-reveal style="--n: 4;">
-                        <a href="catalogo.html#cases" class="btn-hero">
-                            <span>Ver catálogo</span>
-                            <!-- La flecha de lucide (ArrowRight), como en el diseño -->
-                            <svg class="btn-hero-flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M5 12h14" />
-                                <path d="m12 5 7 7-7 7" />
-                            </svg>
-                        </a>
-                    </div>
+                    <!-- ➤ LAS DOS FLECHAS, lo ultimo y por tanto encima de
+                         todo, tambien de la skin. -->
+                    <svg class="hero-flecha hero-flecha--der" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M2 2 L22 12 L2 22 L7.5 12 Z" />
+                    </svg>
+                    <svg class="hero-flecha hero-flecha--izq" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M22 2 L2 12 L22 22 L16.5 12 Z" />
+                    </svg>
 
                 </div>
 
