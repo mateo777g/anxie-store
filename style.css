@@ -190,7 +190,7 @@ body {
      claro  -> hero blanco y sección 4 blanca   (píldora verde,  panel negro)
      verde  -> fondos verdes                    (píldora blanca, panel negro)
      oscuro -> el portal ya destapado (que es humo NEGRO, no verde), el footer
-               y legal.html                     (píldora blanca, panel verde)
+               y legal.html                     (píldora blanca, panel blanco)
 
    La tipografía es Arial y no la Montserrat del resto del sitio: es la del
    diseño original de la píldora y la letra por letra del roll se lee mejor
@@ -260,21 +260,18 @@ body {
 }
 
 /* Sobre negro no puede entrar ninguno de los dos en negro, o desaparece contra
-   el fondo: píldora blanca con letras NEGRAS, y al abrir el panel entra en el
-   verde de marca. Es el espejo del tema claro, que es lo que hace que cruzar el
-   portal se sienta como darle la vuelta a la página.
-
-   Las letras van en negro y no en el verde de marca a propósito: el verde ya es
-   el color del panel de este tema, y sobre la píldora blanca se leía como si el
-   menú estuviera a medio abrir. */
+   el fondo: al abrir el panel entra en BLANCO con letras negras (21 septiembre
+   2026, a pedido del dueño; antes era el verde de marca). Es el espejo del
+   tema claro, que es lo que hace que cruzar el portal se sienta como darle la
+   vuelta a la página. */
 .menu[data-theme="oscuro"] {
     --menu-bg: transparent;
     --menu-fg: #ffffff;
     --menu-cristal: var(--cristal-borde-claro);
     --menu-boton: #ffffff;
     --menu-boton-fg: var(--tinta);
-    --menu-panel: var(--verde);
-    --menu-panel-fg: #ffffff;
+    --menu-panel: #ffffff;
+    --menu-panel-fg: var(--tinta);
 }
 
 .menu__shell {
@@ -2050,7 +2047,13 @@ body {
    pin sin recortarse. */
 .cuenta-card {
     position: relative;
-    width: min(42.5vw, 78vh);
+    /* Las fotos de las cuentas son 16:9 y se ven enteras, sin recorte (21
+       septiembre 2026, a pedido del dueño). Antes la caja era 2:1 con
+       object-fit: cover y se comía arriba y abajo. En pantallas anchas el
+       ancho no cambia (42.5vw) y la foto crece ~12% en alto, que cabe; en las
+       bajas, donde manda el alto, el tope baja de 78vh a 69.3vh (x 16/18)
+       para que la foto no pase del alto de antes y empuje el precio al arco. */
+    width: min(42.5vw, 69.3vh);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -2066,7 +2069,7 @@ body {
 .cuenta-img-box {
     position: relative;
     width: 100%;
-    aspect-ratio: 2 / 1;
+    aspect-ratio: 16 / 9;
     margin-bottom: 0.6rem;
     border-radius: 16px;
     background: #1a1a1a;
@@ -2081,10 +2084,7 @@ body {
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-
-.cuenta-card:hover .cuenta-img-box img { transform: scale(1.03); }
 
 /* En UNA línea, con puntos suspensivos. No es estética: el título lo escribe
    Supabase y puede venir larguísimo, y dentro del pin cada línea de más
@@ -2122,30 +2122,6 @@ body {
     font-weight: 500;
     font-size: 0.85rem;
     color: rgba(255, 255, 255, 0.6);
-}
-
-/* La compra: el botón verde se fue, pero el enlace a Discord sigue, estirado
-   sobre la cuenta entera (foto, título y precio llevan a comprar). El texto
-   queda solo para lectores de pantalla. */
-.cuenta-cta {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    border-radius: 16px;
-}
-
-.cuenta-cta:focus-visible {
-    outline: 2px solid #ffffff;
-    outline-offset: 6px;
-}
-
-.cuenta-cta-texto {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
 }
 
 /* Pie: el botón al catálogo y el conteo debajo, centrados sobre el arco. */
@@ -2257,13 +2233,15 @@ body {
 }
 
 /* Teléfonos bajos: el conteo sobra; lo que no puede faltar es la cuenta y el
-   botón al catálogo. La foto se hace más panorámica, que es lo que más alto
+   botón al catálogo. La cuenta se angosta (la foto va entera), que es lo que más alto
    ahorra sin tocar ningún texto. */
 @media (max-width: 900px) and (max-height: 700px) {
     .destacada { gap: 1rem; }
     .destacada-titulo { font-size: clamp(1.6rem, 8.5vw, 2.2rem); }
     .destacada-pie-texto { display: none; }
-    .cuenta-img-box { aspect-ratio: 2.2 / 1; }
+    /* Ya no se recorta a 2.2:1 (la foto va entera): se angosta la cuenta
+       para ahorrar el mismo alto. */
+    .cuenta-card { width: min(80.8%, 452px); }
 }
 
 
