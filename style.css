@@ -36,6 +36,29 @@ body {
    SECCIÓN 1: HERO CLARO (sin intro, sin Spline)
    ========================================== */
 .hero {
+    /* 📐 La unidad de la composición. La maqueta es de 1440x900, y todo lo
+       grande de la portada (la marca, el personaje, los datos y los márgenes)
+       se mide en esta unidad para que se vea igual en cualquier pantalla: es
+       1vw, salvo cuando la pantalla es tan bajita que la cabeza chocaría con
+       la píldora del menú. La cabeza llega a 52 unidades del suelo, y arriba
+       tiene que quedar sitio para la píldora (fija a 20px, 48px de alto) y
+       40px de aire: esos son los 6.75rem. Manda el alto casi siempre que la
+       pantalla es más ancha que 16:9 (un monitor con la barra del navegador,
+       una laptop de 1366x625).
+       En celular no se usa: allí la portada se apila (ver el @media 900). */
+    --hero-u: min(1vw, (100vh - 6.75rem) / 52);
+    /* Si la pantalla es más alta que la maqueta (un iPad acostado, un monitor
+       5:4), sobra alto. Todo va asentado abajo, así que ese sobrante caía
+       entero arriba y dejaba la cabeza flotando a media pantalla. Esta es la
+       mitad del sobrante: la figura y las dos columnas se suben eso, y el aire
+       queda repartido. La maqueta mide 62.5 unidades de alto (900/14.4); en
+       ella, y en cualquier pantalla más ancha, vale 0. */
+    --hero-aire: max(0px, (100vh - var(--hero-u) * 62.5) / 2);
+    /* El ancho del personaje. La marca, que cuelga de él, se mide en esta
+       misma variable, en PC y en celular, y por eso las dos van siempre
+       juntas. 51.7 unidades es lo que deja la coronilla a 52 del suelo, donde
+       la tiene la maqueta. */
+    --hero-fig: calc(var(--hero-u) * 51.7);
     position: relative;
     width: 100%;
     min-height: 100vh;
@@ -52,27 +75,22 @@ body {
 
 /* --- Caja del hero ---------------------------------------------------------
    Blanco liso, como la sección 2: ya no hay tarjeta (ni borde, ni sombra, ni
-   fondo de manchas). La caja solo ordena el contenido.
-   Columna centrada: el ::before de arriba y el ::after de abajo crecen
-   parejos (flex 1 los dos) y reparten el aire, así todo el bloque (menú,
-   marca, datos, frase y botón) queda al centro. En una pantalla bajita son
-   ellos los que ceden, en vez de empujar el contenido fuera de la pantalla.
-   Es flex y no grid a propósito: el hero solo tiene min-height, y con eso las
-   filas fr de un grid no reparten nada. */
+   fondo de manchas). La caja solo reparte el contenido en las dos esquinas de
+   abajo: la frase y el botón a la izquierda, los datos a la derecha. Es una
+   fila con align-items: flex-end, así que las dos columnas se asientan en el
+   suelo y todo el aire queda arriba. Es flex y no grid a propósito: el hero
+   solo tiene min-height, y con eso las filas fr de un grid no reparten nada.
+   Los márgenes van en --hero-u para que las esquinas queden donde la maqueta
+   a cualquier tamaño: 52px de los lados y 56px del suelo a 1440. */
 .hero-panel {
     position: relative;
     flex: 1 1 auto;
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: calc(var(--hero-u) * 4);
     width: 100%;
-    padding: 3rem 2.5rem;
-}
-
-.hero-panel::before,
-.hero-panel::after {
-    content: '';
-    flex: 1 1 0;
+    padding: 0 calc(var(--hero-u) * 3.6) calc(var(--hero-u) * 3.9 + var(--hero-aire));
 }
 
 /* --- Entrada escalonada de la portada -------------------------------------
@@ -109,7 +127,11 @@ body {
     animation-delay: calc(var(--n, 0) * 110ms);
 }
 
-/* Con el movimiento reducido no hay ola: todo aparece ya puesto. */
+/* Con el movimiento reducido no hay ola: todo aparece ya puesto. (El relevo
+   del botón se apaga en su propio bloque, al lado de sus reglas: este de aquí
+   solo puede pisar lo declarado más arriba. La cinta que tuvo el hero estuvo
+   en esta lista y por eso nunca se detuvo: su animation iba declarada
+   después.) */
 @media (prefers-reduced-motion: reduce) {
     .hero [data-reveal],
     .menu {
@@ -164,16 +186,6 @@ body {
     pointer-events: none;
     animation: menu-in 520ms var(--menu-ease) both;
     animation-delay: calc(var(--n, 0) * 110ms);
-}
-
-/* Variante del index: la píldora sigue centrada, pero su top lo escribe el JS
-   (--menu-top) para que caiga en el hueco de encima de la marca del hero, y
-   al bajar se queda pegada a 20px (ver el script "LA PÍLDORA DEL MENÚ" de
-   index.html).
-   Tiene que ir ANTES del bloque de 640px: allí .menu vuelve a mandar con
-   top: 0, y a igual especificidad gana el que va después. */
-.menu--hero {
-    top: var(--menu-top, 20px);
 }
 
 /* Entrada: baja desenfocada, primer paso de la ola de la portada (ver
@@ -611,18 +623,18 @@ body {
     }
 }
 
-/* --- Rejilla interna: una sola columna centrada en la pantalla --- */
+/* --- Rejilla interna: la columna de texto, por encima del personaje ---
+   z-index 2 contra el 1 de .hero-figura: si en alguna pantalla se tocan, el
+   texto queda encima y se sigue leyendo. */
 .hero-inner {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    /* Margen alrededor del contenido. Arriba no reserva la píldora: va
-       dentro de la columna, en .hero-menu-hueco. */
-    padding: 3.5rem 3.5rem 4.5rem;
+    /* Arriba deja pasar la píldora, que va fija a 20px y mide 48px de alto.
+       Los lados y el fondo los pone .hero-panel. */
+    padding-top: 4.5rem;
 }
 
 .acento-verde { color: var(--verde); }
@@ -657,166 +669,240 @@ body {
     text-transform: uppercase;
 }
 
-/* 👑 CENTRO DE LA TARJETA: MARCA + DATOS DE CONFIANZA */
-/* SIN z-index a propósito: con él esto sería su propio contexto de apilado y
-   el multiply de .hero-wordmark mezclaría contra la nada en vez de contra la
-   fondo blanco del hero. */
-.hero-marca {
+/* --- 🧍 EL PERSONAJE -------------------------------------------------------
+   Al centro y apoyado en el suelo, como en la maqueta. Lo que va centrado es
+   la CABEZA y no la caja: en la imagen la cabeza cae al 53.4% del ancho, y así
+   queda justo debajo de la píldora del menú. Va por debajo de las dos
+   columnas de texto (z-index 1 contra el 2 de .hero-inner).
+   El desvanecido de abajo es un mask-image, calcado de la maqueta: entero
+   hasta el 73% del alto y perdido del todo al 97.5%. Es lo que esconde que la
+   imagen viene cortada por abajo. */
+.hero-figura {
+    position: absolute;
+    left: calc(50% - var(--hero-fig) * 0.534);
+    bottom: var(--hero-aire);
+    z-index: 1;
+    width: var(--hero-fig);
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.hero-figura-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    -webkit-mask-image: linear-gradient(to bottom, #000 73%, rgba(0, 0, 0, 0.84) 78.5%, rgba(0, 0, 0, 0.56) 85.3%, rgba(0, 0, 0, 0.18) 92%, transparent 97.5%);
+    mask-image: linear-gradient(to bottom, #000 73%, rgba(0, 0, 0, 0.84) 78.5%, rgba(0, 0, 0, 0.56) 85.3%, rgba(0, 0, 0, 0.18) 92%, transparent 97.5%);
+}
+
+/* --- 🌫️ LA NIEBLA QUE SE MUEVE DENTRO DEL PERSONAJE ------------------------
+   La imagen ya es la silueta en negro con humo quieto (el mismo negro y los
+   mismos grises que el shader del portal, sin el anillo). Encima van dos capas
+   de niebla con transparencia que se pasean despacio, recortadas por DOS
+   máscaras a la vez: la silueta (el alfa de la propia imagen) y el mismo
+   desvanecido de abajo que lleva .hero-figura-img.
+   Solo se animan transforms, nada de canvas ni blend modes: es lo que trababa
+   la entrada con blur cuando el humo del hero era un shader. Por lo mismo la
+   niebla arranca quieta y no empieza a moverse hasta que terminó la entrada
+   (el retraso de 0.9s). */
+.hero-figura-humo {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    -webkit-mask-image: url('assets/hero-personaje-humo-700.webp'), linear-gradient(to bottom, #000 73%, rgba(0, 0, 0, 0.84) 78.5%, rgba(0, 0, 0, 0.56) 85.3%, rgba(0, 0, 0, 0.18) 92%, transparent 97.5%);
+    mask-image: url('assets/hero-personaje-humo-700.webp'), linear-gradient(to bottom, #000 73%, rgba(0, 0, 0, 0.84) 78.5%, rgba(0, 0, 0, 0.56) 85.3%, rgba(0, 0, 0, 0.18) 92%, transparent 97.5%);
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+}
+
+.hero-figura-humo span {
+    position: absolute;
+    inset: -18%;
+    background: url('assets/humo-niebla-a.webp') center / cover no-repeat;
+    will-change: transform;
+    animation: niebla-a 19s ease-in-out 0.9s infinite alternate;
+}
+
+.hero-figura-humo span + span {
+    background-image: url('assets/humo-niebla-b.webp');
+    animation: niebla-b 27s ease-in-out 0.9s infinite alternate;
+}
+
+@keyframes niebla-a {
+    0%   { transform: translate(-7%, 5%) rotate(0deg) scale(1); }
+    50%  { transform: translate(4%, -3%) rotate(6deg) scale(1.08); }
+    100% { transform: translate(8%, 6%) rotate(-4deg) scale(1.02); }
+}
+
+@keyframes niebla-b {
+    0%   { transform: translate(6%, -6%) rotate(0deg) scale(1.05); }
+    50%  { transform: translate(-5%, 4%) rotate(-7deg) scale(1); }
+    100% { transform: translate(-8%, -3%) rotate(5deg) scale(1.1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-figura-humo span,
+    .hero-figura-humo span + span {
+        animation: none;
+    }
+}
+
+/* --- 👑 LA MARCA, DETRÁS DE LA CABEZA ---------------------------------------
+   Gigante y en el MISMO gris que tenía la cinta "TIENDA DE CUENTAS" y que
+   sigue teniendo el rótulo "CUENTAS DESTACADAS" del portal
+   (.corona-watermark): aquí es marca de agua, no titular. Hasta el 20 de
+   septiembre de 2026 iba en negro, desvanecida hacia abajo con un mask-image;
+   en este gris la máscara la borraba del todo, así que se fue.
+
+   Cuelga de .hero-figura por lo mismo que colgaba la cinta: se mide en el
+   ancho del personaje (--hero-fig), así que queda SIEMPRE a la altura de la
+   cabeza, en PC y en celular. El z-index -1 la manda detrás de la imagen sin
+   sacarla de la figura (la figura es contexto de apilado: position + z-index
+   1), así que no se hunde bajo el fondo del hero.
+
+   Todo sale de la maqueta, en fracciones del ancho del personaje:
+   - la letra es el 22.32% (11.5 unidades) y la marca entera, de la A a la
+     última E, mide 1.4755 veces el personaje;
+   - arranca un 12.77% a la IZQUIERDA del personaje, o sea que no va centrada
+     en la pantalla: va corrida a la derecha para que la cabeza tape la "E" de
+     ANXIE y deje entero STORE, como en la maqueta;
+   - el hueco de 0.7em entre las dos palabras es el sitio de la cabeza (un
+     espacio normal dejaba media S tapada).
+   La interlínea de 0.68 hace que la caja empiece justo en el tope de las
+   mayúsculas (en Plus Jakarta Sans: 2 × 0.75 de mayúscula − 1.04 de
+   ascendente + 0.22 de descendente), así que el top es directamente la
+   altura de la letra: el 16.8% del ancho, bajo la coronilla. */
+.hero-wordmark {
+    position: absolute;
+    top: calc(var(--hero-fig) * 0.168);
+    left: calc(var(--hero-fig) * -0.1277);
+    z-index: -1;
+    display: flex;
+    gap: 0.7em;
+    margin: 0;
+    font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: calc(var(--hero-fig) * 0.2232);
+    line-height: 0.68;
+    letter-spacing: -0.045em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: rgba(17, 17, 17, 0.055);
+}
+
+/* 📝 ABAJO A LA IZQUIERDA: FRASE + BOTÓN */
+.hero-pie {
     position: relative;
+    flex: 0 1 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: calc(var(--hero-u) * 1.9);
+    text-align: left;
+}
+
+/* La frase: en caja normal y en gris, como en la maqueta. Las palabras
+   destacadas siguen verdes, que llevan su propia clase (.acento-verde). El
+   ancho va en em para que corte en los mismos cuatro renglones de la maqueta
+   con cualquier tamaño de letra: el renglón más largo ("acompañada. Elige la
+   tuya en el catálogo,") mide 20.96em, y con "hasta" el tercero ya pasaría
+   de 21.5. Por debajo de ~1220px de ancho la letra ya va en su mínimo pero
+   el personaje se sigue encogiendo, y la frase se le metía encima (a 1024 el
+   "catálogo" caía sobre su brazo): el tope de 26.3 unidades la corta antes
+   de llegar a él, que empieza en la unidad 31.4. */
+.hero-texto {
+    max-width: min(21.2em, calc(var(--hero-u) * 26.3));
+    margin: 0;
+    font-weight: 500;
+    font-size: clamp(0.95rem, calc(var(--hero-u) * 1.12), 1.2rem);
+    line-height: 1.7;
+    color: var(--gris-texto);
+}
+
+/* 📊 ABAJO A LA DERECHA: LOS DATOS DE CONFIANZA
+   Uno encima del otro, pegados al filo derecho y separados por una raya fina.
+   El número va con la letra de la marca (Plus Jakarta Sans 800, el mismo
+   tracking) y en negro; la etiqueta, chiquita, espaciada y en gris. Todo en
+   --hero-u, como en la maqueta: a 1440 el número mide 58px y la columna
+   termina en el mismo suelo que el botón. */
+.hero-datos {
     flex: 0 0 auto;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 1.75rem;
-    width: 100%;
-    max-width: 1180px;
-    text-align: center;
-}
-
-/* El sitio de la píldora (48px = --menu-bar de escritorio). El margen de
-   abajo suma al gap de .hero-marca los 2rem que el diseño deja entre la
-   etiqueta y el titular. */
-.hero-menu-hueco {
-    flex: 0 0 auto;
-    height: 48px;
-    margin-bottom: 0.25rem;
-}
-
-/* --- La marca, rellena con el humo del portal -----------------------------
-   Tres capas y dos mezclas, sin máscaras ni SVG:
-     1. .hero-wordmark-humo: el canvas del shader, abajo de todo.
-     2. .hero-wordmark-texto: letras NEGRAS sobre fondo BLANCO, en "screen".
-        Screen con negro deja pasar lo de abajo (el humo) y con blanco da
-        blanco: queda el humo con forma de letras dentro de un recuadro blanco.
-     3. El h1 entero en "multiply" contra la tarjeta: el blanco del recuadro se
-        vuelve transparente (multiplicar por blanco no cambia nada) y la
-        tablita de puntos se sigue viendo alrededor de las letras.
-   isolation: isolate encierra la mezcla del paso 2 dentro del h1.
-   Si no hay WebGL el canvas se esconde, el screen no tiene nada debajo y las
-   letras quedan negras como siempre. */
-.hero-wordmark {
-    position: relative;
-    isolation: isolate;
-    mix-blend-mode: multiply;
-    display: flex;
-    justify-content: center;
-    /* El recuadro de las letras lleva un poco de aire (ver abajo) para que
-       ningún trazo se salga del humo; este margen se lo devuelve al layout. */
-    margin: -0.06em -0.03em;
-    font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
-    font-weight: 800;
-    font-size: clamp(3rem, 10.2vw, 9.6rem);
-    line-height: 0.88;
-    letter-spacing: -0.045em;
-    text-transform: uppercase;
-    color: var(--tinta);
-}
-
-.hero-wordmark-humo {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    display: block;
-    width: 100%;
-    height: 100%;
-}
-
-.hero-wordmark-texto {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: baseline;
-    justify-content: center;
-    gap: clamp(8px, 1.25vw, 18px);
-    padding: 0.06em 0.03em;
-    background: #ffffff;
-    color: #000000;
-    mix-blend-mode: screen;
-}
-
-/* Los dos datos de confianza, separados por una rayita vertical. Van en gris
-   de la familia del rótulo "CUENTAS DESTACADAS" del portal, pero más oscuro:
-   aquel 5.5% de opacidad solo se lee porque las letras son enormes, a este
-   tamaño desaparecía. */
-.hero-datos {
-    display: flex;
-    align-items: stretch;
-    justify-content: center;
+    align-items: flex-end;
     margin: 0;
     padding: 0;
     list-style: none;
-    color: var(--gris-tenue);
+    text-align: right;
+    color: #000000;
 }
 
 .hero-dato {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 0.15rem;
-    padding: 0 1.6rem;
+    align-items: flex-end;
+    gap: calc(var(--hero-u) * 0.25);
 }
 
-.hero-dato + .hero-dato {
-    border-left: 2px solid rgba(17, 17, 17, 0.16);
+/* La raya entre los dos, más corta que los números. En la maqueta hay 1.5
+   unidades de la línea base de la etiqueta a la raya y 2 de la raya al tope
+   del número; los márgenes son eso menos lo que cada caja de texto sobra por
+   encima y por debajo de la letra (y, abajo, menos el gap del .hero-dato,
+   que también cae entre la raya y el número). */
+.hero-dato + .hero-dato::before {
+    content: '';
+    width: calc(var(--hero-u) * 8.4);
+    height: 1px;
+    margin: calc(var(--hero-u) * 1.37) 0 calc(var(--hero-u) * 1.11);
+    background: rgba(17, 17, 17, 0.16);
 }
 
 .hero-dato-valor {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: clamp(1.15rem, 1.6vw, 1.5rem);
-    line-height: 1.1;
-    letter-spacing: -0.01em;
+    font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: calc(var(--hero-u) * 4);
+    line-height: 1;
+    letter-spacing: -0.045em;
 }
 
 .hero-dato-etiqueta {
     font-family: 'Montserrat', sans-serif;
     font-weight: 500;
-    font-size: clamp(0.62rem, 0.8vw, 0.75rem);
-    letter-spacing: 0.16em;
+    font-size: max(0.62rem, calc(var(--hero-u) * 0.91));
+    line-height: 1;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-}
-
-/* 📝 BAJO LOS DATOS: FRASE + BOTÓN, centrados como en el diseño */
-.hero-pie {
-    position: relative;
-    z-index: 1;
-    flex: 0 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3rem;
-    padding-top: 2.5rem;
-    text-align: center;
-}
-
-/* La frase: en caja normal y gris, como la bajada del diseño. */
-.hero-texto {
-    max-width: 42rem;
-    margin: 0;
-    font-weight: 500;
-    font-size: clamp(1rem, 1.35vw, 1.2rem);
-    line-height: 1.65;
-    color: var(--gris-texto);
+    color: var(--gris-tenue);
 }
 
 .hero-botones {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     flex-wrap: wrap;
     gap: 1rem;
 }
 
-/* 🟢 EL BOTÓN DEL HERO — el "Start Typing" del diseño en verde: al pasar el
-   cursor crece un 5%, le sale un anillo verde tenue y la flecha avanza; al
-   pulsarlo se hunde. */
+/* 🟢 EL BOTÓN DEL HERO — píldora verde con la flecha en un círculo blanco.
+   Al pasar el cursor nada se mueve de sitio: lo que hay dentro se RELEVA. El
+   texto sube y una copia idéntica entra por abajo; la flecha se va en diagonal
+   hacia arriba a la derecha y otra entra desde abajo a la izquierda. Las dos
+   copias existen siempre en el marcado y cada caja las recorta con overflow,
+   así que no hay JS ni se reflowea nada: solo dos transforms.
+   El ancho del botón no cambia en hover a propósito — si creciera, el relevo
+   se leería como un salto. */
 .btn-hero {
+    --btn-hero-ease: cubic-bezier(0.22, 1, 0.36, 1);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 18px;
     height: 56px;
-    padding: 0 48px;
+    /* Menos aire a la derecha: ahí el círculo hace de tope. */
+    padding: 0 7px 0 34px;
     border-radius: 999px;
     background: var(--verde);
     color: #ffffff;
@@ -825,26 +911,70 @@ body {
     font-size: 1rem;
     text-decoration: none;
     white-space: nowrap;
-    box-shadow: 0 0 0 0 rgba(28, 78, 47, 0.2);
-    transition: background-color 300ms ease, transform 300ms ease, box-shadow 300ms ease;
+    transition: background-color 300ms ease, transform 300ms ease;
 }
 
-.btn-hero:hover {
-    background: rgba(28, 78, 47, 0.9);
-    transform: scale(1.05);
-    box-shadow: 0 0 0 4px rgba(28, 78, 47, 0.2);
+.btn-hero:hover { background: #163d25; }
+
+.btn-hero:active { transform: scale(0.97); }
+
+/* La ventanita del texto: alta como su propia línea, para que el relevo no
+   corte las tildes ni las colas de la "g". */
+.btn-hero-rodillo {
+    display: grid;
+    overflow: hidden;
+    line-height: 1.45;
 }
 
-.btn-hero:active { transform: scale(0.95); }
+.btn-hero-copia {
+    grid-area: 1 / 1;
+    transition: transform 460ms var(--btn-hero-ease);
+}
+
+/* La de repuesto espera fuera de cuadro, justo debajo. */
+.btn-hero-copia + .btn-hero-copia { transform: translateY(100%); }
+
+.btn-hero:hover .btn-hero-copia { transform: translateY(-100%); }
+.btn-hero:hover .btn-hero-copia + .btn-hero-copia { transform: translateY(0); }
+
+/* El círculo blanco: la otra ventanita, esta redonda. */
+.btn-hero-circulo {
+    position: relative;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #ffffff;
+    color: var(--verde);
+    overflow: hidden;
+}
 
 .btn-hero-flecha {
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    transition: transform 300ms ease;
+    grid-area: 1 / 1;
+    width: 17px;
+    height: 17px;
+    transition: transform 460ms var(--btn-hero-ease);
 }
 
-.btn-hero:hover .btn-hero-flecha { transform: translateX(4px); }
+/* 140% y no 100%: en diagonal la esquina de la flecha asoma más tiempo, y con
+   100% justo se le ve la punta pegada al borde del círculo. */
+.btn-hero-flecha--entra { transform: translate(-140%, 140%); }
+
+.btn-hero:hover .btn-hero-flecha { transform: translate(140%, -140%); }
+.btn-hero:hover .btn-hero-flecha--entra { transform: translate(0, 0); }
+
+/* Sin relevo con el movimiento reducido: el cambio es instantáneo. Va aquí y
+   no en el bloque de arriba porque a igual especificidad manda el que va
+   después, y las reglas del botón son estas. */
+@media (prefers-reduced-motion: reduce) {
+    .btn-hero,
+    .btn-hero-copia,
+    .btn-hero-flecha {
+        transition: none;
+    }
+}
 
 /* 🟢 BOTÓN DE CONTORNO VERDE (Discord) */
 .btn-discord-linea {
@@ -1160,47 +1290,108 @@ body {
 
 @media (max-width: 900px) {
 
-    /* 🟩 1.5. SECCIÓN 1 EN CELULAR (hero claro) */
-    .hero-inner {
-        padding: 1rem 1rem 2.5rem;
+    /* 🟩 1.5. SECCIÓN 1 EN CELULAR (hero claro)
+       No hay ancho para las dos esquinas a los lados del personaje, así que
+       todo se apila: arriba el personaje con la marca por detrás, igual que en
+       PC; debajo los dos datos, en fila; y al final la frase y el botón. El
+       texto se encima en el desvanecido del personaje (el margen negativo de
+       .hero-inner) para que no quede un hueco blanco entre los dos. El grupo
+       va centrado en el alto: en un teléfono alto el aire se reparte arriba y
+       abajo en vez de abrirse entre la imagen y el texto.
+       --hero-fig manda aquí lo mismo que en PC (la marca se mide con él),
+       pero sale del ancho de la pantalla: es el ancho que hace que la marca,
+       1.4755 veces el personaje, llene la pantalla de margen a margen. El tope
+       de 60svh es para el teléfono acostado, donde si no el personaje salía
+       más alto que la pantalla. */
+    .hero {
+        --hero-fig: min((100vw - 2.3rem) / 1.4755, 60svh);
+        justify-content: center;
+        /* La cabeza tiene que librar la píldora, que en celular va arriba a
+           la derecha. */
+        padding-top: 4rem;
     }
 
-    /* Con el margen de escritorio en un telefono no quedaba ancho util para
-       la marca. */
+    /* La figura entra en el flujo. Lo que se centra aquí es la MARCA y no la
+       cabeza como en PC: con la cabeza al centro, la marca (que va corrida a
+       la derecha) se salía de la pantalla. */
+    .hero-figura {
+        position: relative;
+        left: auto;
+        bottom: auto;
+        align-self: flex-start;
+        margin-left: calc((100vw - var(--hero-fig) * 1.4755) / 2 + var(--hero-fig) * 0.1277);
+    }
+
+    /* El texto sube hasta donde la figura ya casi se borró (el 92% de su alto,
+       donde el desvanecido va en 0.18). */
+    .hero-inner {
+        flex: 0 0 auto;
+        margin-top: calc(var(--hero-fig) * -0.086);
+        padding-top: 0;
+    }
+
+    /* Las dos esquinas de PC se vuelven una columna. Con el margen de
+       escritorio en un teléfono no quedaba ancho útil para la frase. */
     .hero-panel {
-        padding: 2.5rem 1.15rem;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.4rem;
+        padding: 0 1.15rem 2.5rem;
     }
 
     .eyebrow-punto { width: 8px; height: 8px; }
     .eyebrow-linea { width: 34px; }
     .eyebrow-texto { font-size: 0.6rem; letter-spacing: 3.5px; }
 
-    .hero-marca { gap: 1.4rem; }
-
-    .hero-dato { padding: 0 1.1rem; }
-
-    .hero-pie {
-        width: 100%;
-        align-self: stretch;
-        gap: 2rem;
-        padding-top: 2rem;
-    }
-
-    .hero-wordmark {
-        font-size: clamp(2.6rem, 14vw, 3.8rem);
-        letter-spacing: -0.035em;
-    }
-
-    .hero-wordmark-texto { gap: 8px; }
+    .hero-pie { gap: 2rem; }
 
     .hero-texto {
+        max-width: none;
         font-size: 0.95rem;
         line-height: 1.6;
     }
 
+    /* Los datos, en fila y por encima de la frase (order), con la raya en
+       vertical entre los dos en vez de horizontal. */
+    .hero-datos {
+        order: -1;
+        flex-direction: row;
+        align-items: stretch;
+        text-align: left;
+    }
+
+    .hero-dato {
+        align-items: flex-start;
+        gap: 0.35rem;
+        padding: 0 1.4rem;
+    }
+
+    .hero-dato:first-child { padding-left: 0; }
+
+    .hero-dato + .hero-dato { border-left: 1px solid rgba(17, 17, 17, 0.16); }
+
+    .hero-dato + .hero-dato::before { content: none; }
+
+    .hero-dato-valor { font-size: 2rem; }
+
+    .hero-dato-etiqueta {
+        font-size: 0.62rem;
+        letter-spacing: 0.12em;
+    }
+
+    /* Aquí el botón se estira a todo el ancho (.hero-botones lo hace), así que
+       el texto se va a la izquierda y el círculo al filo derecho: centrados
+       los dos dejaban un hueco raro a la derecha. */
     .btn-hero {
         height: 52px;
-        padding: 0 1.5rem;
+        gap: 14px;
+        padding: 0 6px 0 1.5rem;
+        justify-content: space-between;
+    }
+
+    .btn-hero-circulo {
+        width: 40px;
+        height: 40px;
     }
 
     .btn-discord-linea,
@@ -1262,13 +1453,6 @@ body {
     }
 
     .corona-watermark-plural { display: none; }
-
-    /* La píldora del hero: aquí va arriba a la derecha y se abre como panel
-       lateral, así que el hueco de encima de la marca sobra, y arriba de la
-       tarjeta hay que dejarle su sitio. */
-    .hero-menu-hueco { display: none; }
-
-    .hero-inner { padding-top: 4.5rem; }
 
     /* El botón va a todo lo ancho */
     .hero-botones {

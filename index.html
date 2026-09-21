@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260916q">
+    <link rel="stylesheet" href="style.css?v=20260920l">
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -30,18 +30,17 @@
 
     <!--
         🟢 MENÚ PÍLDORA (reemplazó a la navbar vieja).
-        Píldora fija al centro, pero en la portada va encajada en la tarjeta
-        del hero, justo encima de la marca (.menu--hero: su top lo escribe el
-        JS siguiendo a .hero-menu-hueco, y al subir la página se queda pegada
-        arriba). Cerrada muestra "Menú" + hamburguesa; al abrirse se estira y
-        un círculo baja desde arriba pintando el panel. En celular se convierte
-        en un panel lateral de alto completo, anclado a la derecha.
+        Píldora fija arriba al centro, a 20px, igual en toda la página: el
+        hero ya no la baja a un hueco dentro de la tarjeta. Cerrada muestra
+        "Menú" + hamburguesa; al abrirse se estira y un círculo baja desde
+        arriba pintando el panel. En celular se convierte en un panel lateral
+        de alto completo, anclado a la derecha.
 
         El color lo cambia el JS según la sección que tenga debajo
         (data-theme = claro | verde). Arranca en "claro" porque el hero es
         blanco. Ver el bloque MENÚ PÍLDORA de style.css y menu.js.
     -->
-    <nav class="menu menu--hero" data-theme="claro" aria-label="Menú principal">
+    <nav class="menu" data-theme="claro" aria-label="Menú principal">
         <div class="menu__shell">
             <!-- El círculo que "moja" el panel al abrir. Va detrás del texto. -->
             <span class="menu__circle" aria-hidden="true"></span>
@@ -97,57 +96,66 @@
 
     <!-- ==========================================================
          SECCIÓN 1: HERO CLARO
-         Todo en una columna al centro, sobre blanco liso (como la sección 2):
-         el hueco de la píldora del menú, la marca, los dos datos de confianza
-         (años vendiendo y referencias), la frase y el botón al catálogo. El
-         Discord ya no va aquí: lo lleva la sección 3.
+         Sobre blanco liso, calcado de la maqueta del 20 de septiembre de 2026:
+         el personaje al centro, apoyado abajo, con "ANXIE STORE" gigante y en
+         gris por detrás de su cabeza; abajo a la izquierda la frase y el botón
+         al catálogo, y abajo a la derecha los dos datos de confianza, uno
+         encima del otro. La cinta "TIENDA DE CUENTAS" ya no va: la marca ocupa
+         su sitio y hereda su gris. El Discord no va aquí: lo lleva la sección 3.
          El scroll-jacking no vive aquí, vive en el portal de la corona que
          va justo debajo.
          ========================================================== -->
     <header class="hero" id="home">
 
+        <!-- 🧍 EL PERSONAJE, CON LA MARCA POR DETRÁS
+             La imagen es assets/diseño 2.png pasada a WebP en tres anchos
+             (700, 1100 y 1600) para no bajar el PNG de 1.5 MB. Viene cortada
+             por abajo; el desvanecido lo pone un mask-image en style.css, y es
+             lo que esconde el corte.
+
+             La marca va DENTRO de esta caja, como iba antes la cinta, para
+             quedar siempre a la altura de la cabeza: se mide en el ancho del
+             personaje y crece y se encoge con él. Se sale de la caja a lo ancho
+             a propósito, y su z-index -1 la manda detrás de la imagen sin
+             hundirla bajo el fondo del hero. La cabeza tapa la "E" de ANXIE:
+             así viene en la maqueta, y por eso entre las dos palabras hay un
+             hueco más ancho que un espacio. -->
+        <div class="hero-figura">
+            <h1 class="hero-wordmark" data-reveal style="--n: 1;">
+                <span>Anxie</span>
+                <span>Store</span>
+            </h1>
+
+            <!-- 🌫️ La silueta en negro con humo va HORNEADA en la imagen (sale
+                 de assets/diseño 2.png); la niebla que se mueve encima es
+                 .hero-figura-humo, dos capas de CSS. Nada de shader en vivo: el
+                 hero entra con un filter: blur() y un canvas aquí lo arrastraba. -->
+            <img class="hero-figura-img"
+                 src="assets/hero-personaje-humo-1100.webp"
+                 srcset="assets/hero-personaje-humo-700.webp 700w,
+                         assets/hero-personaje-humo-1100.webp 1100w,
+                         assets/hero-personaje-humo-1600.webp 1600w"
+                 sizes="(max-width: 900px) 66vw, 52vw"
+                 width="2004" height="2154" alt=""
+                 fetchpriority="high" decoding="async"
+                 data-reveal style="--n: 2;">
+
+            <div class="hero-figura-humo" aria-hidden="true"
+                 data-reveal style="--n: 2;">
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
         <div class="hero-inner">
 
-            <!-- 🔲 CAJA DEL HERO
-                 Ya no se ve como tarjeta (sin borde, sin sombra, sin fondo
-                 propio): solo ordena la columna, y el humo de la marca la
-                 sigue usando como marco. -->
+            <!-- 🔲 LAS DOS ESQUINAS DE ABAJO
+                 Sin tarjeta (sin borde, sin sombra, sin fondo propio): solo
+                 reparte el contenido, la frase a la izquierda y los datos a la
+                 derecha, los dos asentados abajo. -->
             <div class="hero-panel" id="heroPanel">
 
-                <!-- 👑 MARCA + DATOS DE CONFIANZA, al centro de la tarjeta -->
-                <div class="hero-marca">
-
-                    <!-- El sitio de la píldora del menú. Está vacío: la píldora
-                         es fija (tiene que seguir a mano al bajar) y el JS la
-                         pone encima de este hueco mientras se ve. -->
-                    <div class="hero-menu-hueco" id="heroMenuHueco" aria-hidden="true"></div>
-
-                    <!-- Las letras van rellenas con el humo del portal: el
-                         canvas dibuja el humo y .hero-wordmark-texto lo recorta
-                         con su forma (ver style.css). El texto sigue siendo
-                         texto para buscadores y lectores de pantalla. -->
-                    <h1 class="hero-wordmark" data-reveal style="--n: 1;">
-                        <canvas class="hero-wordmark-humo" id="wordmarkHumo" aria-hidden="true"></canvas>
-                        <span class="hero-wordmark-texto">
-                            <span>Anxie</span>
-                            <span>Store</span>
-                        </span>
-                    </h1>
-
-                    <ul class="hero-datos" data-reveal style="--n: 2;">
-                        <li class="hero-dato">
-                            <span class="hero-dato-valor">2 años</span>
-                            <span class="hero-dato-etiqueta">Vendiendo</span>
-                        </li>
-                        <li class="hero-dato">
-                            <span class="hero-dato-valor">+700</span>
-                            <span class="hero-dato-etiqueta">Referencias</span>
-                        </li>
-                    </ul>
-
-                </div>
-
-                <!-- 📝 FRASE + ACCIÓN, centradas bajo los datos -->
+                <!-- 📝 FRASE + ACCIÓN, abajo a la izquierda -->
                 <div class="hero-pie">
 
                     <p class="hero-texto" data-reveal style="--n: 3;">
@@ -157,17 +165,47 @@
                     </p>
 
                     <div class="hero-botones" data-reveal style="--n: 4;">
+                        <!-- El texto y la flecha van DUPLICADOS: al pasar el
+                             cursor, la copia de arriba se va y la de abajo
+                             ocupa su sitio (ver .btn-hero en style.css). La
+                             segunda copia del texto es aria-hidden para que el
+                             lector de pantalla no lea "Ver catálogo" dos
+                             veces. -->
                         <a href="catalogo.html#cases" class="btn-hero">
-                            <span>Ver catálogo</span>
-                            <!-- La flecha de lucide (ArrowRight), como en el diseño -->
-                            <svg class="btn-hero-flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M5 12h14" />
-                                <path d="m12 5 7 7-7 7" />
-                            </svg>
+                            <span class="btn-hero-rodillo">
+                                <span class="btn-hero-copia">Ver catálogo</span>
+                                <span class="btn-hero-copia" aria-hidden="true">Ver catálogo</span>
+                            </span>
+                            <!-- La flecha de lucide (ArrowUpRight): sale hacia
+                                 arriba a la derecha y entra otra desde abajo a
+                                 la izquierda, en diagonal. -->
+                            <span class="btn-hero-circulo" aria-hidden="true">
+                                <svg class="btn-hero-flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M7 17 17 7" />
+                                    <path d="M7 7h10v10" />
+                                </svg>
+                                <svg class="btn-hero-flecha btn-hero-flecha--entra" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M7 17 17 7" />
+                                    <path d="M7 7h10v10" />
+                                </svg>
+                            </span>
                         </a>
                     </div>
 
                 </div>
+
+                <!-- 📊 DATOS DE CONFIANZA, abajo a la derecha, uno encima del
+                     otro y separados por una raya fina. -->
+                <ul class="hero-datos" data-reveal style="--n: 3;">
+                    <li class="hero-dato">
+                        <span class="hero-dato-valor">2 años</span>
+                        <span class="hero-dato-etiqueta">Vendiendo</span>
+                    </li>
+                    <li class="hero-dato">
+                        <span class="hero-dato-valor">+700</span>
+                        <span class="hero-dato-etiqueta">Referencias</span>
+                    </li>
+                </ul>
 
             </div>
 
@@ -1235,13 +1273,11 @@
          original es un componente de React; aquí va portado a JS plano porque
          este proyecto no tiene build step. Cero dependencias.
 
-         El MISMO humo rellena las letras de "ANXIE STORE" en el hero: un
-         segundo <canvas> (#wordmarkHumo) con su propio contexto, creado por la
-         misma función crearHumo(). Ese canvas solo mide lo que mide la marca,
-         pero dibuja como si ocupara la tarjeta entera (el "marco"): así las
-         letras son ventanas a un anillo de humo del tamaño de la tarjeta, igual
-         que la corona es una ventana al del portal. El recorte con la forma de
-         las letras lo hace el CSS (ver .hero-wordmark en style.css).
+         Hasta septiembre de 2026 este mismo humo rellenaba las letras de
+         "ANXIE STORE" en el hero, con un segundo <canvas>. Se quitó: la marca
+         es negra y basta. crearHumo() sigue aceptando un "marco" más grande que
+         el canvas (el uniform u_marco) por si alguna vez hay que colgar otro
+         recorte del mismo anillo en otro sitio.
 
          Cuidado si lo tocas:
            - El canvas vive DENTRO de un elemento con transform: scale(). Para
@@ -1249,9 +1285,9 @@
              el rect llega ya escalado, y el canvas se estaría redimensionando
              en cada fotograma del zoom, que es lo más caro que hay.
            - Si no hay WebGL, si el contexto se pierde, o si el sistema pide
-             menos animación, el canvas se esconde: en el portal queda el verde
-             plano de .corona-lienzo, y en la marca las letras vuelven a negro.
-           - Cada canvas solo dibuja estando en pantalla y con la pestaña
+             menos animación, el canvas se esconde y en el portal queda el verde
+             plano de .corona-lienzo.
+           - El canvas solo dibuja estando en pantalla y con la pestaña
              visible.
          ========================================================== -->
     <script>
@@ -1259,8 +1295,7 @@
         'use strict';
 
         const canvasCorona = document.getElementById('coronaShader');
-        const canvasLetras = document.getElementById('wordmarkHumo');
-        if (!canvasCorona && !canvasLetras) return;
+        if (!canvasCorona) return;
 
         // 🎨 PALETA: los 4 colores del preset, en RGB de 0 a 1 (NO de 0 a 255).
         //    El [0] es el fondo oscuro y el [1] el filo brillante del anillo.
@@ -1302,8 +1337,7 @@
         // Si el sistema pide menos animación, ni encendemos WebGL.
         if (window.matchMedia &&
             window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            if (canvasCorona) canvasCorona.style.display = 'none';
-            if (canvasLetras) canvasLetras.style.display = 'none';
+            canvasCorona.style.display = 'none';
             return;
         }
 
@@ -1763,9 +1797,7 @@ void main() {
         }
 
         // 👑 EL PORTAL: el marco es el propio canvas.
-        const humoCorona = canvasCorona
-            ? crearHumo(canvasCorona, { nombre: 'Shader de la corona' })
-            : null;
+        const humoCorona = crearHumo(canvasCorona, { nombre: 'Shader de la corona' });
 
         // 🔌 LO ÚNICO QUE ESTE BLOQUE EXPONE
         // pintarCorona() (el JS del portal, más arriba) llama a setTapado(true)
@@ -1779,94 +1811,9 @@ void main() {
             }
         };
 
-        // 🔤 LA MARCA DEL HERO: el marco es la tarjeta entera (.hero-panel), y
-        // el canvas es el trozo de ella que ocupan las letras.
-        if (canvasLetras) {
-            const panel = canvasLetras.closest('.hero-panel');
-            const marca = canvasLetras.closest('.hero-wordmark');
-            const humoLetras = crearHumo(canvasLetras, {
-                nombre: 'Shader de la marca',
-                observarTambien: panel,
-                // En celular y tablet la tarjeta es alta y angosta, y el anillo
-                // (que se mide contra el lado CORTO) quedaba tan chico que su
-                // filo blanco pasaba por todas las letras y "STORE" se perdía
-                // contra el fondo. Ahí el marco se ensancha a 1.6 veces las
-                // letras (sin pasarse del alto de la tarjeta): el centro de la
-                // palabra cae en el humo oscuro y el filo solo roza las
-                // puntas, que es como se ve en PC.
-                medirMarco: panel ? function () {
-                    const rp = panel.getBoundingClientRect();
-                    const rc = canvasLetras.getBoundingClientRect();
-                    const vertical = rp.height > rp.width;
-                    const ancho = vertical
-                        ? Math.max(rp.width, Math.min(rp.height, rc.width * 1.6))
-                        : rp.width;
-                    const izquierda = rp.left - (ancho - rp.width) / 2;
-                    return {
-                        x: rc.left - izquierda,
-                        y: rc.top - rp.top,
-                        ancho: ancho,
-                        alto: rp.height
-                    };
-                } : null
-            });
-
-            // La marca entra bajando 20px (la ola del hero): si se midió a media
-            // animación el marco quedó corrido, así que al terminar se remide.
-            // Lo mismo cuando carga la tipografía, que cambia el ancho.
-            if (humoLetras && marca) {
-                marca.addEventListener('animationend', humoLetras.remedir);
-                if (document.fonts && document.fonts.ready) {
-                    document.fonts.ready.then(humoLetras.remedir);
-                }
-            }
-        }
     })();
     </script>
 
-    <!-- ==========================================================
-         🧭 LA PÍLDORA DEL MENÚ, ENCAJADA EN EL HERO
-         ==========================================================
-         La píldora es position: fixed (tiene que seguir a mano en toda la
-         página), pero en la portada su sitio es el hueco de encima de la
-         marca. Así que aquí solo se le escribe el top: el del hueco mientras
-         se ve, y nunca menos de 20px. Al bajar, sube con la tarjeta hasta
-         pegarse arriba y ahí se queda, como un sticky.
-         En celular (hasta 640px) el CSS ignora --menu-top: allí la píldora
-         vive arriba a la derecha y se abre como panel lateral.
-         ========================================================== -->
-    <script>
-    (function () {
-        'use strict';
-
-        const menu = document.querySelector('.menu--hero');
-        const hueco = document.getElementById('heroMenuHueco');
-        if (!menu || !hueco) return;
-
-        const TOPE = 20;
-        let pedido = false;
-
-        function colocar() {
-            pedido = false;
-            const top = Math.max(TOPE, Math.round(hueco.getBoundingClientRect().top));
-            menu.style.setProperty('--menu-top', top + 'px');
-        }
-
-        function pedir() {
-            if (pedido) return;
-            pedido = true;
-            requestAnimationFrame(colocar);
-        }
-
-        colocar();
-        window.addEventListener('scroll', pedir, { passive: true });
-        window.addEventListener('resize', pedir);
-        // La tipografía de la marca cambia su alto al cargar, y con él dónde
-        // cae el hueco.
-        if (window.ResizeObserver) new ResizeObserver(pedir).observe(document.getElementById('heroPanel'));
-        if (document.fonts && document.fonts.ready) document.fonts.ready.then(pedir);
-    })();
-    </script>
 
 </body>
 </html>
