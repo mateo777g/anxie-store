@@ -163,8 +163,8 @@
     abrirMenu(false);
 
     // 🎨 Puerta para que la página diga de qué color va la píldora. index.html la
-    // llama desde su bucle de scroll; legal.html no la usa nunca y se queda con
-    // el data-theme que trae el HTML. Se compara antes de escribir para no
+    // llama desde su bucle de scroll; legal.html, desde el script de su footer
+    // (clara sobre la página blanca, oscura sobre el footer). Se compara antes de escribir para no
     // reiniciar la transición de color en cada fotograma.
     window.anxieMenu = {
         setTema(tema) {

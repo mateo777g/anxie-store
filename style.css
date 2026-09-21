@@ -2684,8 +2684,9 @@ body {
 
    A diferencia de la sección 2, aquí el estado escondido SÍ depende del JS:
    index.html les pone .revela al arrancar y luego quita y pone .is-revealed
-   al scrollear. Sin JS no hay .revela y todo se ve. Por eso también el footer
-   de catalogo.html y legal.html, que no llevan ese JS, no cambia. */
+   al scrollear. Sin JS no hay .revela y todo se ve. catalogo.html y
+   legal.html hacen lo mismo con su footer en un script propio, al final de
+   cada página. */
 .seccion-tres.revela {
     /* El --n más alto del markup (el botón). */
     --n-ultimo: 2;
@@ -2912,8 +2913,11 @@ body {
    los atajos y las redes queden dentro del negro del arco (22 septiembre
    2026, a pedido del dueño). La franja que se monta sobre la sección es
    transparente: el negro de ahí lo pone el arco, y un rectángulo negro
-   taparía sus orillas, que a esa altura todavía están en el borde gris. */
-.seccion-tres-scroll-wrapper + .footer-social {
+   taparía sus orillas, que a esa altura todavía están en el borde gris.
+   catalogo.html y legal.html llevan el mismo arco en su propia franja
+   (.pie-arco, más abajo) y el mismo montaje. */
+.seccion-tres-scroll-wrapper + .footer-social,
+.pie-arco + .footer-social {
     --footer-jalon: calc(var(--s3-arco-asoma) * 0.5);
     margin-top: calc(var(--footer-jalon) * -1);
     background: linear-gradient(to bottom, transparent var(--footer-jalon), #000000 var(--footer-jalon));
@@ -2924,9 +2928,27 @@ body {
    una rayita gris de lado a lado. El negro del footer arranca 2px antes y
    la tapa; ahí el arco ya es negro, así que no se nota la diferencia. */
 @media (max-width: 900px) {
-    .seccion-tres-scroll-wrapper + .footer-social {
+    .seccion-tres-scroll-wrapper + .footer-social,
+    .pie-arco + .footer-social {
         background: linear-gradient(to bottom, transparent calc(var(--footer-jalon) - 2px), #000000 calc(var(--footer-jalon) - 2px));
     }
+}
+
+/* 🌑 EL ARCO DEL PIE EN catalogo.html Y legal.html (22 septiembre 2026, a
+   pedido del dueño: el footer tiene que ser el mismo en todo el sitio). En
+   index el arco cuelga del fondo de la sección 3, que le reserva hueco con
+   su padding de abajo; aquí no hay sección 3, así que va en una franja
+   propia, alta justo lo que asoma, entre el contenido y el footer. Dentro
+   va el mismo .s3-arco de index: con la franja así de alta, su
+   `top: calc(100% - asoma)` lo deja arriba del todo, y el overflow lo corta
+   igual que la sección 3. Como es un bloque aparte, no tapa nada del
+   contenido: solo suma su alto. Sin fondo: encima asoma el de la página
+   (blanco en el catálogo, negro en el aviso legal). */
+.pie-arco {
+    position: relative;
+    height: var(--s3-arco-asoma);
+    overflow: hidden;
+    pointer-events: none;
 }
 
 .footer-top {

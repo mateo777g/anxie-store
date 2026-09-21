@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,800;0,900;1,300;1,400&display=swap" rel="stylesheet">
 
     <!-- CSS Base y CSS del Catálogo -->
-    <link rel="stylesheet" href="style.css?v=20260922p">
+    <link rel="stylesheet" href="style.css?v=20260922q">
     <link rel="stylesheet" href="catalogo.css?v=20260922a">
     
     <!-- Visor de Spline -->
@@ -194,17 +194,24 @@
         </div>
     </div>
 
+    <!-- 🌑 El arco del pie: el mismo de la sección 3 de index.html (.s3-arco),
+         negro con el borde encendido. Aquí va en su propia franja
+         (.pie-arco), DEBAJO del contenido, así que no tapa ninguna cuenta
+         ni ningún aviso: solo suma su alto. El footer se monta encima de la
+         mitad de abajo, como en index. -->
+    <div class="pie-arco" aria-hidden="true"><div class="s3-arco"></div></div>
+
     <!-- 🌐 FOOTER 🌐 -->
     <footer class="footer-social">
         <div class="footer-top">
             <!-- Atajos. El aviso legal va abajo, junto al copyright. -->
-            <nav class="footer-nav" aria-label="Enlaces del pie">
+            <nav class="footer-nav" aria-label="Enlaces del pie" data-reveal style="--n: 0;">
                 <a href="index.html#home" class="footer-nav-link"><span>Inicio</span></a>
                 <a href="#cases" class="footer-nav-link"><span>Catalogo</span></a>
                 <a href="index.html#features" class="footer-nav-link"><span>Contacto</span></a>
             </nav>
 
-            <div class="footer-redes">
+            <div class="footer-redes" data-reveal style="--n: 1;">
                 <a href="https://x.com/anxiebb?s=11" target="_blank" rel="noopener noreferrer" class="footer-social-link" aria-label="X (Twitter)">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
                         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
@@ -230,13 +237,49 @@
 
         <!-- La marca gigante, solo el contorno, que se apaga hacia abajo.
              Decorativa: el copyright de abajo ya dice el nombre. -->
-        <p class="footer-marca" aria-hidden="true">Anxie<em>Store</em></p>
+        <p class="footer-marca" aria-hidden="true" data-reveal style="--n: 2;">Anxie<em>Store</em></p>
 
-        <div class="footer-bottom">
+        <div class="footer-bottom" data-reveal style="--n: 3;">
             <a href="legal.html" class="footer-legal">Aviso Legal</a>
             <p class="footer-copy">&copy; 2026 AnxieStore. Todos los derechos reservados.</p>
         </div>
     </footer>
+
+    <!-- 🌊 La ola del footer: la misma de index.html (entra al pasar su
+         borde el 90% de la pantalla y se va con la ola al revés al subir).
+         El CSS es el de "LA OLA DE LA SECCIÓN 3 Y DEL FOOTER" en style.css;
+         .revela se pone aquí para que sin JS el footer se vea entero. -->
+    <script>
+        (function () {
+            const pie = document.querySelector('.footer-social');
+            if (!pie) return;
+            pie.classList.add('revela');
+
+            // En celular, el alto cacheado: la barra del navegador que se
+            // colapsa cambia innerHeight y haría saltar la ola (como en index).
+            let vpAlto = window.innerHeight;
+            let vpAncho = window.innerWidth;
+            function altoViewport() {
+                return window.innerWidth > 900 ? window.innerHeight : vpAlto;
+            }
+
+            function actualizarPie() {
+                const arriba = pie.getBoundingClientRect().top;
+                pie.classList.toggle('is-revealed', arriba <= altoViewport() * 0.9);
+            }
+
+            window.addEventListener('scroll', actualizarPie, { passive: true });
+            window.addEventListener('resize', () => {
+                if (window.innerWidth !== vpAncho) {
+                    vpAncho = window.innerWidth;
+                    vpAlto = window.innerHeight;
+                }
+                actualizarPie();
+            }, { passive: true });
+            actualizarPie();
+        })();
+    </script>
+
 
     <!-- LÓGICA DE SUPABASE + BÚSQUEDA EN TIEMPO REAL + FILTROS -->
     <script>

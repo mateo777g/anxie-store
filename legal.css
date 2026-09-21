@@ -1,15 +1,19 @@
 /* ==========================================
    AVISO LEGAL — PALETA Y TIPOGRAFÍA
-   Gris oscuro casi negro. Ver AVISOS-LEGALES.txt Parte 3-B.
+   Fondo blanco con texto negro (22 sep 2026, a pedido del dueño; antes
+   era gris oscuro casi negro, ver AVISOS-LEGALES.txt Parte 3-B).
    ========================================== */
 :root {
-    --legal-bg:      #0a0a0a;                 /* fondo de la página */
-    --legal-panel:   #141414;                 /* bloques de texto, un tono arriba */
-    --legal-borde:   rgba(255, 255, 255, 0.1); /* separadores */
-    --legal-titulo:  #ffffff;                 /* títulos */
-    --legal-texto:   #dddddd;                 /* cuerpo */
-    --legal-tenue:   #888888;                 /* fechas y notas secundarias */
-    --legal-acento:  #FF0000;                 /* enlaces y hover, rojo de la marca */
+    --legal-bg:      #ffffff;                 /* fondo de la página */
+    --legal-panel:   #f4f4f4;                 /* bloques de texto, un tono abajo */
+    --legal-borde:   rgba(0, 0, 0, 0.1);      /* separadores */
+    --legal-titulo:  #000000;                 /* títulos */
+    --legal-texto:   #111111;                 /* cuerpo */
+    --legal-tenue:   #6b6b6b;                 /* fechas y notas secundarias */
+    /* Enlaces, índice y subtítulos. Era el rojo de la marca; el dueño lo
+       quitó (22 sep 2026): ahora van en negro y se distinguen por la
+       negrita y el subrayado. */
+    --legal-acento:  #000000;
 }
 
 /* ====== BASE DE LA PÁGINA ====== */
@@ -168,8 +172,9 @@ body {
 
 .legal-section a {
     color: var(--legal-acento);
+    font-weight: 700;
     text-decoration: none;
-    border-bottom: 1px solid rgba(255, 0, 0, 0.35);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.35);
     transition: border-color 0.2s ease;
 }
 
