@@ -2745,9 +2745,11 @@ body {
 /* ==========================================
    FOOTER
    ==========================================
-   Columna centrada: atajos -> redes -> copyright. (La franja rayada en
-   movimiento que iba antes del copyright se quitó el 22 de septiembre de
-   2026, a pedido del dueño.)
+   Columna centrada: atajos -> redes -> la marca gigante "AnxieStore" en
+   contorno -> una fila con el aviso legal a la izquierda y el copyright a
+   la derecha (22 septiembre 2026, de una referencia del dueño; ahí se quitó
+   también la franja rayada en movimiento y "Aviso Legal" bajó de los
+   atajos a esa fila).
    Lo comparten index, catalogo y legal, y los tres usan el MISMO markup
    (solo cambian los href de "Inicio" y "Contacto" segun la pagina).
    El <footer> conserva la clase .footer-social porque actualizarMenu() en
@@ -2864,23 +2866,71 @@ body {
     transform: scale(1.1);
 }
 
-/* ====== COPYRIGHT ====== */
-.footer-bottom {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem 1rem 0 1rem;
-    text-align: center;
+/* ====== LA MARCA GIGANTE ======
+   De una referencia del dueño (22 septiembre 2026): "AnxieStore" de orilla a
+   orilla, solo el contorno de las letras (texto transparente con un trazo
+   fino), "Store" en cursiva, y apagándose hacia abajo con una máscara hasta
+   casi desaparecer justo encima de la fila del copyright. Montserrat, que es
+   la única familia que cargan las tres páginas. El tamaño en vw hace que
+   ocupe siempre el mismo ancho: con 19vw la palabra va de orilla a orilla
+   dejando un 2% a cada lado (medido en el navegador). Si cambias el peso,
+   el espaciado o el texto, vuelve a medirlo. */
+.footer-marca {
+    margin: 0;
+    padding: 0 2vw;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 300;
+    font-size: 19vw;
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+    /* Relleno negro PINTADO ENCIMA del trazo (paint-order): Montserrat es
+       variable y sus letras son piezas que se enciman, así que un trazo
+       solo dibujaba también las costuras de adentro (un cuadrito en la "x",
+       la barra de la "e"). Con el relleno encima, la mitad interior del
+       trazo y esas costuras quedan tapadas y solo se ve el borde de afuera.
+       Por eso el trazo es de 2px: se ve 1px. El negro es el del footer. */
+    color: #000000;
+    -webkit-text-stroke: 2px rgba(255, 255, 255, 0.36);
+    paint-order: stroke fill;
+    -webkit-mask-image: linear-gradient(to bottom, #000 25%, transparent 92%);
+            mask-image: linear-gradient(to bottom, #000 25%, transparent 92%);
+    user-select: none;
+    pointer-events: none;
 }
+
+.footer-marca em { font-style: italic; }
+
+/* ====== FILA DE ABAJO: AVISO LEGAL Y COPYRIGHT ====== */
+.footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.6rem 1.5rem;
+    width: 100%;
+    padding: 1.2rem 2vw 0;
+}
+
+.footer-legal {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    transition: color 0.25s ease;
+}
+
+.footer-legal:hover { color: #ffffff; }
 
 .footer-copy {
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.8rem;
+    font-weight: 500;
+    font-size: 0.85rem;
     /* Blanco translucido y no un gris fijo: aguanta igual el footer negro
        y cualquier fondo oscuro que se le ponga. */
-    color: rgba(255, 255, 255, 0.55);
-    text-align: center;
-    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.85);
+    letter-spacing: 0.2px;
 }
 
 /* 📱 RESPONSIVE FOOTER */
@@ -2908,11 +2958,14 @@ body {
     }
 
 
+    /* En celular la fila se apila y se centra. */
     .footer-bottom {
-        padding-top: 1.5rem;
+        flex-direction: column;
+        padding-top: 1rem;
     }
 
+    .footer-legal,
     .footer-copy {
-        font-size: 0.72rem;
+        font-size: 0.74rem;
     }
 }

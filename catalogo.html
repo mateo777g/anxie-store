@@ -14,10 +14,10 @@
     <!-- Google Fonts: Montserrat -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,800;0,900;1,300;1,400&display=swap" rel="stylesheet">
 
     <!-- CSS Base y CSS del Catálogo -->
-    <link rel="stylesheet" href="style.css?v=20260922c">
+    <link rel="stylesheet" href="style.css?v=20260922e">
     <link rel="stylesheet" href="catalogo.css?v=20260916c">
     
     <!-- Visor de Spline -->
@@ -197,12 +197,11 @@
     <!-- 🌐 FOOTER 🌐 -->
     <footer class="footer-social">
         <div class="footer-top">
-            <!-- Atajos: el aviso legal vive aqui, ya no colgado del copyright -->
+            <!-- Atajos. El aviso legal va abajo, junto al copyright. -->
             <nav class="footer-nav" aria-label="Enlaces del pie">
                 <a href="index.html#home" class="footer-nav-link"><span>Inicio</span></a>
                 <a href="#cases" class="footer-nav-link"><span>Catalogo</span></a>
                 <a href="index.html#features" class="footer-nav-link"><span>Contacto</span></a>
-                <a href="legal.html" class="footer-nav-link"><span>Aviso Legal</span></a>
             </nav>
 
             <div class="footer-redes">
@@ -229,8 +228,13 @@
             </div>
         </div>
 
+        <!-- La marca gigante, solo el contorno, que se apaga hacia abajo.
+             Decorativa: el copyright de abajo ya dice el nombre. -->
+        <p class="footer-marca" aria-hidden="true">Anxie<em>Store</em></p>
+
         <div class="footer-bottom">
-            <p class="footer-copy">&copy; 2026 ANXIE STORE. Todos los derechos reservados.</p>
+            <a href="legal.html" class="footer-legal">Aviso Legal</a>
+            <p class="footer-copy">&copy; 2026 AnxieStore. Todos los derechos reservados.</p>
         </div>
     </footer>
 

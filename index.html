@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260922c">
+    <link rel="stylesheet" href="style.css?v=20260922e">
     <script type="module" src="https://cdn.spline.design/@splinetool/viewer@2.0.55/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -521,12 +521,11 @@
     <!-- 🌐 FOOTER 🌐 -->
     <footer class="footer-social">
         <div class="footer-top">
-            <!-- Atajos: el aviso legal vive aqui, ya no colgado del copyright -->
+            <!-- Atajos. El aviso legal va abajo, junto al copyright. -->
             <nav class="footer-nav" aria-label="Enlaces del pie" data-reveal style="--n: 0;">
                 <a href="#home" class="footer-nav-link"><span>Inicio</span></a>
                 <a href="catalogo.html#cases" class="footer-nav-link"><span>Catalogo</span></a>
                 <a href="#features" class="footer-nav-link"><span>Contacto</span></a>
-                <a href="legal.html" class="footer-nav-link"><span>Aviso Legal</span></a>
             </nav>
 
             <div class="footer-redes" data-reveal style="--n: 1;">
@@ -553,8 +552,13 @@
             </div>
         </div>
 
-        <div class="footer-bottom" data-reveal style="--n: 2;">
-            <p class="footer-copy">&copy; 2026 ANXIE STORE. Todos los derechos reservados.</p>
+        <!-- La marca gigante, solo el contorno, que se apaga hacia abajo.
+             Decorativa: el copyright de abajo ya dice el nombre. -->
+        <p class="footer-marca" aria-hidden="true" data-reveal style="--n: 2;">Anxie<em>Store</em></p>
+
+        <div class="footer-bottom" data-reveal style="--n: 3;">
+            <a href="legal.html" class="footer-legal">Aviso Legal</a>
+            <p class="footer-copy">&copy; 2026 AnxieStore. Todos los derechos reservados.</p>
         </div>
     </footer>
 
