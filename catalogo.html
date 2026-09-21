@@ -9,7 +9,7 @@
     <title>Catálogo | ANXIE STORE</title>
 
     <!-- 🟢 LOGO DE LA PESTAÑA (FAVICON) -->
-    <link rel="icon" href="assets/logo.jpg" type="assets/logo.jpg">
+    <link rel="icon" href="assets/logo-blanco.png" type="image/png">
 
     <!-- Google Fonts: Montserrat -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,7 +18,7 @@
 
     <!-- CSS Base y CSS del Catálogo -->
     <link rel="stylesheet" href="style.css?v=20260922q">
-    <link rel="stylesheet" href="catalogo.css?v=20260922a">
+    <link rel="stylesheet" href="catalogo.css?v=20260922g">
     
     <!-- Visor de Spline -->
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
@@ -30,7 +30,7 @@
 </head>
 <body>
 
-    <!-- 🌟 HEADER COMPLETO STICKY (LUPA + LOGO + FILTRO + NAV) 🌟 -->
+    <!-- 🌟 HEADER STICKY (LUPA + ATAJOS + FILTRO) 🌟 -->
     <header class="catalog-header">
         <div class="header-top-row">
 
@@ -49,8 +49,15 @@
                 </button>
             </div>
 
-            <!-- 🔴 LOGO CIRCULAR (CENTRO) -->
-            <img src="assets/logo.jpg" alt="ANXIE STORE" class="header-logo">
+            <!-- 🧭 ATAJOS (CENTRO). Antes iban en una segunda barra debajo y aquí
+                 estaba el logo; el dueño quitó el logo y los subió a esta fila
+                 (22 septiembre 2026). En celular se esconden: los lleva el
+                 menú de la hamburguesa. -->
+            <nav class="catalog-nav">
+                <a href="index.html#home">INICIO</a>
+                <a href="catalogo.html">CATALOGO</a>
+                <a href="index.html#features">CONTACTO</a>
+            </nav>
 
             <!-- ⚙️ ÍCONO DE FILTRO (DERECHA) -->
             <div class="filter-dropdown-container">
@@ -71,31 +78,46 @@
                 </div>
             </div>
         </div>
-        
-        <!-- BARRA GRIS NAVEGACIÓN -->
-        <div class="catalog-nav-container">
-            <nav class="catalog-nav">
-                <a href="index.html#home">INICIO</a>
-                <a href="catalogo.html">CATÁLOGO</a>
-                <a href="index.html#features">CONTACTO</a>
-            </nav>
-        </div>
+
     </header>
 
-    <!-- 🚪 BARRA LATERAL (SIDEBAR) & OVERLAY PARA MÓVIL (BLANCA) -->
+    <!-- 🚪 BARRA LATERAL (SOLO CELULAR) & OVERLAY. Es el mismo panel del menú
+         píldora de index.html en celular (22 septiembre 2026, a pedido del
+         dueño): blanco, de alto completo (pero saliendo por la izquierda), "Menú" y la X
+         arriba, y los links en Arial con sus mismos iconos. -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
-    <aside class="sidebar-catalog" id="sidebar">
-        <button class="sidebar-close-btn" id="sidebarClose">&times;</button>
-        
-        <div class="sidebar-header">
-            <img src="assets/logo.jpg" alt="Logo ANXIE STORE" class="sidebar-logo">
-            <span class="sidebar-title">ANXIE STORE</span>
+    <aside class="sidebar-catalog" id="sidebar" aria-label="Menú">
+        <div class="sidebar-bar">
+            <span class="sidebar-etiqueta">Menú</span>
+            <button class="sidebar-close-btn" id="sidebarClose" aria-label="Cerrar menú">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+                    <path d="M6 6 18 18" />
+                    <path d="M18 6 6 18" />
+                </svg>
+            </button>
         </div>
 
         <ul class="sidebar-links">
-            <li><a href="index.html#home">Inicio</a></li>
-            <li><a href="catalogo.html">Catálogo</a></li>
-            <li><a href="index.html#features">Contacto</a></li>
+            <li style="--i: 0;"><a href="index.html#home">
+                <svg class="sidebar-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 10a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <path d="M15 21v-8H9v8" />
+                </svg>
+                <span>Inicio</span>
+            </a></li>
+            <li style="--i: 1;"><a href="catalogo.html">
+                <svg class="sidebar-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M4 8h16l-1.2 11a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8z" />
+                    <path d="M9 11V7a3 3 0 0 1 6 0v4" />
+                </svg>
+                <span>Catálogo</span>
+            </a></li>
+            <li style="--i: 2;"><a href="index.html#features">
+                <svg class="sidebar-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z" />
+                </svg>
+                <span>Contacto</span>
+            </a></li>
         </ul>
     </aside>
 
@@ -244,6 +266,59 @@
             <p class="footer-copy">&copy; 2026 AnxieStore. Todos los derechos reservados.</p>
         </div>
     </footer>
+
+    <!-- 🔤 El roll de letras de los atajos del header: el mismo de los links
+         del menú píldora de index.html (armarLetras() y el cerrojo de
+         menu.js), que esta página no carga. -->
+    <script>
+        (function () {
+            document.querySelectorAll('.catalog-nav a').forEach((link) => {
+                const etiqueta = link.textContent.trim();
+                link.textContent = '';
+                link.setAttribute('aria-label', etiqueta);
+
+                [...etiqueta].forEach((letra, i) => {
+                    if (letra === ' ') {
+                        link.appendChild(Object.assign(document.createElement('span'), { className: 'menu__space' }));
+                        return;
+                    }
+                    const caja = document.createElement('span');
+                    caja.className = 'menu__char';
+                    caja.style.setProperty('--c', i);
+                    const rollo = document.createElement('span');
+                    rollo.className = 'menu__roll';
+                    rollo.appendChild(Object.assign(document.createElement('span'), { textContent: letra }));
+                    rollo.appendChild(Object.assign(document.createElement('span'), { textContent: letra }));
+                    caja.appendChild(rollo);
+                    link.appendChild(caja);
+                });
+
+                // Si el mouse sale a mitad del roll, la salida espera a que
+                // termine; si no, la columna vuelve de un salto (como en menu.js).
+                const cerrojo = 30 * link.querySelectorAll('.menu__char').length + 300;
+                let temporizador = 0;
+                let salidaPendiente = false;
+
+                link.addEventListener('mouseenter', () => {
+                    salidaPendiente = false;
+                    if (link.classList.contains('is-rolling')) return;
+                    link.classList.add('is-rolling');
+                    temporizador = window.setTimeout(() => {
+                        temporizador = 0;
+                        if (salidaPendiente) {
+                            salidaPendiente = false;
+                            link.classList.remove('is-rolling');
+                        }
+                    }, cerrojo);
+                });
+
+                link.addEventListener('mouseleave', () => {
+                    if (temporizador) salidaPendiente = true;
+                    else link.classList.remove('is-rolling');
+                });
+            });
+        })();
+    </script>
 
     <!-- 🌊 La ola del footer: la misma de index.html (entra al pasar su
          borde el 90% de la pantalla y se va con la ola al revés al subir).
