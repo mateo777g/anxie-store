@@ -14,11 +14,11 @@
     <!-- Google Fonts: Montserrat -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,800;0,900;1,300;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,800;0,900;1,300;1,400&family=Plus+Jakarta+Sans:wght@800&display=swap" rel="stylesheet">
 
     <!-- CSS Base y CSS del Catálogo -->
     <link rel="stylesheet" href="style.css?v=20260922q">
-    <link rel="stylesheet" href="catalogo.css?v=20260922i">
+    <link rel="stylesheet" href="catalogo.css?v=20260922m">
     
     <!-- Visor de Spline -->
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
@@ -123,7 +123,7 @@
 
     <!-- 🛒 ÁREA PRINCIPAL DEL CATÁLOGO 🛒 -->
     <main class="catalog-main">
-        <h1 class="shop-all-title">CATÁLOGO COMPLETO</h1>
+        <h1 class="shop-all-title"><span>CATÁLOGO COMPLETO</span></h1>
         
         <div class="product-grid" id="product-grid">
             <div id="loading-msg">Cargando cuentas...</div>
@@ -473,7 +473,8 @@
             let found = [];
             platforms.forEach(p => {
                 if (p.regex.test(texto)) {
-                    found.push(`<span class="platform-item" style="display:inline-flex; align-items:center; margin-right:10px;">${p.svg}<span>${p.name}</span></span>`);
+                    // 🎮 Solo el ícono; el nombre queda para lectores de pantalla y al pasar el mouse
+                    found.push(`<span class="platform-item" role="img" aria-label="${p.name}" title="${p.name}" style="display:inline-flex; align-items:center; margin-left:14px;">${p.svg.replace('margin-right: 5px; ', '')}</span>`);
                 }
             });
 
@@ -482,7 +483,7 @@
                 return escapeHTML(limpio || texto);
             }
 
-            return found.join('');
+            return `<span style="margin-right:6px;">PARA PLATAFORMAS:</span>${found.join('')}`;
         }
 
         // ✅ REEMPLAZAR la función completa por esta:
@@ -522,7 +523,7 @@
                                 $${cuenta.preciomxn} MXN
                                 <span class="price-usd">$${cuenta.preciousd} USD</span>
                             </div>
-                            <button type="button" class="btn-buy open-buy-modal-btn">¡Contáctanos!</button>
+                            <button type="button" class="btn-buy open-buy-modal-btn">¿Cómo adquirir?</button>
                         </div>
                     </div>
                 `;

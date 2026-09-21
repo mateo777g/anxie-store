@@ -195,13 +195,52 @@ body.no-scroll {
     margin: 0 auto;
 }
 
+/* 🌫️ "CATÁLOGO COMPLETO" como la marca del index (22 septiembre 2026, a
+   pedido del cliente): la misma Plus Jakarta Sans 800 apretada y el mismo
+   relleno de humo con grano (--humo-grano y marca-niebla viven en style.css),
+   pero de tamaño de título, no de sección. El humo va en el <span> para que
+   el fondo mida lo que mide el texto y no todo el ancho del <h1>. */
 .shop-all-title {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
     font-weight: 800;
-    font-size: 1.8rem;
+    font-size: clamp(2.4rem, 5.5vw, 5rem);
+    line-height: 1;
+    letter-spacing: -0.045em;
     text-transform: uppercase;
     margin-bottom: 50px;
-    letter-spacing: 1px;
+    text-align: center;
+    color: #1a1a1a;
+}
+
+.shop-all-title span {
+    display: inline-block;
+    padding: 0.12em;
+    margin: -0.12em;
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+    .shop-all-title span {
+        color: transparent;
+        background-image: var(--humo-grano), url('assets/humo-niebla-a.webp'), url('assets/humo-niebla-b.webp'), url('assets/marca-humo.webp');
+        background-size: 160px 160px, 3.2em auto, 4.4em auto, cover;
+        background-repeat: repeat, repeat, repeat, no-repeat;
+        background-position: 0 0, 0 -0.6em, 1.5em -1.2em, center;
+        -webkit-background-clip: text;
+        background-clip: text;
+        animation: marca-niebla 24s ease-in-out infinite alternate;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shop-all-title span { animation: none; }
+}
+
+/* En celular ocupa el ancho sin salirse: dos líneas si hace falta. */
+@media (max-width: 900px) {
+    .shop-all-title {
+        font-size: clamp(2rem, 10.5vw, 3.2rem);
+        margin-bottom: 36px;
+    }
 }
 
 /* CUADRÍCULA DE PRODUCTOS */
@@ -273,6 +312,7 @@ body.no-scroll {
     font-size: 0.95rem;
     color: #000000;
     margin: 0;
+    text-align: center;
 }
 
 .product-price {
@@ -281,6 +321,7 @@ body.no-scroll {
     font-size: 0.9rem;
     color: #000000;
     display: flex;
+    justify-content: center;
     gap: 8px;
     align-items: center;
 }
@@ -475,6 +516,15 @@ body.no-scroll {
     }
     .header-top-row {
         padding: 0 15px;
+    }
+
+    /* 📱 La rayita de arriba del header: en pantallas 3x (iPhone) el scroll
+       táctil queda en fracciones de píxel, el header pegado se redondea hacia
+       abajo y por encima se asomaba 1px del contenido, que parpadeaba al
+       arrastrar. Una sombra negra hacia arriba tapa ese hueco; queda fuera de
+       la pantalla, así que no se ve. */
+    .catalog-header {
+        box-shadow: 0 -4px 0 #000000, 0 4px 15px rgba(0, 0, 0, 0.03);
     }
     
     /* 🔴 AQUI ESTÁ LA MAGIA DEL CELULAR: Ocultamos los textos (los lleva el
@@ -992,4 +1042,20 @@ body.no-scroll {
 /* 3. Apagar por completo los lienzos 3D de Spline mientras el modal esté cerrado */
 .buy-modal-overlay:not(.active) spline-viewer {
     pointer-events: none !important;
+}
+
+/* 🎮 "PARA PLATAFORMAS:" + íconos en celulares angostos (≤380px): la
+   etiqueta no cabía en una línea y los íconos bajaban a una segunda. Letra
+   un poco menor y los íconos un poco más juntos (el margen va inline en
+   renderPlataformasHTML(), por eso el !important). */
+@media (max-width: 380px) {
+    .platform-badge {
+        font-size: 0.66rem;
+        letter-spacing: 0;
+        padding: 6px 12px;
+    }
+
+    .platform-badge .platform-item {
+        margin-left: 9px !important;
+    }
 }
