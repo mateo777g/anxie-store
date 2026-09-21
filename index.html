@@ -17,8 +17,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260921zs">
-    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
+    <link rel="stylesheet" href="style.css?v=20260921zz">
+    <script type="module" src="https://cdn.spline.design/@splinetool/viewer@2.0.55/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -459,110 +459,54 @@
         </div>
     </div>
 
-    <!-- SECCIÓN 4: POR QUÉ ANXIE STORE & DISCORD -->
+    <!-- SECCIÓN 4: POR QUÉ ANXIE STORE -->
     <div class="seccion-tres-scroll-wrapper" id="features">
         <section class="seccion-tres">
             <div class="seccion-tres-container">
 
-                <!-- 👈 COLUMNA IZQUIERDA: ¿Por qué Anxie Store? + las tres razones -->
-                <div class="seccion-tres-left">
-                    <div class="seccion-tres-info" id="s3Left">
+                <!-- 👈 IZQUIERDA: titular, la historia de Anxie Store
+                     y el botón del Discord. Lo único que
+                     entra con la ola. -->
+                <div class="s3-texto">
+                    <h2 class="s3-titulo" data-reveal style="--n: 0;">
+                        ¿Por qué <span class="s3-titulo-linea">Anxie Store?</span>
+                    </h2>
 
-                        <div class="s3-eyebrow">
-                            <span class="eyebrow-punto"></span>
-                            <span class="eyebrow-linea"></span>
-                            <span class="eyebrow-texto">Confianza</span>
-                        </div>
+                    <p class="s3-parrafo" data-reveal style="--n: 1;">
+                        Con 2 años de experiencia y más de 700 referencias, en AnxieStore
+                        priorizamos tu confianza y una atención personalizada. Buscamos
+                        ofrecerte un servicio cercano, seguro y diferente. Podrás encontrar
+                        nuestras referencias en Discord.
+                    </p>
 
-                        <h2 class="seccion-tres-title-alt">
-                            ¿POR QUÉ<br>ANXIE STORE?
-                        </h2>
-
-                        <p class="seccion-tres-description">
-                            Con 2 años de experiencia y más de <strong class="acento-verde">700 referencias</strong>,
-                            priorizamos <strong class="acento-verde">tu confianza</strong> y una atención personalizada.
-                            Un servicio cercano, seguro y <strong class="acento-verde">diferente</strong>.
-                        </p>
-
-                        <!-- Las tres razones. Cada una: icono en cuadro verde suave,
-                             título y una línea que la explica. -->
-                        <ul class="s3-razones">
-
-                            <li class="s3-razon">
-                                <span class="s3-razon-icono" aria-hidden="true">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M12 3 4.5 6v5.2c0 4.5 3.1 8.7 7.5 9.8 4.4-1.1 7.5-5.3 7.5-9.8V6z"/>
-                                        <path d="m9 12 2.1 2.1L15.3 10"/>
-                                    </svg>
-                                </span>
-                                <div class="s3-razon-texto">
-                                    <h3 class="s3-razon-titulo">Entrega acompañada</h3>
-                                    <p class="s3-razon-desc">Te guiamos en el cambio de correo y contraseña <strong class="acento-verde">hasta que la cuenta sea tuya</strong>.</p>
-                                </div>
-                            </li>
-
-                            <li class="s3-razon">
-                                <span class="s3-razon-icono" aria-hidden="true">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M20.5 12.5c0 4-3.8 7.2-8.5 7.2a9.9 9.9 0 0 1-2.6-.34L4.2 21l1.2-3.7a6.8 6.8 0 0 1-2.4-5.1c0-4 3.8-7.2 8.5-7.2s9 3.2 9 7.5Z"/>
-                                        <path d="M8.6 12h.01M12 12h.01M15.4 12h.01"/>
-                                    </svg>
-                                </span>
-                                <div class="s3-razon-texto">
-                                    <h3 class="s3-razon-titulo">+700 referencias públicas</h3>
-                                    <p class="s3-razon-desc">Todas visibles en el <strong class="acento-verde">canal de reseñas</strong> del Discord, no capturas sueltas.</p>
-                                </div>
-                            </li>
-
-                            <li class="s3-razon">
-                                <span class="s3-razon-icono" aria-hidden="true">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="12" cy="12" r="8.4"/>
-                                        <path d="M12 7.3V12l3.1 1.9"/>
-                                    </svg>
-                                </span>
-                                <div class="s3-razon-texto">
-                                    <h3 class="s3-razon-titulo">2 años respondiendo el mismo día</h3>
-                                    <p class="s3-razon-desc">Abres ticket, te contestamos. <strong class="acento-verde">Sin bots</strong> ni formularios eternos.</p>
-                                </div>
-                            </li>
-
-                        </ul>
+                    <div class="s3-botones" data-reveal style="--n: 2;">
+                        <!-- El mismo botón de cristal con relevo que "Ver catálogo" del
+                             hero (.btn-hero): texto y flecha duplicados, la
+                             segunda copia del texto aria-hidden. -->
+                        <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener" class="btn-hero">
+                            <span class="btn-hero-rodillo">
+                                <span class="btn-hero-copia">Unirse a Discord</span>
+                                <span class="btn-hero-copia" aria-hidden="true">Unirse a Discord</span>
+                            </span>
+                            <span class="btn-hero-circulo" aria-hidden="true">
+                                <svg class="btn-hero-flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M7 17 17 7" />
+                                    <path d="M7 7h10v10" />
+                                </svg>
+                                <svg class="btn-hero-flecha btn-hero-flecha--entra" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M7 17 17 7" />
+                                    <path d="M7 7h10v10" />
+                                </svg>
+                            </span>
+                        </a>
                     </div>
                 </div>
 
-                <!-- 👉 COLUMNA DERECHA: la tarjeta negra del Discord -->
-                <div class="seccion-tres-right">
-                    <div class="seccion-tres-content" id="s3Right">
-                        <article class="s3-discord">
-
-                            <span class="s3-discord-icono" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M20.5 11.8c0 3.9-3.8 7.1-8.5 7.1a9.9 9.9 0 0 1-2.6-.34L4.2 20.3l1.2-3.7a6.8 6.8 0 0 1-2.4-5.1c0-3.9 3.8-7.1 8.5-7.1s9 3.2 9 7.4Z"/>
-                                </svg>
-                            </span>
-
-                            <h2 class="seccion-tres-title">
-                                ÚNETE AL <br>SERVIDOR DE <br>DISCORD
-                            </h2>
-
-                            <p class="s3-discord-texto">
-                                Ahí está todo: el catálogo actualizado, las referencias de cada venta
-                                y el ticket para comprar o resolver dudas.
-                            </p>
-
-                            <div class="s3-discord-chips">
-                                <span class="s3-chip">Tickets 24/7</span>
-                                <span class="s3-chip">Reseñas reales</span>
-                            </div>
-
-                            <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener" class="s3-discord-cta">
-                                Unirse al Discord
-                                <span class="s3-discord-cta-icono" aria-hidden="true">+</span>
-                            </a>
-
-                        </article>
-                    </div>
+                <!-- 👉 DERECHA: la mascota del Discord en 3D (Spline). Va FUERA de
+                     la ola a propósito: el blur de la entrada sobre un canvas
+                     WebGL vivo la trababa. -->
+                <div class="s3-mascota" aria-hidden="true">
+                    <spline-viewer url="https://prod.spline.design/HFQiKc5wRilijMuJ/scene.splinecode"></spline-viewer>
                 </div>
 
             </div>
@@ -573,14 +517,14 @@
     <footer class="footer-social">
         <div class="footer-top">
             <!-- Atajos: el aviso legal vive aqui, ya no colgado del copyright -->
-            <nav class="footer-nav" aria-label="Enlaces del pie">
+            <nav class="footer-nav" aria-label="Enlaces del pie" data-reveal style="--n: 0;">
                 <a href="#home" class="footer-nav-link"><span>Inicio</span></a>
                 <a href="catalogo.html#cases" class="footer-nav-link"><span>Catalogo</span></a>
                 <a href="#features" class="footer-nav-link"><span>Contacto</span></a>
                 <a href="legal.html" class="footer-nav-link"><span>Aviso Legal</span></a>
             </nav>
 
-            <div class="footer-redes">
+            <div class="footer-redes" data-reveal style="--n: 1;">
                 <a href="https://x.com/anxiebb?s=11" target="_blank" rel="noopener noreferrer" class="footer-social-link" aria-label="X (Twitter)">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
                         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
@@ -605,9 +549,9 @@
         </div>
 
         <!-- Franja rayada en movimiento (decorativa) -->
-        <div class="footer-franja" aria-hidden="true"></div>
+        <div class="footer-franja" aria-hidden="true" data-reveal style="--n: 2;"></div>
 
-        <div class="footer-bottom">
+        <div class="footer-bottom" data-reveal style="--n: 3;">
             <p class="footer-copy">&copy; 2026 ANXIE STORE. Todos los derechos reservados.</p>
         </div>
     </footer>
@@ -1220,33 +1164,35 @@
             if (!_coronaRAF) _coronaRAF = requestAnimationFrame(bucleCorona);
         }
 
+        // 🌊 LA OLA DE LA SECCIÓN 3 Y DEL FOOTER: la misma entrada que la
+        // sección 2 (el CSS está en "LA OLA DE LA SECCIÓN 3 Y DEL FOOTER").
+        // .revela se pone aquí y no en el markup para que, sin JS, todo se
+        // vea. Entra cuando su borde de arriba pasa el umbral y solo se va
+        // cuando vuelve a quedar por debajo (subiendo), no al pasarlo de largo.
+        const revelados = [
+            { el: document.querySelector('.seccion-tres'), umbral: 0.75 },
+            { el: document.querySelector('.footer-social'), umbral: 0.9 }
+        ].filter(r => r.el);
+
+        revelados.forEach(r => r.el.classList.add('revela'));
+
+        function actualizarRevelados() {
+            const alto = altoViewport();
+            revelados.forEach(r => {
+                const arriba = r.el.getBoundingClientRect().top;
+                if (arriba <= alto * r.umbral) r.el.classList.add('is-revealed');
+                else r.el.classList.remove('is-revealed');
+            });
+        }
+
         // 🎮 LÓGICA DE ANIMACIONES Y SCROLL
         window.addEventListener('scroll', () => {
             actualizarCorona();
-
-            const windowHeight = altoViewport();
-
-            // --- ANIMACIÓN SECCIÓN 4 ---
-            const s3Wrapper = document.getElementById('features');
-            const s3Left = document.getElementById('s3Left');
-            const s3Right = document.getElementById('s3Right');
-
-            if (s3Wrapper && s3Left && s3Right) {
-                const rect3 = s3Wrapper.getBoundingClientRect();
-
-                if (rect3.top <= windowHeight * 0.75 && rect3.bottom >= 0) {
-                    s3Left.style.transform = 'translateX(0px)';
-                    s3Left.style.opacity = '1';
-                    s3Right.style.transform = 'translateX(0px)';
-                    s3Right.style.opacity = '1';
-                } else if (rect3.top > windowHeight * 0.75) {
-                    s3Left.style.transform = 'translateX(-150px)';
-                    s3Left.style.opacity = '0';
-                    s3Right.style.transform = 'translateX(150px)';
-                    s3Right.style.opacity = '0';
-                }
-            }
+            actualizarRevelados();
         }, { passive: true });
+
+        window.addEventListener('resize', actualizarRevelados, { passive: true });
+        actualizarRevelados();
 
         function refrescarCorona() {
             actualizarCorona(true);

@@ -2419,16 +2419,16 @@ body {
 
 
 /* ==========================================
-   SECCIÓN 4: POR QUÉ ANXIE & DISCORD
+   SECCIÓN 4: POR QUÉ ANXIE STORE
    ==========================================
    Las clases siguen llamándose .seccion-tres (y el wrapper sigue siendo
    #features, que es a donde apunta el enlace "Contacto" del menú): solo
    cambió de número al mudarse la cuenta destacada a la sección 3.
 
-   Dos columnas: a la izquierda el titular con las TRES RAZONES en lista, a
-   la derecha la tarjeta negra del Discord. Antes aquí solo había dos títulos
-   sueltos y los huecos de los modelos 3D que se quitaron; la sección se veía
-   vacía. Los modelos ya no vuelven, así que los huecos se fueron con ellos. */
+   Dos columnas, de una referencia del dueño (21 septiembre 2026): a la
+   izquierda "¿Por qué Anxie Store?" con su historia y el botón para
+   unirse al Discord, a la derecha la mascota del Discord en 3D
+   (Spline). Reemplaza a las tres razones y a la tarjeta negra del Discord. */
 
 /* ------------------------------------------------------------------------
    TRANSICIÓN SECCIÓN 3 -> 4: la sección blanca SUBE POR ENCIMA del portal.
@@ -2483,6 +2483,25 @@ body {
     overflow: hidden;
 }
 
+/* La cuadrícula de arriba (21 septiembre 2026, a pedido del dueño): la misma
+   de la sección 2 (.corona-horizonte-rejilla), mismo paso de 6rem x 5rem y
+   misma elipse que la desvanece, pero con líneas oscuras porque aquí el
+   fondo es blanco. Cubre la sección entera, así que la elipse (alta como
+   media sección) la apaga justo hacia la mitad. Va debajo del contenido
+   (que tiene z-index 10). */
+.seccion-tres::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(to right, #e4e4e4 1px, transparent 1px),
+        linear-gradient(to bottom, #e4e4e4 1px, transparent 1px);
+    background-size: 6rem 5rem;
+    -webkit-mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, #000 70%, transparent 110%);
+            mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, #000 70%, transparent 110%);
+    pointer-events: none;
+}
+
 /* Contenedor principal en Grid de 2 Columnas (ORIGINAL DE PC) */
 .seccion-tres-container {
     position: relative;
@@ -2496,249 +2515,119 @@ body {
     align-items: center;
 }
 
-/* 🌟 Animación de desplazamiento al entrar. El JS de index.html les escribe
-   el translateX/opacity a #s3Left y #s3Right al scrollear. */
-.seccion-tres-info,
-.seccion-tres-content {
-    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-    will-change: transform, opacity;
+/* 🌟 LA OLA DE LA SECCIÓN 3 Y DEL FOOTER (21 septiembre 2026, a pedido del
+   dueño) — la misma entrada que el contenido de la sección 2 (ver "La ola,
+   de ida y de vuelta"): cada pieza baja desde arriba desenfocada, escalonada
+   por --n, y al subir se va con la ola al revés. Reemplaza el deslizado
+   lateral que tenía la sección 3.
+
+   A diferencia de la sección 2, aquí el estado escondido SÍ depende del JS:
+   index.html les pone .revela al arrancar y luego quita y pone .is-revealed
+   al scrollear. Sin JS no hay .revela y todo se ve. Por eso también el footer
+   de catalogo.html y legal.html, que no llevan ese JS, no cambia. */
+.seccion-tres.revela {
+    /* El --n más alto del markup (el botón). */
+    --n-ultimo: 2;
 }
 
-/* 📍 COLUMNA IZQUIERDA */
-.seccion-tres-left {
-    display: flex;
-    flex-direction: column;
+.footer-social.revela {
+    /* El --n más alto del markup (el copyright). */
+    --n-ultimo: 3;
 }
 
-.seccion-tres-info {
-    display: flex;
-    flex-direction: column;
-    gap: 1.3rem;
+.revela [data-reveal] {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(-20px);
+    transition: opacity 360ms ease, filter 360ms ease, transform 360ms ease;
+    transition-delay: calc((var(--n-ultimo) - var(--n, 0)) * 60ms);
 }
 
-/* La línea "● ── CONFIANZA". Reusa las piezas del hero, pero con su propio
-   contenedor: .destacada-eyebrow las pinta en --verde-suave porque en la
-   sección 2 el fondo es oscuro, y sobre blanco ese verde se pierde. */
-.s3-eyebrow {
-    display: flex;
-    align-items: center;
-    gap: 14px;
+.revela.is-revealed [data-reveal] {
+    opacity: 1;
+    filter: none;
+    transform: none;
+    transition: opacity 520ms ease, filter 520ms ease, transform 520ms ease;
+    transition-delay: calc(var(--n, 0) * 110ms);
 }
 
-.s3-eyebrow .eyebrow-punto,
-.s3-eyebrow .eyebrow-linea { background: var(--verde); }
-.s3-eyebrow .eyebrow-texto { color: var(--verde); }
-
-/* Misma familia y mismo corte que la marca del hero y el titular de la
-   sección 2: los titulares grandes del sitio se leen como una sola pieza. */
-.seccion-tres-title-alt {
-    font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
-    font-weight: 800;
-    font-size: clamp(2.4rem, 4.6vw, 4.2rem);
-    color: var(--tinta);
-    line-height: 0.9;
-    letter-spacing: -0.05em;
-    text-transform: uppercase;
+@media (prefers-reduced-motion: reduce) {
+    .revela [data-reveal],
+    .revela.is-revealed [data-reveal] {
+        filter: none;
+        transform: none;
+        transition: opacity 200ms ease;
+        transition-delay: 0s;
+    }
 }
 
-.seccion-tres-description {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 500;
-    font-size: 1.02rem;
-    color: var(--gris-texto);
-    line-height: 1.7;
-    max-width: 480px;
-}
-
-.seccion-tres-description strong { font-weight: 700; }
-
-/* --- Las tres razones -----------------------------------------------------
-   Lista con una línea fina arriba y otra bajo cada fila, sin cajas: la
-   tarjeta negra de la derecha ya es la caja de la sección. */
-.s3-razones {
-    list-style: none;
-    margin: 0.5rem 0 0;
-    padding: 0;
-    border-top: 1px solid rgba(17, 17, 17, 0.10);
-    max-width: 560px;
-}
-
-.s3-razon {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
-    gap: 1.1rem;
-    padding: 1.15rem 0;
-    border-bottom: 1px solid rgba(17, 17, 17, 0.10);
-}
-
-.s3-razon-icono {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 46px;
-    height: 46px;
-    border-radius: 14px;
-    background: rgba(28, 78, 47, 0.09);
-    color: var(--verde);
-}
-
-.s3-razon-icono svg {
-    width: 21px;
-    height: 21px;
-}
-
-.s3-razon-texto {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.s3-razon-titulo {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: 0.98rem;
-    line-height: 1.25;
-    color: var(--tinta);
-}
-
-.s3-razon-desc {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 500;
-    font-size: 0.83rem;
-    line-height: 1.55;
-    color: var(--gris-texto);
-}
-
-.s3-razon-desc strong { font-weight: 700; }
-
-/* 📍 COLUMNA DERECHA: LA TARJETA DEL DISCORD */
-.seccion-tres-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-
-.seccion-tres-content {
-    display: flex;
-    justify-content: flex-end;
-    width: 100%;
-}
-
-/* El mismo negro de la sección 2 y del footer (--negro): la tarjeta se lee
-   como un trozo del portal apoyado sobre el blanco. */
-.s3-discord {
+/* 📍 IZQUIERDA: EL TEXTO
+   Acomodo de una referencia del dueño (21 septiembre 2026): titular grande
+   en negro, un párrafo y el botón de cristal del hero (.btn-hero), aquí
+   "Unirse a Discord" (la pastilla de arriba y el segundo botón de la
+   referencia se quitaron a pedido del dueño). Las
+   tipografías son las del resto del sitio, no las de la referencia: el
+   titular en Plus Jakarta Sans 800 como la marca del hero y el titular de la
+   sección 2, todo lo demás en Montserrat como los textos del hero. */
+.s3-texto {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 1.3rem;
-    width: 100%;
-    max-width: 480px;
-    padding: 2.6rem;
-    border-radius: 26px;
-    background: var(--negro);
-    box-shadow: 0 30px 60px -32px rgba(17, 17, 17, 0.45);
+    gap: 1.6rem;
 }
 
-.s3-discord-icono {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 54px;
-    height: 54px;
-    border-radius: 16px;
-    background: var(--verde);
-    color: #ffffff;
-}
-
-.s3-discord-icono svg {
-    width: 26px;
-    height: 26px;
-}
-
-.seccion-tres-title {
+/* Todo en negro (la segunda mitad iba en gris, como en la referencia, y el
+   dueño la pidió negra). */
+.s3-titulo {
     font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
     font-weight: 800;
-    font-size: clamp(1.9rem, 3.1vw, 2.8rem);
-    color: #ffffff;
-    line-height: 0.95;
+    font-size: clamp(2.6rem, 5.2vw, 5rem);
+    line-height: 0.92;
     letter-spacing: -0.045em;
     text-transform: uppercase;
+    color: var(--tinta);
+    max-width: 11ch;
 }
 
-.s3-discord-texto {
+/* "ANXIE STORE?" en su propio renglón, también en el celular. */
+.s3-titulo-linea { display: block; }
+
+.s3-parrafo {
     font-family: 'Montserrat', sans-serif;
     font-weight: 500;
-    font-size: 0.93rem;
+    font-size: 1.05rem;
     line-height: 1.65;
-    color: rgba(255, 255, 255, 0.62);
+    color: var(--gris-texto);
+    max-width: 500px;
 }
 
-.s3-discord-chips {
+.s3-botones {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-}
-
-.s3-chip {
-    padding: 9px 16px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.82);
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: 0.74rem;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-}
-
-/* El CTA usa --verde-medio y no --verde: sobre el negro de la tarjeta el
-   verde de la paleta queda oscuro sobre oscuro y el botón desaparece. */
-.s3-discord-cta {
-    display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 12px;
+    gap: 0.9rem 1.6rem;
+    margin-top: 0.4rem;
+}
+
+/* 📍 DERECHA: LA MASCOTA DEL DISCORD (Spline). Cuadrada y sin fondo propio:
+   la escena ya trae el blanco. No lleva data-reveal a propósito (ver el
+   comentario del markup). */
+.s3-mascota {
+    justify-self: end;
+    width: min(100%, 560px, 68vh);
+    aspect-ratio: 1;
+}
+
+.s3-mascota spline-viewer {
+    display: block;
     width: 100%;
-    margin-top: 0.3rem;
-    padding: 19px 24px;
-    border-radius: 14px;
-    background: var(--verde-medio);
-    color: #ffffff;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: 0.95rem;
-    text-decoration: none;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+    height: 100%;
 }
-
-.s3-discord-cta:hover {
-    background: var(--verde);
-    transform: translateY(-2px);
-}
-
-.s3-discord-cta-icono {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background: #ffffff;
-    color: var(--verde-medio);
-    font-weight: 800;
-    font-size: 1rem;
-    line-height: 1;
-    transition: transform 0.35s ease;
-}
-
-.s3-discord-cta:hover .s3-discord-cta-icono { transform: rotate(90deg); }
 
 /* 📱 RESPONSIVE (MÓVILES)
-   La sección mide UNA pantalla, como el hero y el portal: por eso aquí todo
-   va más apretado que en PC, la tarjeta pierde el cuadro del ícono y su
-   titular pasa a dos renglones (los <br> se esconden; el espacio antes de
-   cada uno está a propósito para que las palabras no se peguen). */
+   La sección mide UNA pantalla, como el hero y el portal: la mascota va
+   arriba y más chica, y debajo el texto. En el celular la mascota no recibe
+   toques: arrastrar sobre ella giraba la escena en vez de bajar la página. */
 @media (max-width: 900px) {
     /* Esquinas un poco más chicas: a 390px de ancho, 28px se comía el título. */
     .seccion-tres-scroll-wrapper {
@@ -2755,91 +2644,53 @@ body {
 
     .seccion-tres-container {
         grid-template-columns: 1fr;
-        gap: 1.4rem;
+        gap: 0.6rem;
     }
 
-    /* Todo alineado a la izquierda, no centrado: la lista de razones y la
-       tarjeta son bloques de texto, y centrarlos rompía la columna. */
-    .seccion-tres-left,
-    .seccion-tres-right {
-        align-items: stretch;
+    /* Spline no encoge la escena con el lienzo: en un recuadro chico la
+       mascota salía enorme y cortada. Así que la escena se dibuja a 560px,
+       el tamaño de PC, y se reduce con scale. */
+    .s3-mascota {
+        --mascota: 280px;
+        --mascota-n: 280;
+        order: -1;
+        justify-self: center;
+        width: var(--mascota);
+        height: var(--mascota);
+        aspect-ratio: auto;
+        overflow: hidden;
+        pointer-events: none;
     }
 
-    .seccion-tres-info { gap: 0.8rem; }
+    .s3-mascota spline-viewer {
+        width: 560px;
+        height: 560px;
+        transform: scale(calc(var(--mascota-n) / 560));
+        transform-origin: 0 0;
+    }
 
-    .s3-eyebrow { gap: 10px; }
-    .s3-eyebrow .eyebrow-linea { width: 40px; }
-    .s3-eyebrow .eyebrow-texto { font-size: 0.65rem; letter-spacing: 4px; }
+    .s3-texto { gap: 1rem; }
 
-    .seccion-tres-title-alt { font-size: 2rem; }
+    .s3-titulo {
+        font-size: clamp(2.2rem, 11vw, 3.2rem);
+        max-width: none;
+    }
 
-    .seccion-tres-description {
-        font-size: 0.82rem;
+    .s3-parrafo {
+        font-size: 0.88rem;
         line-height: 1.55;
     }
 
-    .s3-razones { margin-top: 0.2rem; }
+    .s3-botones { margin-top: 0.2rem; gap: 0.8rem 1.3rem; }
 
-    .s3-razon {
-        gap: 0.8rem;
-        padding: 0.65rem 0;
-    }
-
-    .s3-razon-icono {
-        width: 34px;
-        height: 34px;
-        border-radius: 10px;
-    }
-
-    .s3-razon-icono svg { width: 17px; height: 17px; }
-    .s3-razon-texto { gap: 2px; }
-    .s3-razon-titulo { font-size: 0.84rem; }
-    .s3-razon-desc { font-size: 0.74rem; line-height: 1.4; }
-
-    .s3-discord {
-        max-width: none;
-        padding: 1.3rem 1.25rem;
-        gap: 0.8rem;
-        border-radius: 20px;
-    }
-
-    .s3-discord-icono { display: none; }
-
-    .seccion-tres-title { font-size: 1.65rem; }
-    .seccion-tres-title br { display: none; }
-
-    .s3-discord-texto { font-size: 0.78rem; line-height: 1.5; }
-
-    .s3-chip {
-        padding: 6px 11px;
-        font-size: 0.66rem;
-    }
-
-    .s3-discord-cta {
-        margin-top: 0;
-        padding: 14px 18px;
-        font-size: 0.86rem;
-    }
 }
 
-/* Teléfonos bajitos (SE, Android compactos): para que siga entrando en una
-   pantalla se van las líneas de apoyo. Los títulos de las razones y el botón
-   se quedan, que es lo que importa. */
-@media (max-width: 900px) and (max-height: 760px) {
-    .s3-razon-desc,
-    .s3-discord-chips { display: none; }
-
-    .s3-razon { padding: 0.55rem 0; }
-}
-
-/* Y los de 667px (iPhone SE / 8): un último apretón de espacios. */
+/* Teléfonos bajitos (SE, Android compactos): la mascota se encoge para que
+   todo siga entrando en una pantalla. */
 @media (max-width: 900px) and (max-height: 700px) {
     .seccion-tres { padding: 4.2rem 1.25rem 1rem; }
-    .seccion-tres-container { gap: 1rem; }
-    .seccion-tres-info { gap: 0.6rem; }
-    .seccion-tres-title-alt { font-size: 1.8rem; }
-    .s3-discord { padding: 1.1rem 1.1rem; gap: 0.7rem; }
-    .s3-discord-cta { padding: 13px 16px; }
+    .s3-mascota { --mascota: 210px; --mascota-n: 210; }
+    .s3-texto { gap: 0.8rem; }
 }
 
 /* ==========================================
@@ -2855,10 +2706,11 @@ body {
     position: relative;
     z-index: 30;
     width: 100%;
-    /* El mismo negro de la sección 2 (--negro), no #000: contra el #101010 del
-       portal, un footer en negro puro se notaba como un escalón. Lo comparten
-       index, catalogo y legal. */
-    background-color: var(--negro);
+    /* Negro puro (21 septiembre 2026, a pedido del dueño). Antes era --negro
+       (#101010) para no hacer escalón con el portal, pero en index.html entre
+       los dos está la sección 3, blanca. Lo comparten index, catalogo y
+       legal. */
+    background-color: #000000;
     padding: 3rem 0 2rem 0;
     /* La franja rayada va a sangre: nada puede desbordar en horizontal. */
     overflow: hidden;
