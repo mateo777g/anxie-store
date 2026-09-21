@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260921zz">
+    <link rel="stylesheet" href="style.css?v=20260922c">
     <script type="module" src="https://cdn.spline.design/@splinetool/viewer@2.0.55/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -510,6 +510,11 @@
                 </div>
 
             </div>
+
+            <!-- El arco del pie: el mismo de la sección 2, negro con el borde
+                 encendido. Su negro es el del footer, así que el footer nace
+                 de él en vez de empezar con un corte plano. -->
+            <div class="s3-arco" aria-hidden="true"></div>
         </section>
     </div>
 
@@ -548,10 +553,7 @@
             </div>
         </div>
 
-        <!-- Franja rayada en movimiento (decorativa) -->
-        <div class="footer-franja" aria-hidden="true" data-reveal style="--n: 2;"></div>
-
-        <div class="footer-bottom" data-reveal style="--n: 3;">
+        <div class="footer-bottom" data-reveal style="--n: 2;">
             <p class="footer-copy">&copy; 2026 ANXIE STORE. Todos los derechos reservados.</p>
         </div>
     </footer>

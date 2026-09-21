@@ -2502,6 +2502,55 @@ body {
     pointer-events: none;
 }
 
+/* 🌑 EL ARCO DEL PIE (21 septiembre 2026, a pedido del dueño) — el mismo de
+   la sección 2 (.corona-horizonte-arco): una elipse negra con el borde
+   encendido en gris, asomando por abajo. Aquí va quieto (sin la subida del
+   portal) y sobre blanco. Su negro es #000, el del footer.
+
+   Sus medidas NO son las de la sección 2, y es a propósito: allá el arco no
+   toca nada abajo, aquí el footer lo corta en seco, y con 120% de ancho las
+   orillas llegaban al corte todavía en la franja gris del borde. El borde
+   ocupa del 82% al 100% del radio; para que en la línea del footer toda la
+   pantalla ya esté en el negro, el ancho es 130% (la orilla de la pantalla
+   queda al 77% del radio) y el alto 2.6 veces lo que asoma (el corte queda
+   cerca del centro de la elipse). Así el gris se sale de la pantalla por
+   los lados antes de llegar al footer, en cualquier pantalla, porque las
+   dos medidas son proporcionales.
+   La sección suma abajo lo que asoma el arco (--s3-arco-asoma, en :root
+   porque el footer también la usa) para que el
+   contenido no le quede encima. La píldora no necesita tema para él: la
+   página se acaba antes de que el arco suba hasta ella. */
+:root { --s3-arco-asoma: 25vh; }
+
+.seccion-tres {
+    padding-bottom: calc(var(--s3-arco-asoma) + 1rem);
+}
+
+.s3-arco {
+    position: absolute;
+    left: 50%;
+    top: calc(100% - var(--s3-arco-asoma));
+    z-index: 1;
+    width: 130%;
+    height: calc(var(--s3-arco-asoma) * 2.6);
+    transform: translateX(-50%);
+    border-radius: 100%;
+    /* El mismo degradado del de la sección 2, más un último paso a
+       transparente para que el borde no corte en seco contra el blanco. */
+    background: radial-gradient(closest-side, #000000 82%, #999999 98.5%, rgba(153, 153, 153, 0) 100%);
+    pointer-events: none;
+}
+
+/* Los mismos escalones que el de la sección 2 (solo cambia lo que asoma;
+   ancho y alto lo siguen solos). */
+@media (max-width: 1023px) {
+    :root { --s3-arco-asoma: 175px; }
+}
+
+@media (max-width: 767px) {
+    :root { --s3-arco-asoma: 120px; }
+}
+
 /* Contenedor principal en Grid de 2 Columnas (ORIGINAL DE PC) */
 .seccion-tres-container {
     position: relative;
@@ -2532,7 +2581,7 @@ body {
 
 .footer-social.revela {
     /* El --n más alto del markup (el copyright). */
-    --n-ultimo: 3;
+    --n-ultimo: 2;
 }
 
 .revela [data-reveal] {
@@ -2639,7 +2688,7 @@ body {
     .seccion-tres {
         min-height: 100vh;
         min-height: 100svh;
-        padding: 4.6rem 1.25rem 1.5rem;
+        padding: 4.6rem 1.25rem calc(var(--s3-arco-asoma) + 1rem);
     }
 
     .seccion-tres-container {
@@ -2688,7 +2737,7 @@ body {
 /* Teléfonos bajitos (SE, Android compactos): la mascota se encoge para que
    todo siga entrando en una pantalla. */
 @media (max-width: 900px) and (max-height: 700px) {
-    .seccion-tres { padding: 4.2rem 1.25rem 1rem; }
+    .seccion-tres { padding: 4.2rem 1.25rem calc(var(--s3-arco-asoma) + 0.5rem); }
     .s3-mascota { --mascota: 210px; --mascota-n: 210; }
     .s3-texto { gap: 0.8rem; }
 }
@@ -2696,7 +2745,9 @@ body {
 /* ==========================================
    FOOTER
    ==========================================
-   Columna centrada: atajos -> redes -> franja rayada -> copyright.
+   Columna centrada: atajos -> redes -> copyright. (La franja rayada en
+   movimiento que iba antes del copyright se quitó el 22 de septiembre de
+   2026, a pedido del dueño.)
    Lo comparten index, catalogo y legal, y los tres usan el MISMO markup
    (solo cambian los href de "Inicio" y "Contacto" segun la pagina).
    El <footer> conserva la clase .footer-social porque actualizarMenu() en
@@ -2712,8 +2763,19 @@ body {
        legal. */
     background-color: #000000;
     padding: 3rem 0 2rem 0;
-    /* La franja rayada va a sangre: nada puede desbordar en horizontal. */
     overflow: hidden;
+}
+
+/* En index.html el footer va justo después de la sección 4 y su arco negro
+   (ver EL ARCO DEL PIE): se sube la mitad de lo que asoma el arco para que
+   los atajos y las redes queden dentro del negro del arco (22 septiembre
+   2026, a pedido del dueño). La franja que se monta sobre la sección es
+   transparente: el negro de ahí lo pone el arco, y un rectángulo negro
+   taparía sus orillas, que a esa altura todavía están en el borde gris. */
+.seccion-tres-scroll-wrapper + .footer-social {
+    --footer-jalon: calc(var(--s3-arco-asoma) * 0.5);
+    margin-top: calc(var(--footer-jalon) * -1);
+    background: linear-gradient(to bottom, transparent var(--footer-jalon), #000000 var(--footer-jalon));
 }
 
 .footer-top {
@@ -2802,31 +2864,6 @@ body {
     transform: scale(1.1);
 }
 
-/* ====== FRANJA RAYADA DE SEPARACION ======
-   Rayas diagonales a 45 grados que se desplazan despacio en bucle. El paso de
-   la animacion (200px) es multiplo exacto del mosaico (10px), asi el loop no
-   pega saltos. */
-.footer-franja {
-    width: 100%;
-    height: 48px;
-    border-top: 1px solid rgba(255, 255, 255, 0.16);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
-    background-image: repeating-linear-gradient(
-        315deg,
-        rgba(255, 255, 255, 0.16) 0,
-        rgba(255, 255, 255, 0.16) 1px,
-        transparent 0,
-        transparent 50%
-    );
-    background-size: 10px 10px;
-    animation: footerFranjaDeriva 20s linear infinite;
-}
-
-@keyframes footerFranjaDeriva {
-    from { background-position: 0 0; }
-    to   { background-position: 200px 0; }
-}
-
 /* ====== COPYRIGHT ====== */
 .footer-bottom {
     width: 100%;
@@ -2870,9 +2907,6 @@ body {
         gap: 1.4rem;
     }
 
-    .footer-franja {
-        height: 36px;
-    }
 
     .footer-bottom {
         padding-top: 1.5rem;
