@@ -140,6 +140,34 @@ body {
 }
 
 /* =========================================================================
+   🫧 CRISTAL LÍQUIDO — la píldora del menú y el botón "Ver catálogo"
+   =========================================================================
+   Port del LiquidButton (React + Tailwind) que mandó el dueño; aquí no hay
+   React ni Tailwind, así que es CSS puro. Tres piezas:
+   - fondo transparente;
+   - el borde de cristal, que son solo sombras (las mismas del componente):
+     el anillo oscuro por dentro y un brillo blanco por fuera. Sobre fondo
+     negro va la versión clara, que es la dark: del componente;
+   - el backdrop-filter con el filtro SVG #container-glass (va al principio
+     del <body> de index.html y legal.html), que ondula lo que queda detrás.
+     Ese url() solo lo pinta Chromium; en Safari y Firefox queda el cristal
+     sin ondas, que es lo mismo que se ve sobre un fondo blanco liso.
+   Ojo: un filter, opacity < 1 o mask en un ANCESTRO corta el backdrop-filter.
+   Las entradas (hero-in, menu-in) terminan en filter: none, así que al
+   acabar la ola el cristal ya ve la página. */
+:root {
+    --cristal-borde: 0 0 6px rgba(0, 0, 0, 0.03), 0 2px 6px rgba(0, 0, 0, 0.08), inset 3px 3px 0.5px -3px rgba(0, 0, 0, 0.9), inset -3px -3px 0.5px -3px rgba(0, 0, 0, 0.85), inset 1px 1px 1px -0.5px rgba(0, 0, 0, 0.6), inset -1px -1px 1px -0.5px rgba(0, 0, 0, 0.6), inset 0 0 6px 6px rgba(0, 0, 0, 0.12), inset 0 0 2px 2px rgba(0, 0, 0, 0.06), 0 0 12px rgba(255, 255, 255, 0.15);
+    --cristal-borde-claro: 0 0 8px rgba(0, 0, 0, 0.03), 0 2px 6px rgba(0, 0, 0, 0.08), inset 3px 3px 0.5px -3.5px rgba(255, 255, 255, 0.09), inset -3px -3px 0.5px -3.5px rgba(255, 255, 255, 0.85), inset 1px 1px 1px -0.5px rgba(255, 255, 255, 0.6), inset -1px -1px 1px -0.5px rgba(255, 255, 255, 0.6), inset 0 0 6px 6px rgba(255, 255, 255, 0.12), inset 0 0 2px 2px rgba(255, 255, 255, 0.06), 0 0 12px rgba(0, 0, 0, 0.15);
+}
+
+.cristal-filtro {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}
+
+/* =========================================================================
    🟢 MENÚ PÍLDORA (.menu) — reemplaza a la navbar vieja
    =========================================================================
    Píldora fija arriba al centro. Cerrada muestra "Menú" + hamburguesa; al
@@ -170,8 +198,11 @@ body {
    ========================================================================= */
 .menu {
     --menu-ease: cubic-bezier(0.22, 1, 0.36, 1);
-    --menu-bg: var(--verde);
-    --menu-fg: #ffffff;
+    --menu-bg: transparent;
+    --menu-fg: var(--tinta);
+    --menu-cristal: var(--cristal-borde);
+    --menu-boton: var(--tinta);
+    --menu-boton-fg: #ffffff;
     --menu-panel: var(--tinta);
     --menu-panel-fg: #ffffff;
     /* Alto de la barra cerrada. Lo usan la píldora y el propio botón. */
@@ -209,15 +240,21 @@ body {
    verde quedó reservado para el panel del tema oscuro y tener dos panel verdes
    hacía que el menú se viera igual en las dos mitades de la página. */
 .menu[data-theme="claro"] {
-    --menu-bg: var(--verde);
-    --menu-fg: #ffffff;
+    --menu-bg: transparent;
+    --menu-fg: var(--tinta);
+    --menu-cristal: var(--cristal-borde);
+    --menu-boton: var(--tinta);
+    --menu-boton-fg: #ffffff;
     --menu-panel: var(--tinta);
     --menu-panel-fg: #ffffff;
 }
 
 .menu[data-theme="verde"] {
-    --menu-bg: #ffffff;
-    --menu-fg: var(--verde);
+    --menu-bg: transparent;
+    --menu-fg: #ffffff;
+    --menu-cristal: var(--cristal-borde-claro);
+    --menu-boton: #ffffff;
+    --menu-boton-fg: var(--verde);
     --menu-panel: var(--tinta);
     --menu-panel-fg: #ffffff;
 }
@@ -231,8 +268,11 @@ body {
    el color del panel de este tema, y sobre la píldora blanca se leía como si el
    menú estuviera a medio abrir. */
 .menu[data-theme="oscuro"] {
-    --menu-bg: #ffffff;
-    --menu-fg: var(--tinta);
+    --menu-bg: transparent;
+    --menu-fg: #ffffff;
+    --menu-cristal: var(--cristal-borde-claro);
+    --menu-boton: #ffffff;
+    --menu-boton-fg: var(--tinta);
     --menu-panel: var(--verde);
     --menu-panel-fg: #ffffff;
 }
@@ -246,14 +286,19 @@ body {
     overflow: hidden;
     border-radius: 999px;
     background: var(--menu-bg);
-    box-shadow: 0 10px 30px rgba(3, 12, 6, 0.22);
+    /* Cristal líquido (ver arriba). Abierto, el círculo del panel tapa las
+       sombras de dentro y queda el panel liso de siempre. */
+    box-shadow: var(--menu-cristal);
+    -webkit-backdrop-filter: url('#container-glass');
+    backdrop-filter: url('#container-glass');
     pointer-events: auto;
     transition:
         width 800ms var(--menu-ease),
         height 800ms var(--menu-ease),
         border-radius 800ms var(--menu-ease),
         transform 250ms var(--menu-ease),
-        background-color 400ms ease;
+        background-color 400ms ease,
+        box-shadow 400ms ease;
 }
 
 .menu:not(.is-open) .menu__shell:hover {
@@ -295,7 +340,8 @@ body {
     flex-shrink: 0;
     width: 100%;
     height: var(--menu-bar);
-    padding: 0 20px;
+    /* Menos aire a la derecha: ahí el círculo hace de tope, como en .btn-hero. */
+    padding: 0 7px 0 20px;
     border: 0;
     /* Hereda el radio de la píldora para que el anillo de foco salga redondo
        y no un rectángulo asomando por los costados. */
@@ -322,17 +368,69 @@ body {
     outline-offset: -5px;
 }
 
+/* 🔁 EL RELEVO DE LA PÍLDORA — el mismo efecto que "Ver catálogo" (.btn-hero).
+   Cerrada, al pasar el cursor nada se mueve de sitio: la palabra sube y una
+   copia idéntica entra por abajo, y la hamburguesa se va por la derecha dentro
+   de su círculo mientras otra entra por la izquierda (en horizontal y no en
+   diagonal como la flecha: unas rayas en diagonal se leían torcidas). Las dos
+   copias están siempre en el marcado y cada caja las recorta con overflow.
+   Abierta no hay relevo (el hover va con :not(.is-open)): la primera copia
+   vuelve a su sitio y sus rayas giran a la X de siempre. */
+.menu__label {
+    display: grid;
+    overflow: hidden;
+    /* Alta como su propia línea, para que el relevo no corte la tilde. */
+    line-height: 1.45;
+}
+
+.menu__copia {
+    grid-area: 1 / 1;
+    transition: transform 460ms var(--menu-ease);
+}
+
+.menu__copia + .menu__copia { transform: translateY(100%); }
+
+.menu:not(.is-open) .menu__bar:hover .menu__copia { transform: translateY(-100%); }
+.menu:not(.is-open) .menu__bar:hover .menu__copia + .menu__copia { transform: translateY(0); }
+
+/* El círculo: negro con rayas blancas sobre fondo claro, blanco con rayas
+   negras sobre el negro del portal (--menu-boton). Abierto se vuelve
+   transparente y la X queda sobre el panel como antes. */
 .menu__icon {
     position: relative;
     display: grid;
-    width: 24px;
-    height: 24px;
+    width: 34px;
+    height: 34px;
     place-items: center;
+    border-radius: 50%;
+    background: var(--menu-boton);
+    color: var(--menu-boton-fg);
+    overflow: hidden;
+    transition: background-color 400ms ease, color 300ms ease;
 }
+
+.menu.is-open .menu__icon {
+    background: transparent;
+    color: inherit;
+}
+
+.menu__lineas {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    transition: transform 460ms var(--menu-ease);
+}
+
+/* 140% como la flecha: con 100% justo asoma la punta de las rayas. */
+.menu__lineas--entra { transform: translateX(-140%); }
+
+.menu:not(.is-open) .menu__bar:hover .menu__lineas { transform: translateX(140%); }
+.menu:not(.is-open) .menu__bar:hover .menu__lineas--entra { transform: translateX(0); }
 
 .menu__icon i {
     position: absolute;
-    width: 18px;
+    width: 16px;
     height: 2px;
     border-radius: 999px;
     background: currentColor;
@@ -528,7 +626,8 @@ body {
             margin 800ms var(--menu-ease),
             border-radius 800ms var(--menu-ease),
             transform 250ms var(--menu-ease),
-            background-color 400ms ease;
+            background-color 400ms ease,
+            box-shadow 400ms ease;
     }
 
     /* El alto lo manda el CSS (100% de .menu = pantalla), no el JS: en celular
@@ -543,8 +642,13 @@ body {
     .menu__bar {
         justify-content: center;
         gap: 8px;
-        padding: 0 14px;
+        padding: 0 6px 0 14px;
         font-size: 0.88rem;
+    }
+
+    .menu__icon {
+        width: 32px;
+        height: 32px;
     }
 
     .menu.is-open .menu__bar {
@@ -608,7 +712,10 @@ body {
     .menu__shell,
     .menu__circle,
     .menu__bar,
+    .menu__icon,
     .menu__icon i,
+    .menu__copia,
+    .menu__lineas,
     .menu__item {
         transition-duration: 1ms;
     }
@@ -696,20 +803,24 @@ body {
     mask-image: linear-gradient(to bottom, #000 73%, rgba(0, 0, 0, 0.84) 78.5%, rgba(0, 0, 0, 0.56) 85.3%, rgba(0, 0, 0, 0.18) 92%, transparent 97.5%);
 }
 
-/* --- 🌫️ LA NIEBLA QUE SE MUEVE DENTRO DEL PERSONAJE ------------------------
-   La imagen ya es la silueta en negro con humo quieto (el mismo negro y los
-   mismos grises que el shader del portal, sin el anillo). Encima van dos capas
-   de niebla con transparencia que se pasean despacio, recortadas por DOS
-   máscaras a la vez: la silueta (el alfa de la propia imagen) y el mismo
-   desvanecido de abajo que lleva .hero-figura-img.
-   Solo se animan transforms, nada de canvas ni blend modes: es lo que trababa
-   la entrada con blur cuando el humo del hero era un shader. Por lo mismo la
-   niebla arranca quieta y no empieza a moverse hasta que terminó la entrada
-   (el retraso de 0.9s). */
+/* --- 🌫️ EL PERSONAJE, EN EL GRIS DE MARCA DE AGUA ---------------------------
+   El 20 de septiembre de 2026 se invirtieron los colores del hero: el humo se
+   pasó a las letras de la marca y el personaje quedó en el gris que tenían
+   ellas. La imagen (.hero-figura-img) sigue ahí solo para dar la forma y el
+   alto de la caja, invisible; lo que se ve es esta capa, un gris liso
+   recortado con DOS máscaras a la vez: la silueta (el alfa de la imagen) y el
+   mismo desvanecido de abajo.
+   El gris es OPACO: #f2f2f2 es lo que da rgba(17, 17, 17, 0.055) sobre el
+   blanco del hero, así que se ve igual que la marca de agua de antes, pero
+   tapa de verdad la "E" de ANXIE que queda detrás de la cabeza. */
+.hero-figura-img {
+    visibility: hidden;
+}
+
 .hero-figura-humo {
     position: absolute;
     inset: 0;
-    overflow: hidden;
+    background: #f2f2f2;
     -webkit-mask-image: url('assets/hero-personaje-humo-700.webp'), linear-gradient(to bottom, #000 73%, rgba(0, 0, 0, 0.84) 78.5%, rgba(0, 0, 0, 0.56) 85.3%, rgba(0, 0, 0, 0.18) 92%, transparent 97.5%);
     mask-image: url('assets/hero-personaje-humo-700.webp'), linear-gradient(to bottom, #000 73%, rgba(0, 0, 0, 0.84) 78.5%, rgba(0, 0, 0, 0.56) 85.3%, rgba(0, 0, 0, 0.18) 92%, transparent 97.5%);
     -webkit-mask-size: 100% 100%;
@@ -718,79 +829,101 @@ body {
     mask-composite: intersect;
 }
 
-.hero-figura-humo span {
-    position: absolute;
-    inset: -18%;
-    background: url('assets/humo-niebla-a.webp') center / cover no-repeat;
-    will-change: transform;
-    animation: niebla-a 19s ease-in-out 0.9s infinite alternate;
-}
+/* --- 👑 LA MARCA, ENCIMA DE LA CABEZA --------------------------------------
+   "ANXIE STORE" en una sola línea, con el espacio normal entre las palabras,
+   centrada sobre la cabeza y ENCIMA del personaje (20 de septiembre de 2026,
+   de la maqueta del dueño). Antes iba detrás, primero con la cabeza tapando la
+   "E" y luego abierta en dos a los lados de la cabeza.
 
-.hero-figura-humo span + span {
-    background-image: url('assets/humo-niebla-b.webp');
-    animation: niebla-b 27s ease-in-out 0.9s infinite alternate;
-}
+   Cuelga de .hero-figura: se mide en el ancho del personaje (--hero-fig), así
+   que queda SIEMPRE a la altura de la cabeza, en PC y en celular. El z-index
+   1 la sube por encima de la silueta sin sacarla de la figura (la figura es
+   contexto de apilado: position + z-index 1, por debajo de .hero-inner).
 
-@keyframes niebla-a {
-    0%   { transform: translate(-7%, 5%) rotate(0deg) scale(1); }
-    50%  { transform: translate(4%, -3%) rotate(6deg) scale(1.08); }
-    100% { transform: translate(8%, 6%) rotate(-4deg) scale(1.02); }
-}
+   Centrada sobre la CABEZA, no sobre la caja: la cabeza cae al 53.4% del
+   ancho. El <h1> mide el doble de la figura y arranca en el −46.6%, así que su
+   centro cae justo ahí, y el flex centra las palabras sin depender de cuánto
+   mida cada una con la fuente que toque (no se puede centrar con transform:
+   el <h1> ya usa el suyo en la entrada, hero-in). La marca entera mide unas
+   1.75 veces el personaje.
 
-@keyframes niebla-b {
-    0%   { transform: translate(6%, -6%) rotate(0deg) scale(1.05); }
-    50%  { transform: translate(-5%, 4%) rotate(-7deg) scale(1); }
-    100% { transform: translate(-8%, -3%) rotate(5deg) scale(1.1); }
-}
+   Tamaño y altura salen de la última maqueta del dueño: la letra es el 28.5%
+   del ancho (antes 22.32%) y las mayúsculas arrancan al 33% (antes al 16.8%),
+   a la altura de la barbilla (el dueño la pidió más abajo que la maqueta).
 
-@media (prefers-reduced-motion: reduce) {
-    .hero-figura-humo span,
-    .hero-figura-humo span + span {
-        animation: none;
-    }
-}
-
-/* --- 👑 LA MARCA, DETRÁS DE LA CABEZA ---------------------------------------
-   Gigante y en el MISMO gris que tenía la cinta "TIENDA DE CUENTAS" y que
-   sigue teniendo el rótulo "CUENTAS DESTACADAS" del portal
-   (.corona-watermark): aquí es marca de agua, no titular. Hasta el 20 de
-   septiembre de 2026 iba en negro, desvanecida hacia abajo con un mask-image;
-   en este gris la máscara la borraba del todo, así que se fue.
-
-   Cuelga de .hero-figura por lo mismo que colgaba la cinta: se mide en el
-   ancho del personaje (--hero-fig), así que queda SIEMPRE a la altura de la
-   cabeza, en PC y en celular. El z-index -1 la manda detrás de la imagen sin
-   sacarla de la figura (la figura es contexto de apilado: position + z-index
-   1), así que no se hunde bajo el fondo del hero.
-
-   Todo sale de la maqueta, en fracciones del ancho del personaje:
-   - la letra es el 22.32% (11.5 unidades) y la marca entera, de la A a la
-     última E, mide 1.4755 veces el personaje;
-   - arranca un 12.77% a la IZQUIERDA del personaje, o sea que no va centrada
-     en la pantalla: va corrida a la derecha para que la cabeza tape la "E" de
-     ANXIE y deje entero STORE, como en la maqueta;
-   - el hueco de 0.7em entre las dos palabras es el sitio de la cabeza (un
-     espacio normal dejaba media S tapada).
-   La interlínea de 0.68 hace que la caja empiece justo en el tope de las
-   mayúsculas (en Plus Jakarta Sans: 2 × 0.75 de mayúscula − 1.04 de
-   ascendente + 0.22 de descendente), así que el top es directamente la
-   altura de la letra: el 16.8% del ancho, bajo la coronilla. */
+   La interlínea de 0.68 hace que la caja
+   empiece justo en el tope de las mayúsculas (en Plus Jakarta Sans: 2 × 0.75
+   de mayúscula − 1.04 de ascendente + 0.22 de descendente), así que el top
+   es directamente la altura de la letra. */
 .hero-wordmark {
     position: absolute;
-    top: calc(var(--hero-fig) * 0.168);
-    left: calc(var(--hero-fig) * -0.1277);
-    z-index: -1;
+    top: calc(var(--hero-fig) * 0.33);
+    left: -46.6%;
+    z-index: 1;
     display: flex;
-    gap: 0.7em;
+    justify-content: center;
+    gap: 0.25em;
+    width: 200%;
     margin: 0;
     font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
     font-weight: 800;
-    font-size: calc(var(--hero-fig) * 0.2232);
+    font-size: calc(var(--hero-fig) * 0.285);
     line-height: 0.68;
     letter-spacing: -0.045em;
     text-transform: uppercase;
     white-space: nowrap;
-    color: rgba(17, 17, 17, 0.055);
+    color: #1a1a1a;
+}
+
+/* Cada palabra lleva 0.12em de relleno por los cuatro lados, devuelto con un
+   margen negativo igual para que la letra no se mueva: el humo se recorta con
+   background-clip: text, que solo pinta dentro de la caja, y con la
+   interlínea de 0.68 la caja cortaba lo que la O y la S sobresalen por
+   arriba y por abajo de las demás mayúsculas. */
+.hero-wordmark span {
+    padding: 0.12em;
+    margin: -0.12em;
+}
+
+/* 🌫️ EL HUMO DE LA MARCA
+   Las letras van rellenas de humo con background-clip: text, como pedía la
+   nota del shader: nada de canvas ni blend modes (eso trababa la entrada con
+   blur). Tres fondos por palabra: abajo el humo quieto (assets/marca-humo.webp,
+   negro y grises como el portal) y encima las dos nieblas que antes se
+   paseaban dentro del personaje, que aquí se mueven con background-position.
+   El relleno va en los <span> y no en el <h1> porque el <h1> ya usa su
+   animation para la entrada (hero-in). Sin background-clip: text se queda el
+   color liso de arriba. Las nieblas arrancan quietas hasta que termina la
+   entrada (el retraso de 0.9s). */
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+    .hero-wordmark span {
+        color: transparent;
+        background-image: url('assets/humo-niebla-a.webp'), url('assets/humo-niebla-b.webp'), url('assets/marca-humo.webp');
+        background-size: 3.2em auto, 4.4em auto, cover;
+        background-repeat: repeat, repeat, no-repeat;
+        background-position: 0 -0.6em, 1.5em -1.2em, center;
+        -webkit-background-clip: text;
+        background-clip: text;
+        animation: marca-niebla 24s ease-in-out 0.9s infinite alternate;
+    }
+
+    .hero-wordmark span + span {
+        animation-duration: 31s;
+        animation-direction: alternate-reverse;
+    }
+}
+
+@keyframes marca-niebla {
+    0%   { background-position: 0 -0.6em, 1.5em -1.2em, center; }
+    50%  { background-position: 1.4em -0.9em, 0.2em -0.7em, center; }
+    100% { background-position: 2.6em -0.4em, -1.3em -1.1em, center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-wordmark span,
+    .hero-wordmark span + span {
+        animation: none;
+    }
 }
 
 /* 📝 ABAJO A LA IZQUIERDA: FRASE + BOTÓN */
@@ -804,22 +937,27 @@ body {
     text-align: left;
 }
 
-/* La frase: en caja normal y en gris, como en la maqueta. Las palabras
-   destacadas siguen verdes, que llevan su propia clase (.acento-verde). El
-   ancho va en em para que corte en los mismos cuatro renglones de la maqueta
-   con cualquier tamaño de letra: el renglón más largo ("acompañada. Elige la
-   tuya en el catálogo,") mide 20.96em, y con "hasta" el tercero ya pasaría
-   de 21.5. Por debajo de ~1220px de ancho la letra ya va en su mínimo pero
-   el personaje se sigue encogiendo, y la frase se le metía encima (a 1024 el
-   "catálogo" caía sobre su brazo): el tope de 26.3 unidades la corta antes
-   de llegar a él, que empieza en la unidad 31.4. */
-.hero-texto {
-    max-width: min(21.2em, calc(var(--hero-u) * 26.3));
-    margin: 0;
-    font-weight: 500;
-    font-size: clamp(0.95rem, calc(var(--hero-u) * 1.12), 1.2rem);
-    line-height: 1.7;
-    color: var(--gris-texto);
+/* 🔢 EL CONTEO: "11 Cuentas / EN EL CATÁLOGO", en vivo desde Supabase.
+   Reemplazó a la frase de la maqueta (20 de septiembre de 2026). Usa las
+   mismas clases que los datos de la derecha (.hero-dato-valor y
+   .hero-dato-etiqueta), así que mide y se ve igual que "2 años" en PC y en
+   celular; aquí solo va alineado a la izquierda, en negro, y con la misma
+   raya fina debajo, que lo separa del botón. */
+.hero-conteo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: calc(var(--hero-u) * 0.25);
+    color: #000000;
+    white-space: nowrap;
+}
+
+.hero-conteo::after {
+    content: '';
+    width: calc(var(--hero-u) * 8.4);
+    height: 1px;
+    margin-top: calc(var(--hero-u) * 1.37);
+    background: rgba(17, 17, 17, 0.16);
 }
 
 /* 📊 ABAJO A LA DERECHA: LOS DATOS DE CONFIANZA
@@ -886,7 +1024,7 @@ body {
     gap: 1rem;
 }
 
-/* 🟢 EL BOTÓN DEL HERO — píldora verde con la flecha en un círculo blanco.
+/* 🟢 EL BOTÓN DEL HERO — píldora de cristal con la flecha en un círculo negro.
    Al pasar el cursor nada se mueve de sitio: lo que hay dentro se RELEVA. El
    texto sube y una copia idéntica entra por abajo; la flecha se va en diagonal
    hacia arriba a la derecha y otra entra desde abajo a la izquierda. Las dos
@@ -899,22 +1037,29 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 18px;
-    height: 56px;
+    gap: 22px;
+    height: 66px;
     /* Menos aire a la derecha: ahí el círculo hace de tope. */
-    padding: 0 7px 0 34px;
+    padding: 0 8px 0 40px;
     border-radius: 999px;
-    background: var(--verde);
-    color: #ffffff;
+    /* Cristal líquido, como la píldora del menú (ver CRISTAL LÍQUIDO). */
+    background: transparent;
+    box-shadow: var(--cristal-borde);
+    -webkit-backdrop-filter: url('#container-glass');
+    backdrop-filter: url('#container-glass');
+    color: var(--tinta);
     font-family: 'Montserrat', sans-serif;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 1.15rem;
     text-decoration: none;
     white-space: nowrap;
-    transition: background-color 300ms ease, transform 300ms ease;
+    transition: transform 300ms ease;
 }
 
-.btn-hero:hover { background: #163d25; }
+/* El cristal crece un 5% en hover, como el componente original. Es un
+   transform, no un cambio de ancho: no reflowea nada y el relevo de dentro
+   sigue igual. */
+.btn-hero:hover { transform: scale(1.05); }
 
 .btn-hero:active { transform: scale(0.97); }
 
@@ -937,24 +1082,26 @@ body {
 .btn-hero:hover .btn-hero-copia { transform: translateY(-100%); }
 .btn-hero:hover .btn-hero-copia + .btn-hero-copia { transform: translateY(0); }
 
-/* El círculo blanco: la otra ventanita, esta redonda. */
+/* El círculo negro: la otra ventanita, esta redonda. */
 .btn-hero-circulo {
     position: relative;
     flex-shrink: 0;
     display: grid;
     place-items: center;
-    width: 42px;
-    height: 42px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    background: #ffffff;
-    color: var(--verde);
+    /* Negro con la flecha blanca: sobre el cristal, un círculo blanco se
+       perdía contra el fondo blanco del hero. */
+    background: var(--tinta);
+    color: #ffffff;
     overflow: hidden;
 }
 
 .btn-hero-flecha {
     grid-area: 1 / 1;
-    width: 17px;
-    height: 17px;
+    width: 20px;
+    height: 20px;
     transition: transform 460ms var(--btn-hero-ease);
 }
 
@@ -1300,26 +1447,26 @@ body {
        abajo en vez de abrirse entre la imagen y el texto.
        --hero-fig manda aquí lo mismo que en PC (la marca se mide con él),
        pero sale del ancho de la pantalla: es el ancho que hace que la marca,
-       1.4755 veces el personaje, llene la pantalla de margen a margen. El tope
+       1.75 veces el personaje, llene la pantalla de margen a margen. El tope
        de 60svh es para el teléfono acostado, donde si no el personaje salía
        más alto que la pantalla. */
     .hero {
-        --hero-fig: min((100vw - 2.3rem) / 1.4755, 60svh);
+        --hero-fig: min((100vw - 2.3rem) / 1.75, 60svh);
         justify-content: center;
         /* La cabeza tiene que librar la píldora, que en celular va arriba a
            la derecha. */
         padding-top: 4rem;
     }
 
-    /* La figura entra en el flujo. Lo que se centra aquí es la MARCA y no la
-       cabeza como en PC: con la cabeza al centro, la marca (que va corrida a
-       la derecha) se salía de la pantalla. */
+    /* La figura entra en el flujo, con la cabeza al centro de la pantalla
+       como en PC. La marca va centrada sobre la cabeza, así que también
+       queda centrada. */
     .hero-figura {
         position: relative;
         left: auto;
         bottom: auto;
         align-self: flex-start;
-        margin-left: calc((100vw - var(--hero-fig) * 1.4755) / 2 + var(--hero-fig) * 0.1277);
+        margin-left: calc(50vw - var(--hero-fig) * 0.534);
     }
 
     /* El texto sube hasta donde la figura ya casi se borró (el 92% de su alto,
@@ -1345,10 +1492,11 @@ body {
 
     .hero-pie { gap: 2rem; }
 
-    .hero-texto {
-        max-width: none;
-        font-size: 0.95rem;
-        line-height: 1.6;
+    .hero-conteo { gap: 0.35rem; }
+
+    .hero-conteo::after {
+        width: 4.5rem;
+        margin-top: 1.1rem;
     }
 
     /* Los datos, en fila y por encima de la frase (order), con la raya en
@@ -1383,15 +1531,15 @@ body {
        el texto se va a la izquierda y el círculo al filo derecho: centrados
        los dos dejaban un hueco raro a la derecha. */
     .btn-hero {
-        height: 52px;
-        gap: 14px;
-        padding: 0 6px 0 1.5rem;
+        height: 60px;
+        gap: 16px;
+        padding: 0 7px 0 1.6rem;
         justify-content: space-between;
     }
 
     .btn-hero-circulo {
-        width: 40px;
-        height: 40px;
+        width: 46px;
+        height: 46px;
     }
 
     .btn-discord-linea,

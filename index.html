@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260920l">
+    <link rel="stylesheet" href="style.css?v=20260920y">
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -27,6 +27,21 @@
     <script src="catalog-cache.js?v=20260831c"></script>
 </head>
 <body>
+
+    <!-- 🫧 El filtro del cristal líquido (ver el bloque CRISTAL LÍQUIDO de
+         style.css). Tiene que estar en el marcado para que el backdrop-filter
+         de la píldora y del botón lo encuentre por su id. Mide 0 y no se ve. -->
+    <svg class="cristal-filtro" width="0" height="0" aria-hidden="true" focusable="false">
+        <defs>
+            <filter id="container-glass" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05 0.05" numOctaves="1" seed="1" result="turbulence"/>
+                <feGaussianBlur in="turbulence" stdDeviation="2" result="blurredNoise"/>
+                <feDisplacementMap in="SourceGraphic" in2="blurredNoise" scale="70" xChannelSelector="R" yChannelSelector="B" result="displaced"/>
+                <feGaussianBlur in="displaced" stdDeviation="4" result="finalBlur"/>
+                <feComposite in="finalBlur" in2="finalBlur" operator="over"/>
+            </filter>
+        </defs>
+    </svg>
 
     <!--
         🟢 MENÚ PÍLDORA (reemplazó a la navbar vieja).
@@ -46,8 +61,16 @@
             <span class="menu__circle" aria-hidden="true"></span>
 
             <button type="button" class="menu__bar" aria-expanded="false" aria-controls="menu-items">
-                <span class="menu__label">Menú</span>
-                <span class="menu__icon" aria-hidden="true"><i></i><i></i></span>
+                <!-- Relevo, como .btn-hero: cada cosa va DOS veces y el hover
+                     cambia una copia por la otra (ver .menu__label en style.css). -->
+                <span class="menu__label">
+                    <span class="menu__copia">Menú</span>
+                    <span class="menu__copia" aria-hidden="true">Menú</span>
+                </span>
+                <span class="menu__icon" aria-hidden="true">
+                    <span class="menu__lineas"><i></i><i></i></span>
+                    <span class="menu__lineas menu__lineas--entra"><i></i><i></i></span>
+                </span>
             </button>
 
             <!--
@@ -126,10 +149,11 @@
                 <span>Store</span>
             </h1>
 
-            <!-- 🌫️ La silueta en negro con humo va HORNEADA en la imagen (sale
-                 de assets/diseño 2.png); la niebla que se mueve encima es
-                 .hero-figura-humo, dos capas de CSS. Nada de shader en vivo: el
-                 hero entra con un filter: blur() y un canvas aquí lo arrastraba. -->
+            <!-- 🌫️ Colores invertidos (20 sep 2026): el humo se fue a las letras
+                 de la marca y el personaje quedó en el gris de marca de agua.
+                 La imagen solo da la forma y el alto de la caja (va invisible);
+                 lo que se ve es .hero-figura-humo, un gris liso recortado con
+                 la silueta. -->
             <img class="hero-figura-img"
                  src="assets/hero-personaje-humo-1100.webp"
                  srcset="assets/hero-personaje-humo-700.webp 700w,
@@ -141,10 +165,7 @@
                  data-reveal style="--n: 2;">
 
             <div class="hero-figura-humo" aria-hidden="true"
-                 data-reveal style="--n: 2;">
-                <span></span>
-                <span></span>
-            </div>
+                 data-reveal style="--n: 2;"></div>
         </div>
 
         <div class="hero-inner">
@@ -155,14 +176,18 @@
                  derecha, los dos asentados abajo. -->
             <div class="hero-panel" id="heroPanel">
 
-                <!-- 📝 FRASE + ACCIÓN, abajo a la izquierda -->
+                <!-- 📝 CONTEO + ACCIÓN, abajo a la izquierda -->
                 <div class="hero-pie">
 
-                    <p class="hero-texto" data-reveal style="--n: 3;">
-                        Cuentas de videojuegos con <span class="acento-verde">entrega acompañada</span>.
-                        Elige la tuya en el <span class="acento-verde">catálogo</span>, escríbenos y te
-                        guiamos <span class="acento-verde">paso a paso</span> hasta que esté en tus manos.
-                    </p>
+                    <!-- 🔢 Cuántas cuentas hay en el catálogo, en vivo. Mismo
+                         tamaño y letra que los datos de la derecha (reusa sus
+                         clases). El número lo escribe pintarConteoHero() con el
+                         total que ya trae la consulta de las cuentas destacadas,
+                         y se actualiza con la suscripción Realtime. -->
+                    <div class="hero-conteo" data-reveal style="--n: 3;">
+                        <span class="hero-dato-valor"><span id="heroTotal">—</span> <span id="heroTotalPalabra">Cuentas</span></span>
+                        <span class="hero-dato-etiqueta">En el catálogo</span>
+                    </div>
 
                     <div class="hero-botones" data-reveal style="--n: 4;">
                         <!-- El texto y la flecha van DUPLICADOS: al pasar el
@@ -683,12 +708,24 @@
                     total = count;
                 }
 
+                pintarConteoHero(total);
+
                 if (!cuentas.length) return;
                 pintarCuentasDestacadas(cuentas, total);
 
             } catch (err) {
                 console.error("Error al cargar las cuentas destacadas de Supabase:", err);
             }
+        }
+
+        // 🔢 El conteo del hero ("11 Cuentas / EN EL CATÁLOGO"): el total entero,
+        // sin restar las tarjetas que se ven (eso lo hace destTotal, más abajo).
+        function pintarConteoHero(total) {
+            if (typeof total !== 'number') return;
+            const numero = document.getElementById('heroTotal');
+            const palabra = document.getElementById('heroTotalPalabra');
+            if (numero) numero.textContent = String(total);
+            if (palabra) palabra.textContent = total === 1 ? 'Cuenta' : 'Cuentas';
         }
 
         // Rellena UNA tarjeta. Los ids de la segunda llevan el prefijo "dest2".

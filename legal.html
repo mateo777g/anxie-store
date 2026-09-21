@@ -20,10 +20,25 @@
          así que carga solo lo indispensable (instantáneo). catalogo.css
          tampoco hace falta: el chrome de aquí es el menú píldora de
          index.html, que style.css ya resuelve por completo. -->
-    <link rel="stylesheet" href="style.css?v=20260920l">
+    <link rel="stylesheet" href="style.css?v=20260920y">
     <link rel="stylesheet" href="legal.css?v=20260916c">
 </head>
 <body>
+
+    <!-- 🫧 El filtro del cristal líquido (ver el bloque CRISTAL LÍQUIDO de
+         style.css). Tiene que estar en el marcado para que el backdrop-filter
+         de la píldora y del botón lo encuentre por su id. Mide 0 y no se ve. -->
+    <svg class="cristal-filtro" width="0" height="0" aria-hidden="true" focusable="false">
+        <defs>
+            <filter id="container-glass" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05 0.05" numOctaves="1" seed="1" result="turbulence"/>
+                <feGaussianBlur in="turbulence" stdDeviation="2" result="blurredNoise"/>
+                <feDisplacementMap in="SourceGraphic" in2="blurredNoise" scale="70" xChannelSelector="R" yChannelSelector="B" result="displaced"/>
+                <feGaussianBlur in="displaced" stdDeviation="4" result="finalBlur"/>
+                <feComposite in="finalBlur" in2="finalBlur" operator="over"/>
+            </filter>
+        </defs>
+    </svg>
 
     <!--
         🟢 MENÚ PÍLDORA (el mismo de index.html).
@@ -37,8 +52,16 @@
             <span class="menu__circle" aria-hidden="true"></span>
 
             <button type="button" class="menu__bar" aria-expanded="false" aria-controls="menu-items">
-                <span class="menu__label">Menú</span>
-                <span class="menu__icon" aria-hidden="true"><i></i><i></i></span>
+                <!-- Relevo, como .btn-hero: cada cosa va DOS veces y el hover
+                     cambia una copia por la otra (ver .menu__label en style.css). -->
+                <span class="menu__label">
+                    <span class="menu__copia">Menú</span>
+                    <span class="menu__copia" aria-hidden="true">Menú</span>
+                </span>
+                <span class="menu__icon" aria-hidden="true">
+                    <span class="menu__lineas"><i></i><i></i></span>
+                    <span class="menu__lineas menu__lineas--entra"><i></i><i></i></span>
+                </span>
             </button>
 
             <ul class="menu__items" id="menu-items">
