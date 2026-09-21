@@ -1375,11 +1375,13 @@ body {
        borde encendido (radial-gradient de negro al 82% a blanco), que asoma
        por abajo.
    Cuelga DENTRO de .corona-mask, después del velo: se pinta sobre el negro del
-   humo apagado y nunca fuera de la corona. Su opacidad la escribe
-   pintarCorona() en su PROPIO tramo, separado del velo: primero se va el
-   humo, queda negro liso, y ya casi cerrando la corona entra esto. El arco
-   además sube desde abajo con ese mismo progreso (--horizonte); el degradado
-   y la rejilla no se mueven. (Hacer subir el fondo ENTERO se probó y se veía
+   humo apagado y nunca fuera de la corona. Entra en su PROPIO tramo,
+   separado del velo (primero se va el humo, queda negro liso, y ya casi
+   cerrando la corona entra esto), y en dos tiempos que escribe
+   pintarCorona(): --arco (el arco sube desde abajo y aparece) y después
+   --fondo (se encienden el degradado y la rejilla). El arco va DESPUÉS del
+   degradado en el markup, así que aparece solo sobre el negro y el gris
+   llega luego a su alrededor. (Hacer subir el fondo ENTERO se probó y se veía
    raro.) Sin transition, por lo mismo que el velo: el bucle de
    rAF ya suaviza. La primera parada del degradado es --corona-negro y no el
    #000 del componente, para que arriba no se note un
@@ -1388,7 +1390,6 @@ body {
     position: absolute;
     inset: 0;
     overflow: hidden;
-    opacity: 0;
     pointer-events: none;
 }
 
@@ -1402,34 +1403,46 @@ body {
     background-size: 6rem 5rem;
     -webkit-mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, #000 70%, transparent 110%);
             mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, #000 70%, transparent 110%);
-    opacity: 0.8;
+    opacity: calc(0.8 * var(--fondo, 0));
 }
 
 .corona-horizonte-degradado {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, var(--corona-negro), transparent 30%, #898e8e 78%, #ffffff 99%);
+    /* Mucho más apagado que el del componente (#898e8e → #ffffff): en la
+       maqueta del cliente el fondo casi no se aclara, solo agarra un gris
+       oscuro cerca del arco, y así lo que brilla es el borde del arco. */
+    background: linear-gradient(to bottom, var(--corona-negro), transparent 55%, #1f2020 84%, #343636 99%);
+    opacity: var(--fondo, 0);
 }
 
 .corona-horizonte-arco {
     position: absolute;
     left: 50%;
-    top: calc(100% - 150px);
-    width: 140%;
+    /* Asoma un 25% del alto (230px en un 1080p) y mide 120% de ancho (el
+       componente: 150px fijos y 140%): la maqueta del cliente lo pide más
+       arriba y más curvo. En vh y no en px porque en una laptop de 768px de
+       alto 230px fijos lo subían hasta encima de los títulos de las cuentas. */
+    top: calc(100% - 25vh);
+    width: 120%;
     height: 750px;
-    /* Sube desde abajo: con --horizonte en 0 está --arco-bajada por debajo de
-       su sitio (fuera de pantalla, porque de él solo asoman 150px) y en 1 llega.
+    /* Sube desde abajo: con --arco en 0 está --arco-bajada por debajo de su
+       sitio (fuera de pantalla, porque de él solo asoma el 25% del alto) y en 1 llega.
        Es la ÚNICA pieza del horizonte que se mueve; el degradado y la rejilla
-       solo se encienden. */
-    --arco-bajada: 260px;
-    transform: translateX(-50%) translateY(calc((1 - var(--horizonte, 1)) * var(--arco-bajada)));
+       solo se encienden, y después que él. */
+    --arco-bajada: 32vh;
+    transform: translateX(-50%) translateY(calc((1 - var(--arco, 0)) * var(--arco-bajada)));
+    opacity: var(--arco, 0);
     border-radius: 100%;
     background: radial-gradient(closest-side, #000000 82%, #ffffff);
 }
 
 /* Los mismos escalones del componente: md (768–1023) y el base de celular. */
 @media (max-width: 1023px) {
-    .corona-horizonte-arco { top: calc(100% - 90px); width: 1100px; height: 500px; --arco-bajada: 170px; }
+    /* Asoma 175px y no los 90 del componente: en celular y tablet el pie de
+       la sección 2 (botón + conteo) cae encima del arco, y tiene que caer en
+       su parte NEGRA, no en el borde blanco, donde el botón se perdía. */
+    .corona-horizonte-arco { top: calc(100% - 175px); width: 1100px; height: 500px; --arco-bajada: 260px; }
 }
 
 @media (max-width: 767px) {
@@ -1912,8 +1925,10 @@ body {
    pantalla más baja que te importe (y mira el @media de celular, que lleva su
    propia versión apretada).
 
-   El texto va en blanco y la tarjeta en blanco sólido, igual que cuando el
-   fondo era verde: sobre el negro del humo apagado leen las dos cosas. */
+   Desde el 21 de septiembre de 2026 sigue la maqueta del cliente: titular
+   centrado arriba, las dos cuentas SIN tarjeta (foto grande, título espaciado
+   y precio), y abajo, sobre el arco del horizonte, el botón de
+   cristal al catálogo y el conteo. Todo en blanco sobre el fondo del portal. */
 
 .destacada {
     position: absolute;
@@ -1923,12 +1938,12 @@ body {
     color: #ffffff;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    /* Cinco piezas apiladas (encabezado, titular, regla, cuentas y pie), no
-       dos: el hueco es más corto que cuando aquí solo iban header y cuerpo. */
-    gap: 1.6rem;
+    /* Tres piezas: titular arriba, cuentas en medio y el pie abajo, encima del
+       arco del horizonte. space-between las reparte así en cualquier alto. */
+    justify-content: space-between;
+    gap: clamp(1rem, 3vh, 2rem);
     /* El padding de arriba deja libre el menú píldora, que es fixed. */
-    padding: clamp(6rem, 11vh, 8rem) 3.5rem clamp(3.5rem, 8vh, 6rem) 3.5rem;
+    padding: clamp(4.75rem, 9vh, 6rem) 2.7vw clamp(1.25rem, 3.5vh, 2.25rem);
     /* Mientras no se ha revelado no debe comerse los clics: durante el
        destapado es una capa invisible tapando la pantalla entera. */
     pointer-events: none;
@@ -1967,8 +1982,8 @@ body {
  * sin cambio de clase no hay nada que animar.
  * ------------------------------------------------------------------------- */
 .destacada {
-    /* El --n más alto del markup (la línea del pie). */
-    --n-ultimo: 5;
+    /* El --n más alto del markup (el pie). */
+    --n-ultimo: 3;
 }
 
 .destacada [data-reveal] {
@@ -2004,179 +2019,59 @@ body {
     }
 }
 
-/* Encabezado: solo el rótulo y el atajo, en una línea. El titular ya NO vive
-   aquí dentro — salió a ocupar el ancho entero, debajo. */
-.destacada-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 2.5rem;
-}
-
-/* La línea "● ── LO MÁS COTIZADO" aquí va sobre verde: el --verde-medio de
-   la maqueta no se leía, sube a --verde-suave */
-.destacada-eyebrow .eyebrow-punto,
-.destacada-eyebrow .eyebrow-linea { background: var(--verde-suave); }
-.destacada-eyebrow .eyebrow-texto { color: var(--verde-suave); }
-
-/* El titular cruza el ancho entero, a la escala de la marca del hero: es lo
-   que ata esta sección con la portada. */
+/* El titular, centrado y a lo ancho: ~73% de la pantalla en la maqueta. El
+   tope en vh es para los monitores bajos, donde a 8.6vw se comería el alto que
+   necesitan las fotos. */
 .destacada-titulo {
     font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
     font-weight: 800;
-    font-size: clamp(2rem, 7.2vw, 6.5rem);
+    font-size: min(8.6vw, 15vh);
     line-height: 0.9;
     letter-spacing: -0.05em;
+    text-align: center;
     text-transform: uppercase;
 }
 
-/* Línea fina bajo el titular: separa el rótulo de las cuentas sin meter una
-   caja más. */
-.destacada-regla {
-    display: block;
-    width: 100%;
-    height: 1px;
-    background: rgba(255, 255, 255, 0.18);
-}
-
-.destacada-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 26px;
-    border-radius: 50px;
-    border: 1.5px solid rgba(255, 255, 255, 0.32);
-    color: #ffffff;
-    font-weight: 600;
-    font-size: 0.88rem;
-    text-decoration: none;
-    white-space: nowrap;
-    transition: border-color 0.3s ease, background-color 0.3s ease;
-}
-
-.destacada-link:hover {
-    border-color: #ffffff;
-    background: rgba(255, 255, 255, 0.12);
-}
-
-.destacada-link-flecha {
-    color: var(--verde-suave);
-    font-weight: 800;
-}
-
-/* DOS cuentas, en columnas iguales. En celular esto pasa a una sola columna y
-   la segunda tarjeta se esconde (ver el bloque responsive): dentro del pin del
-   portal no hay alto para dos, y por eso el rótulo de atrás dice "CUENTA
-   DESTACADA" en singular ahí. */
+/* DOS cuentas, una a cada orilla con un pasillo ancho en medio. En celular
+   pasa a una sola (ver el bloque responsive): dentro del pin del portal no hay
+   alto para dos, y por eso el rótulo de atrás dice "CUENTA DESTACADA" en
+   singular ahí. */
 .destacada-cuerpo {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2rem;
-    align-items: stretch;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 4vw;
 }
 
-/* 🃏 TARJETA DE LA CUENTA — acostada: la foto manda a la izquierda y los datos
-   acompañan a la derecha. Blanca sobre el negro del portal, con el mismo borde
-   fino y la misma sombra abierta de la tarjeta del hero, para que las dos
-   secciones se lean como una sola pieza. */
+/* 🃏 LA CUENTA — ya no es una tarjeta: la foto grande y debajo, sueltos sobre
+   el fondo, el título y el precio (la rayita de la maqueta se quitó a pedido
+   del cliente). El ancho lo limita también el
+   alto (78vh = foto de 39vh), para que en un monitor bajo quepa todo en el
+   pin sin recortarse. */
 .cuenta-card {
-    display: grid;
-    /* La foto va en fracción y no en px fijos a propósito: las imágenes del
-       catálogo son banners 16/9 con texto en los extremos, y una columna
-       estrecha los recorta justo por ahí. En fracción la foto crece con la
-       tarjeta y el recorte se queda en algo razonable en cualquier ancho. */
-    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1fr);
-    border-radius: 20px;
-    padding: 0;
-    background-image: none;
-    background-color: #ffffff;
-    border: 1px solid rgba(17, 17, 17, 0.08);
-    box-shadow:
-        0 1px 2px rgba(17, 17, 17, 0.04),
-        0 26px 52px -28px rgba(0, 0, 0, 0.75);
-    overflow: hidden;
-}
-
-.cuenta-card-inner {
     position: relative;
-    /* isolate: el ::before de puntos va en z-index -1 y así queda encima del
-       blanco de esta columna pero debajo del texto, sin tener que subir de
-       capa a cada hijo. */
-    isolation: isolate;
-    background: #ffffff;
-    padding: 20px 22px;
+    width: min(42.5vw, 78vh);
     display: flex;
     flex-direction: column;
-    gap: 9px;
+    align-items: flex-start;
+    gap: 0.55rem;
 }
 
-/* La tablita de puntos que tenía antes la tarjeta del hero. Solo en la
-   columna de datos: la foto la taparía. La elipse de la máscara es ancha
-   porque la columna es apaisada y bajita, y con una más cerrada casi no
-   quedaban puntos. */
-.cuenta-card-inner::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background-image: radial-gradient(circle at 1px 1px, rgba(17, 17, 17, 0.20) 1px, transparent 0);
-    background-size: 16px 16px;
-    -webkit-mask-image: radial-gradient(ellipse 75% 70% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.55) 48%, transparent 85%);
-    mask-image: radial-gradient(ellipse 75% 70% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.55) 48%, transparent 85%);
+/* La segunda, en espejo: el texto a la derecha, como en la maqueta. */
+.cuenta-card-segunda {
+    align-items: flex-end;
+    text-align: right;
 }
 
-/* Plataformas: el badge oscuro de pastilla se cambia por una línea suelta.
-   Los iconos de renderPlataformasHTML() siguen siendo los mismos — lo único
-   que se va es la caja negra que los envolvía. */
-.cuenta-plataformas {
-    display: inline-flex;
-    align-items: center;
-    flex-wrap: wrap;
-    background: none;
-    color: var(--gris-tenue);
-    padding: 0;
-    border-radius: 0;
-    /* Pequeño y apretado para que las cuatro plataformas quepan en UNA línea:
-       partidas en dos ensucian la columna y descuadran las dos tarjetas. */
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-}
-
-.cuenta-plataformas svg {
-    width: 13px;
-    height: 13px;
-}
-
-.cuenta-estado {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-    color: var(--verde-medio);
-}
-
-.cuenta-estado-punto {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--verde-medio);
-}
-
-/* La foto ocupa su columna entera: sin aspect-ratio, se estira al alto que
-   marque la columna de datos. En celular la tarjeta se pone de pie y ahí sí
-   recupera una proporción fija (ver el bloque responsive). */
 .cuenta-img-box {
     position: relative;
     width: 100%;
-    height: 100%;
-    background: #e9e9e9;
+    aspect-ratio: 2 / 1;
+    margin-bottom: 0.6rem;
+    border-radius: 16px;
+    background: #1a1a1a;
     overflow: hidden;
+    box-shadow: 0 28px 60px -30px rgba(0, 0, 0, 0.85);
 }
 
 .cuenta-img-box img {
@@ -2186,22 +2081,26 @@ body {
     height: 100%;
     object-fit: cover;
     display: block;
+    transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* A dos líneas como mucho. No es estética: el título lo escribe Supabase y
-   puede venir larguísimo, y aquí dentro del pin del portal cada línea de más
-   empuja el CTA fuera de la pantalla. Con el tope, el alto de la tarjeta está
-   acotado y la sección entra en cualquier teléfono. */
+.cuenta-card:hover .cuenta-img-box img { transform: scale(1.03); }
+
+/* En UNA línea, con puntos suspensivos. No es estética: el título lo escribe
+   Supabase y puede venir larguísimo, y dentro del pin cada línea de más
+   empuja el pie fuera de la pantalla. */
 .cuenta-titulo {
+    max-width: 100%;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 600;
-    font-size: 1.15rem;
-    line-height: 1.3;
-    color: var(--verde);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
+    font-size: clamp(1.1rem, min(2.2vw, 4vh), 2.6rem);
+    line-height: 1.15;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #ffffff;
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .cuenta-precios {
@@ -2212,232 +2111,159 @@ body {
 }
 
 .cuenta-mxn {
+    font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
     font-weight: 800;
-    font-size: 1.85rem;
-    letter-spacing: -0.8px;
-    color: var(--tinta);
+    font-size: clamp(1.2rem, min(1.8vw, 3.4vh), 2.1rem);
+    letter-spacing: -0.03em;
+    color: #ffffff;
 }
 
 .cuenta-usd {
     font-weight: 500;
-    font-size: 0.88rem;
-    color: var(--gris-texto);
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
 }
 
-/* margin-top:auto lo pega al fondo de la columna: con títulos de distinto
-   largo, los dos botones quedan a la misma altura. */
+/* La compra: el botón verde se fue, pero el enlace a Discord sigue, estirado
+   sobre la cuenta entera (foto, título y precio llevan a comprar). El texto
+   queda solo para lectores de pantalla. */
 .cuenta-cta {
-    margin-top: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--verde);
-    color: #ffffff;
-    font-weight: 700;
-    font-size: 0.88rem;
-    letter-spacing: 0.4px;
-    padding: 16px;
-    border-radius: 10px;
-    text-decoration: none;
-    transition: background-color 0.3s ease;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: 16px;
 }
 
-.cuenta-cta:hover {
-    background: var(--verde-oscuro);
+.cuenta-cta:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 6px;
 }
 
-/* Pie de la sección. Sustituye a la vieja columna de texto lateral: ese sitio
-   ahora lo ocupa la segunda cuenta, así que lo que quedaba por decir baja aquí
-   en una sola línea.
+.cuenta-cta-texto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
 
-   La píldora solo sale en celular, donde el atajo del encabezado está
-   escondido y hace falta algo a mano del pulgar. En escritorio sobra, porque
-   arriba a la derecha ya está "Ver catálogo completo". */
+/* Pie: el botón al catálogo y el conteo debajo, centrados sobre el arco. */
 .destacada-pie {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 1.25rem;
+    gap: 0.9rem;
+}
+
+/* El mismo botón de cristal con relevo del hero, en su versión para fondo
+   oscuro: borde de cristal claro, texto blanco y el círculo blanco con la
+   flecha negra (el negro del hero se perdería aquí). */
+.destacada .btn-hero {
+    /* Más chico que el del hero (66px): aquí comparte el negro del arco con
+       el conteo y no debe competir con las cuentas. */
+    height: 54px;
+    gap: 16px;
+    padding: 0 7px 0 28px;
+    font-size: 1rem;
+    color: #ffffff;
+    box-shadow: var(--cristal-borde-claro);
+}
+
+.destacada .btn-hero-circulo {
+    width: 40px;
+    height: 40px;
+    background: #ffffff;
+    color: var(--tinta);
+}
+
+.destacada .btn-hero-flecha {
+    width: 17px;
+    height: 17px;
+}
+
+/* En escritorio SOLO el botón se sube hacia el borde del arco, que asoma un
+   25% del alto (ver .corona-horizonte-arco); el conteo se queda abajo, donde
+   siempre (lo pidió así el cliente). El margen abre hueco entre los dos para
+   que el botón quede ~60px debajo de la cima del arco, justo al terminar su
+   brillo gris y todavía sobre el NEGRO. 21.5vh = 25vh del arco − 3.5vh del
+   padding de abajo; 9rem = esos 60px + botón, hueco y conteo. */
+@media (min-width: 1024px) {
+    .destacada .btn-hero { margin-bottom: max(0px, calc(21.5vh - 9rem)); }
 }
 
 .destacada-pie-texto {
     margin: 0;
     text-align: center;
     font-weight: 600;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.55);
+    color: rgba(255, 255, 255, 0.85);
 }
 
 .destacada-pie-texto .acento-verde-claro { font-weight: 800; }
 
-.destacada-pie-btn { display: none; }
-
-/* La píldora verde del hero se pierde sobre verde: aquí se invierte */
-.destacada .btn-verde-pill {
-    background: #ffffff;
-    color: var(--verde);
-    box-shadow: 0 8px 20px rgba(7, 28, 16, 0.28);
-}
-
-.destacada .btn-verde-pill:hover {
-    background: #eef5f0;
-    box-shadow: 0 12px 26px rgba(7, 28, 16, 0.34);
-}
-
-.destacada .btn-verde-pill-icono {
-    background: var(--verde);
-    color: #ffffff;
-}
-
 /* ==========================================
-   📱 RESPONSIVE - CUENTA DESTACADA (CELULAR)
+   📱 RESPONSIVE - CUENTA DESTACADA (CELULAR Y TABLET)
    ==========================================
    Aquí pasa LO MÁS IMPORTANTE de la sección en celular: se queda UNA SOLA
    cuenta. Al vivir dentro del pin del portal todo tiene que caber en una
-   pantalla o se recorta, y dos tarjetas no entran; por eso el rótulo de atrás
-   (.corona-watermark) también esconde sus "s" y dice "CUENTA DESTACADA".
-   Con la tarjeta de pie y la foto en 16/9 entra en un teléfono normal (844px
-   de alto); para los más bajos hay un bloque más abajo. */
+   pantalla o se recorta, y dos no entran; por eso el rótulo de atrás
+   (.corona-watermark) también esconde sus "s" y dice "CUENTA DESTACADA". */
 @media (max-width: 900px) {
 
     .destacada {
-        gap: 1.1rem;
+        justify-content: center;
+        gap: 1.4rem;
         /* El padding de arriba solo tiene que salvar la píldora, que en celular
-           mide 44px con 16 de margen: 60px. El resto del aire sobra y aquí el
-           alto se paga caro. */
-        padding: clamp(4.25rem, 10vh, 4.75rem) 1.25rem 1.5rem 1.25rem;
+           mide 44px con 16 de margen: 60px. */
+        padding: clamp(4.25rem, 10vh, 4.75rem) 1.25rem 1.5rem;
     }
 
     .destacada-titulo { font-size: clamp(1.9rem, 11vw, 2.9rem); }
 
-    /* Singular, porque abajo solo hay una cuenta. Mismo criterio (y mismo
-       truco) que .corona-watermark-plural. */
+    /* Singular, porque abajo solo hay una cuenta. */
     .destacada-titulo-plural { display: none; }
 
-    /* El enlace del encabezado sobra en celular: la píldora del pie lleva al
-       mismo sitio y queda a mano del pulgar. */
-    .destacada-link { display: none; }
-
-    .destacada-cuerpo {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 0.9rem;
-    }
+    .destacada-cuerpo { justify-content: center; }
 
     /* 👈 LA REGLA QUE DEJA UNA SOLA CUENTA EN CELULAR. */
     .cuenta-card-segunda { display: none; }
 
-    /* La tarjeta se pone de pie: la foto arriba y los datos debajo. Acostada
-       no cabría el texto en 350px de ancho. */
-    .cuenta-card { grid-template-columns: minmax(0, 1fr); }
-    .cuenta-img-box { aspect-ratio: 16 / 9; height: auto; }
-    .cuenta-card-inner { padding: 14px 16px 16px; gap: 9px; }
-    .cuenta-mxn { font-size: 1.5rem; }
-    .cuenta-titulo { font-size: 1rem; }
-    .cuenta-cta { padding: 13px; }
+    .cuenta-card { width: min(100%, 560px); }
+    .cuenta-img-box { aspect-ratio: 16 / 9; border-radius: 14px; }
+    .cuenta-titulo { font-size: clamp(1rem, 4.6vw, 1.5rem); letter-spacing: 0.06em; }
+    .cuenta-mxn { font-size: clamp(1.25rem, 5.5vw, 1.7rem); }
 
-    /* El pie se parte en dos filas y saca la píldora, que en escritorio no se
-       ve. A lo ancho, para que sea un blanco grande para el pulgar. */
-    .destacada-pie {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.8rem;
-    }
+    .destacada-pie-texto { font-size: 0.66rem; letter-spacing: 2.2px; }
 
-    .destacada-pie-texto { font-size: 0.68rem; letter-spacing: 2.5px; }
+    /* El pie baja hasta el arco del horizonte, como en escritorio: el hueco
+       que sobra se reparte a partes iguales encima del titular y encima del
+       pie, así titular y cuenta quedan juntos y el botón cae sobre el negro
+       del arco en vez de sobre el gris claro. */
+    .destacada-titulo,
+    .destacada-pie { margin-top: auto; }
 
-    .destacada-pie-btn {
-        display: inline-flex;
-        justify-content: center;
-        padding: 14px 20px;
-        font-size: 0.85rem;
-    }
+    /* El .btn-hero de celular se estira y separa texto y círculo; aquí va a
+       su ancho, centrado. */
+    .destacada .btn-hero { justify-content: center; }
 }
 
-/* ==========================================
-   📱 TELÉFONOS BAJOS Y PANTALLAS CHATAS
-   ==========================================
-   Por debajo de ~780px de alto el pin recorta por abajo, así que se aprieta el
-   aire. Lo que NO se toca es la tarjeta (que es el contenido de verdad) ni el
-   camino al catálogo. El mismo recorte vale para un escritorio con la ventana
-   baja. */
-@media (max-height: 780px) {
-
-    .destacada {
-        gap: 1.1rem;
-        padding-top: clamp(4rem, 10vh, 5rem);
-        padding-bottom: 1.25rem;
-    }
-}
-
-/* Teléfonos de verdad pequeños (360x640 y parecidos): el titular de dos líneas
-   se come el alto que falta, así que baja de tamaño y el pie se aprieta. */
+/* Teléfonos de verdad pequeños (360x640 y parecidos). */
 @media (max-width: 380px) {
-
     .destacada-titulo { font-size: clamp(1.7rem, 10vw, 2.3rem); }
-    .destacada-pie-texto { font-size: 0.62rem; letter-spacing: 2px; }
-    .destacada-pie-btn { padding: 12px 16px; font-size: 0.8rem; }
+    .destacada-pie-texto { font-size: 0.6rem; letter-spacing: 1.8px; }
 }
 
+/* Teléfonos bajos: el conteo sobra; lo que no puede faltar es la cuenta y el
+   botón al catálogo. La foto se hace más panorámica, que es lo que más alto
+   ahorra sin tocar ningún texto. */
 @media (max-width: 900px) and (max-height: 700px) {
-
-    .destacada { gap: 0.9rem; }
+    .destacada { gap: 1rem; }
     .destacada-titulo { font-size: clamp(1.6rem, 8.5vw, 2.2rem); }
-    /* Aquí el conteo sí sobra: lo que no puede faltar es la tarjeta y la
-       píldora al catálogo. */
     .destacada-pie-texto { display: none; }
-    .cuenta-card-inner { padding: 12px 14px 14px; gap: 8px; }
-    /* Más panorámica: es lo que más alto ahorra sin tocar ningún texto. */
     .cuenta-img-box { aspect-ratio: 2.2 / 1; }
-    .cuenta-cta { padding: 11px; }
-}
-
-/* Y si es un escritorio bajito (1366x768 y parecidos), lo que sobra no son las
-   cuentas sino el aire: las dos tarjetas se quedan, el titular baja un punto y
-   la foto se acorta. */
-@media (min-width: 901px) and (max-height: 820px) {
-
-    .destacada {
-        gap: 1.3rem;
-        padding: clamp(5rem, 9vh, 6.5rem) 3.5rem clamp(2rem, 5vh, 3rem) 3.5rem;
-    }
-
-    .destacada-titulo { font-size: clamp(1.8rem, 5.6vw, 4.6rem); }
-    .cuenta-card-inner { padding: 16px 18px; gap: 8px; }
-    .cuenta-mxn { font-size: 1.6rem; }
-}
-
-/* ==========================================
-   📱 RESPONSIVE - CUENTA DESTACADA (TABLET)
-   ==========================================
-   Entre 601 y 900px sigue habiendo UNA sola cuenta (manda el bloque de arriba),
-   pero hay ancho de sobra: la tarjeta se centra a un ancho cómodo y recupera la
-   forma acostada, que a partir de 560px ya se lee bien. El alto sigue siendo el
-   de una pantalla, así que el aire se queda medido. */
-@media (min-width: 601px) and (max-width: 900px) {
-
-    .destacada {
-        padding: clamp(5.5rem, 10vh, 6.5rem) 2.5rem clamp(2rem, 4vh, 3rem) 2.5rem;
-        gap: 1.6rem;
-    }
-
-    .destacada-cuerpo { justify-items: center; }
-
-    .cuenta-card {
-        width: 100%;
-        max-width: 620px;
-        grid-template-columns: minmax(0, 0.95fr) minmax(0, 1fr);
-    }
-
-    .cuenta-img-box { aspect-ratio: auto; height: 100%; }
-    .cuenta-card-inner { padding: 20px 22px; }
-
-    /* El pie sigue en dos filas como en celular, pero centrado y con la píldora
-       a su ancho: aquí sobra sitio y a lo ancho quedaría desproporcionada. */
-    .destacada-pie { align-items: center; }
-    .destacada-pie-texto { max-width: 46ch; }
-    .destacada-pie-btn { align-self: center; padding: 13px 24px; }
 }
 
 

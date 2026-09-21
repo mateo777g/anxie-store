@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260921l">
+    <link rel="stylesheet" href="style.css?v=20260921w">
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -340,14 +340,14 @@
                      Va después del velo, así que se pinta sobre el negro del
                      humo apagado, y dentro de la máscara, así que nunca asoma
                      fuera de la corona. Aparece DESPUÉS del apagado, ya casi
-                     cerrando la corona: primero se va el humo, queda negro, y
-                     entonces entra esto. La opacidad la escribe pintarCorona()
-                     (HORIZONTE_INICIO/FIN). -->
+                     cerrando la corona, y en dos tiempos: primero sube el arco
+                     sobre el negro y después se encienden el degradado y la
+                     rejilla. Los tramos los escribe pintarCorona()
+                     (ARCO_* y FONDO_*). -->
                 <div class="corona-horizonte" id="coronaHorizonte" aria-hidden="true">
                     <div class="corona-horizonte-rejilla"></div>
-                    <div class="corona-horizonte-degradado">
-                        <div class="corona-horizonte-arco"></div>
-                    </div>
+                    <div class="corona-horizonte-degradado"></div>
+                    <div class="corona-horizonte-arco"></div>
                 </div>
 
                 <!-- Marcas de encuadre, mitad de arriba: van DENTRO de la
@@ -382,86 +382,83 @@
                  lleva su propia versión apretada en style.css. -->
             <section class="destacada" id="cases" aria-label="Cuentas destacadas">
 
-                <!-- Fila de encabezado: el rótulo a la izquierda y el atajo al
-                     catálogo a la derecha. En celular el atajo se esconde y su
-                     trabajo lo hace la píldora del pie. -->
-                <div class="destacada-header">
-                    <div class="destacada-eyebrow" data-reveal style="--n: 0;">
-                        <span class="eyebrow-punto"></span>
-                        <span class="eyebrow-linea"></span>
-                        <span class="eyebrow-texto">Lo más cotizado</span>
-                    </div>
-                    <a href="catalogo.html#cases" class="destacada-link" data-reveal style="--n: 2;">
-                        Ver catálogo completo
-                        <span class="destacada-link-flecha" aria-hidden="true">&rarr;</span>
-                    </a>
-                </div>
+                <!-- Maqueta del cliente (21 sep 2026): el titular centrado
+                     arriba, las dos cuentas sin tarjeta (foto grande, título
+                     espaciado y precio), y abajo, sobre el arco del
+                     horizonte, el botón de cristal al catálogo y el conteo.
+                     Se fueron el rótulo "Lo más cotizado", la regla, el enlace
+                     de arriba a la derecha, el estado "Disponible", las
+                     plataformas y el botón verde de compra (la compra sigue:
+                     ahora es la tarjeta entera).
 
-                <!-- El titular cruza el ancho entero, como la marca del hero.
-                     Las dos "s" van en <span> sueltos y se esconden en celular:
-                     el mismo truco de .corona-watermark-plural, y por la misma
-                     razón — ahí abajo solo entra UNA cuenta. -->
-                <h2 class="destacada-titulo" data-reveal style="--n: 1;">Cuenta<span class="destacada-titulo-plural">s</span> destacada<span class="destacada-titulo-plural">s</span></h2>
+                     Las dos "s" del titular van en <span> sueltos y se esconden
+                     en celular: el mismo truco de .corona-watermark-plural, y
+                     por la misma razón — ahí abajo solo entra UNA cuenta. -->
+                <h2 class="destacada-titulo" data-reveal style="--n: 0;">Cuenta<span class="destacada-titulo-plural">s</span> destacada<span class="destacada-titulo-plural">s</span></h2>
 
-                <span class="destacada-regla" data-reveal style="--n: 1;" aria-hidden="true"></span>
-
-                <!-- Las cuentas, acostadas: la foto manda a la izquierda y los
-                     datos acompañan a la derecha. En celular queda solo la
-                     primera (.cuenta-card-segunda se esconde). -->
+                <!-- La primera va a la izquierda con el texto a la izquierda;
+                     la segunda, a la derecha con el texto a la derecha. En
+                     celular queda solo la primera (.cuenta-card-segunda se
+                     esconde). -->
                 <div class="destacada-cuerpo">
 
-                    <article class="cuenta-card" id="cuentaDestacada" data-reveal style="--n: 3;">
+                    <article class="cuenta-card" id="cuentaDestacada" data-reveal style="--n: 1;">
                         <div class="cuenta-img-box">
                             <img id="destImg" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="">
                         </div>
-                        <div class="cuenta-card-inner">
-                            <span class="cuenta-estado">
-                                <span class="cuenta-estado-punto"></span>
-                                Disponible
-                            </span>
-                            <span class="cuenta-titulo" id="destTitulo">Cargando...</span>
-                            <span class="cuenta-plataformas" id="destPlataformas"></span>
-                            <div class="cuenta-precios">
-                                <span class="cuenta-mxn" id="destMxn"></span>
-                                <span class="cuenta-usd" id="destUsd"></span>
-                            </div>
-                            <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener" class="cuenta-cta">
-                                Comprar por Discord
-                            </a>
+                        <span class="cuenta-titulo" id="destTitulo">Cargando...</span>
+                        <div class="cuenta-precios">
+                            <span class="cuenta-mxn" id="destMxn"></span>
+                            <span class="cuenta-usd" id="destUsd"></span>
                         </div>
+                        <!-- La compra: el enlace se estira sobre la tarjeta
+                             entera (ver .cuenta-cta), así que no se ve pero
+                             toda la cuenta lleva a Discord. -->
+                        <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener" class="cuenta-cta">
+                            <span class="cuenta-cta-texto">Comprar por Discord</span>
+                        </a>
                     </article>
 
-                    <article class="cuenta-card cuenta-card-segunda" id="cuentaDestacada2" data-reveal style="--n: 4;">
+                    <article class="cuenta-card cuenta-card-segunda" id="cuentaDestacada2" data-reveal style="--n: 2;">
                         <div class="cuenta-img-box">
                             <img id="dest2Img" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="">
                         </div>
-                        <div class="cuenta-card-inner">
-                            <span class="cuenta-estado">
-                                <span class="cuenta-estado-punto"></span>
-                                Disponible
-                            </span>
-                            <span class="cuenta-titulo" id="dest2Titulo">Cargando...</span>
-                            <span class="cuenta-plataformas" id="dest2Plataformas"></span>
-                            <div class="cuenta-precios">
-                                <span class="cuenta-mxn" id="dest2Mxn"></span>
-                                <span class="cuenta-usd" id="dest2Usd"></span>
-                            </div>
-                            <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener" class="cuenta-cta">
-                                Comprar por Discord
-                            </a>
+                        <span class="cuenta-titulo" id="dest2Titulo">Cargando...</span>
+                        <div class="cuenta-precios">
+                            <span class="cuenta-mxn" id="dest2Mxn"></span>
+                            <span class="cuenta-usd" id="dest2Usd"></span>
                         </div>
+                        <!-- La compra: el enlace se estira sobre la tarjeta
+                             entera (ver .cuenta-cta), así que no se ve pero
+                             toda la cuenta lleva a Discord. -->
+                        <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener" class="cuenta-cta">
+                            <span class="cuenta-cta-texto">Comprar por Discord</span>
+                        </a>
                     </article>
 
                 </div>
 
-                <!-- Pie: el conteo, y en celular la píldora que sustituye al
-                     atajo del encabezado. Es la última pieza de la ola. -->
-                <div class="destacada-pie" data-reveal style="--n: 5;">
-                    <p class="destacada-pie-texto"><span class="acento-verde-claro" id="destTotal">40</span> cuentas más en el catálogo · entrega acompañada paso a paso</p>
-                    <a href="catalogo.html#cases" class="btn-verde-pill destacada-pie-btn">
-                        Ver catálogo completo
-                        <span class="btn-verde-pill-icono" aria-hidden="true">+</span>
+                <!-- Pie: el botón al catálogo (el mismo relevo de cristal que
+                     "Ver catálogo" del hero, en su versión para fondo oscuro)
+                     y el conteo. Es la última pieza de la ola. -->
+                <div class="destacada-pie" data-reveal style="--n: 3;">
+                    <a href="catalogo.html#cases" class="btn-hero destacada-pie-btn">
+                        <span class="btn-hero-rodillo">
+                            <span class="btn-hero-copia">Catálogo completo</span>
+                            <span class="btn-hero-copia" aria-hidden="true">Catálogo completo</span>
+                        </span>
+                        <span class="btn-hero-circulo" aria-hidden="true">
+                            <svg class="btn-hero-flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M7 17 17 7" />
+                                <path d="M7 7h10v10" />
+                            </svg>
+                            <svg class="btn-hero-flecha btn-hero-flecha--entra" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M7 17 17 7" />
+                                <path d="M7 7h10v10" />
+                            </svg>
+                        </span>
                     </a>
+                    <p class="destacada-pie-texto"><span class="acento-verde-claro" id="destTotal">40</span> cuentas más en el catálogo · entrega acompañada paso a paso</p>
                 </div>
 
             </section>
@@ -939,7 +936,7 @@
         // humo empieza a apagarse cuando la silueta va por el 18% de ese tamaño
         // —todavía se lee de sobra como corona— y ya se fue del todo al 38%,
         // con la corona todavía a media pantalla. Queda negro liso y, ya casi
-        // cerrando la corona, entra el horizonte (HORIZONTE_INICIO/FIN).
+        // cerrando la corona, entra el horizonte (ARCO_* y FONDO_*).
         // Historia (21 sep 2026): estaba en 0.45 → 0.85 y el horizonte iba
         // amarrado al mismo velo, así que humo, arco y bordes blancos de la
         // corona salían a la vez y se amontonaban. El cliente pidió los tres
@@ -958,9 +955,15 @@
         // En la misma escala que el apagado, pero SEPARADO de él: arranca con
         // el humo ya apagado del todo y la corona casi cerrando, y está entero
         // justo cuando la corona tapa la pantalla (1), que es cuando entra la
-        // ola de la cuenta destacada.
-        const HORIZONTE_INICIO = 0.72;
-        const HORIZONTE_FIN = 1.0;
+        // ola de la cuenta destacada. Va en dos tiempos, a pedido del cliente:
+        //   ARCO  — el arco sube desde abajo y aparece sobre el negro liso.
+        //   FONDO — ya con el arco casi en su sitio, se encienden el degradado
+        //           gris y la rejilla por encima de él (alrededor).
+        // Se solapan un poco para que no haya un parón entre los dos.
+        const ARCO_INICIO = 0.72;
+        const ARCO_FIN = 0.88;
+        const FONDO_INICIO = 0.84;
+        const FONDO_FIN = 1.0;
 
         // 🎬 LOS DOS ACTOS DEL PORTAL
         // El recorrido pineado se reparte en dos tramos, medidos en PANTALLAS DE
@@ -1072,10 +1075,13 @@
             // sale despacio. Lineal se siente a bajar un fader.
             const velo = pApagado * pApagado * (3 - 2 * pApagado);
 
-            // El horizonte, con su propio tramo y el mismo suavizado en S.
-            const pHorizonte = Math.min(1, Math.max(0,
-                (tam / cobertura - HORIZONTE_INICIO) / (HORIZONTE_FIN - HORIZONTE_INICIO)));
-            const amanecer = pHorizonte * pHorizonte * (3 - 2 * pHorizonte);
+            // El horizonte, en sus dos tramos y con el mismo suavizado en S.
+            const tramoS = (inicio, fin) => {
+                const t = Math.min(1, Math.max(0, (tam / cobertura - inicio) / (fin - inicio)));
+                return t * t * (3 - 2 * t);
+            };
+            const arco = tramoS(ARCO_INICIO, ARCO_FIN);
+            const fondo = tramoS(FONDO_INICIO, FONDO_FIN);
 
             // Lee rects del menú/secciones -- va aquí, ANTES de escribir nada.
             actualizarMenu(tam);
@@ -1096,11 +1102,11 @@
             if (apagado) apagado.style.opacity = velo.toFixed(3);
 
             // 🌅 El horizonte aparece encima del negro, en su propio tramo.
-            // El degradado y la rejilla solo se encienden; el arco además SUBE
-            // desde abajo con el mismo progreso (lo lee el CSS de --horizonte).
+            // Primero el arco (sube y aparece), después el degradado y la
+            // rejilla. El CSS lee las dos variables.
             if (horizonte) {
-                horizonte.style.opacity = amanecer.toFixed(3);
-                horizonte.style.setProperty('--horizonte', amanecer.toFixed(4));
+                horizonte.style.setProperty('--arco', arco.toFixed(4));
+                horizonte.style.setProperty('--fondo', fondo.toFixed(4));
             }
 
             if (cierre) {
