@@ -875,6 +875,10 @@ body {
     color: #1a1a1a;
 }
 
+/* "TIENDA DE CUENTAS" encima de la marca: solo existe en celular (ver el
+   @media 900). En PC la maqueta no lo lleva. */
+.hero-antetitulo { display: none; }
+
 /* Cada palabra lleva 0.12em de relleno por los cuatro lados, devuelto con un
    margen negativo igual para que la letra no se mueva: el humo se recorta con
    background-clip: text, que solo pinta dentro de la caja, y con la
@@ -1452,6 +1456,23 @@ body {
        más alto que la pantalla. */
     .hero {
         --hero-fig: min((100vw - 2.3rem) / 1.75, 60svh);
+        /* El alto de la silueta gris (el ::before de abajo) y, colgando de
+           él, dónde arrancan las mayúsculas de la marca: sobre la coronilla,
+           como en la maqueta del cliente. La coronilla cae al 6.25% del alto
+           de la imagen, y la silueta va apoyada en el suelo; las mayúsculas
+           arrancan 4px más arriba (297 contra 301 en la maqueta, a 382x830).
+           Los % se resuelven donde se usan, contra el alto del .hero. */
+        /* La rendija con el portal (21 de septiembre de 2026): el body es
+           negro, y en teléfonos con densidad fraccionaria (2.625, 2.75: casi
+           todo Android) el borde entre las dos secciones cae a mitad de un
+           píxel físico y ese negro se asomaba como una raya gris de lado a
+           lado. Esta sombra pinta 2px de blanco por debajo del hero, detrás
+           del portal (z-index 11 contra 10): tapa la rendija sin mover nada. */
+        box-shadow: 0 2px 0 #ffffff;
+        --hero-sil-alto: 68svh;
+        --marca-arriba: calc(100% - var(--hero-sil-alto) * 0.9375 - 4px);
+        /* Alto de las mayúsculas de la marca: 0.68em de su letra. */
+        --marca-alto: calc(var(--hero-fig) * 0.285 * 0.68);
         justify-content: center;
         /* La cabeza tiene que librar la píldora, que en celular va arriba a
            la derecha. */
@@ -1467,6 +1488,66 @@ body {
         bottom: auto;
         align-self: flex-start;
         margin-left: calc(50vw - var(--hero-fig) * 0.534);
+    }
+
+    /* 🧍 LA SILUETA GRIS, ABAJO Y EN GRANDE (20 de septiembre de 2026)
+       Como en el diseño viejo de celular: el personaje apoyado en el suelo de
+       la pantalla, más ancho que ella y con la cabeza a media altura. No puede
+       salir de .hero-figura (es su bloque contenedor, y la marca cuelga de él),
+       así que aquí la capa gris de la figura se esconde y la pinta este
+       ::before del .hero, con las mismas dos máscaras. La figura se queda en su
+       sitio, invisible, y sigue dando el alto y la posición de la marca: nada
+       más se mueve.
+       Tamaño calcado del diseño viejo (assets/diseño.png a 63svh de alto),
+       medido lado a lado con una captura suya: la cabeza mide lo mismo. Aquí
+       la imagen trae el cuerpo hasta la cintura, así que mide 68svh. Va
+       apoyada en el suelo y entera, con el mismo desvanecido de PC, para que
+       se vean los brazos (el dueño la pidió más arriba que la vieja). Va
+       centrada por la cabeza CON el chongo (50.5% del ancho), como la vieja,
+       no por la cara como en PC (53.4%): así la cabeza quedaba corrida a la
+       derecha. Entra con la misma ola (hero-in) en el lugar 2. */
+    .hero-figura-humo { display: none; }
+
+    .hero::before {
+        --hero-sil: calc(var(--hero-sil-alto) * 2004 / 2154);
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: calc(50% - var(--hero-sil) * 0.505);
+        z-index: 0;
+        width: var(--hero-sil);
+        height: var(--hero-sil-alto);
+        background: #f2f2f2;
+        pointer-events: none;
+        -webkit-mask-image: url('assets/hero-personaje-humo-1100.webp'), linear-gradient(to bottom, #000 73%, rgba(0, 0, 0, 0.84) 78.5%, rgba(0, 0, 0, 0.56) 85.3%, rgba(0, 0, 0, 0.18) 92%, transparent 97.5%);
+        mask-image: url('assets/hero-personaje-humo-1100.webp'), linear-gradient(to bottom, #000 73%, rgba(0, 0, 0, 0.84) 78.5%, rgba(0, 0, 0, 0.56) 85.3%, rgba(0, 0, 0, 0.18) 92%, transparent 97.5%);
+        -webkit-mask-size: 100% 100%;
+        mask-size: 100% 100%;
+        -webkit-mask-composite: source-in;
+        mask-composite: intersect;
+        animation: hero-in 520ms ease 220ms both;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .hero::before { animation: none; }
+    }
+
+    /* 👑 LA MARCA, SOBRE LA CABEZA DE LA SILUETA (21 de septiembre de 2026)
+       En PC cuelga de la figura; aquí va centrada a lo ancho y, a lo alto,
+       sobre la coronilla de la silueta gris (--marca-arriba), como en la
+       maqueta del cliente. Del 20 al 21 de septiembre estuvo en el centro
+       exacto de la pantalla, que la dejaba a la altura de la barbilla. Con la
+       figura en static, el bloque contenedor de la marca pasa a ser el .hero
+       (position: relative), y la figura sigue en el flujo dando el mismo
+       alto. Con la interlínea de 0.68 la caja mide exactamente las
+       mayúsculas, así que su top es donde arranca la letra. Nada de
+       transform: la entrada (hero-in) es su dueña. */
+    .hero-figura { position: static; }
+
+    .hero-wordmark {
+        top: var(--marca-arriba);
+        left: 0;
+        width: 100%;
     }
 
     /* El texto sube hasta donde la figura ya casi se borró (el 92% de su alto,
@@ -1526,6 +1607,142 @@ body {
         font-size: 0.62rem;
         letter-spacing: 0.12em;
     }
+
+    /* 📱 ACOMODO DE LA MAQUETA DEL CLIENTE (21 de septiembre de 2026)
+       Arriba de la marca, "TIENDA DE CUENTAS"; debajo, "2 años | +700" en
+       fila; y abajo del todo, "11 Cuentas" en grande con el botón debajo.
+       Las medidas salen de la maqueta (su pantalla es 2.41 veces un teléfono
+       de 382px).
+       Todo cuelga del .hero, igual que la marca: el .hero-inner y el
+       .hero-panel pasan a static, así que los datos y el .hero-pie (conteo +
+       botón) se posicionan contra la sección. El antetítulo y los datos se
+       miden desde la marca (--marca-arriba y --marca-alto, en el .hero). */
+    .hero-inner,
+    .hero-panel { position: static; }
+
+    /* Antetítulo: Montserrat 700 espaciado, como el "TIENDA DE CUENTAS" del
+       diseño viejo de celular, del que sale la maqueta. Su borde de abajo
+       queda a 12px de las mayúsculas de la marca. */
+    .hero-antetitulo {
+        display: block;
+        position: absolute;
+        bottom: calc(100% - var(--marca-arriba) + 10px);
+        left: 0;
+        width: 100%;
+        z-index: 1;
+        margin: 0;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        font-size: 0.63rem;
+        line-height: 1;
+        letter-spacing: 0.22em;
+        /* El espaciado también cae después de la última letra: se devuelve
+           por la izquierda para que el texto quede centrado de verdad. */
+        text-indent: 0.22em;
+        text-align: center;
+        text-transform: uppercase;
+        color: var(--tinta);
+    }
+
+    /* "2 años | +700", en fila y centrados, pegados debajo de la marca: en
+       la maqueta hay ~13px de las mayúsculas a la cabeza de los números (la
+       caja del número lleva ~2px de aire encima de la letra; medido lado a
+       lado con la maqueta a 382x830). */
+    .hero-datos {
+        position: absolute;
+        top: calc(var(--marca-arriba) + var(--marca-alto) + 15px);
+        left: 0;
+        right: 0;
+        z-index: 2;
+        justify-content: center;
+    }
+
+    .hero-dato {
+        align-items: center;
+        text-align: center;
+        padding: 0 min(0.85rem, 3.2vw);
+    }
+
+    /* Sin aire por fuera de los dos extremos (el primero ya lo pierde
+       arriba), para que la fila quede centrada. */
+    .hero-dato:last-child { padding-right: 0; }
+
+    /* Más chicos y en gris para no competirle a la marca (21 de septiembre de
+       2026): un escalón más oscuro que el gris de las etiquetas (#8a8a8a),
+       para que el número siga mandando sobre su etiqueta. */
+    .hero-datos .hero-dato-valor {
+        font-size: min(1.4rem, 5.1vw);
+        color: #6b6b6b;
+    }
+
+    .hero-datos .hero-dato-etiqueta { font-size: min(0.62rem, 2.2vw); }
+
+    /* "11 Cuentas" + el botón, abajo y centrados. En la maqueta el botón
+       termina a un 12% del suelo, y hay ~21px del número a la etiqueta y de
+       la etiqueta al botón. */
+    .hero-pie {
+        position: absolute;
+        bottom: 12%;
+        left: 0;
+        right: 0;
+        z-index: 2;
+        align-items: center;
+        gap: 1.3rem;
+        padding: 0 1.15rem;
+    }
+
+    .hero-conteo {
+        align-items: center;
+        gap: 0.75rem;
+        text-align: center;
+    }
+
+    .hero-conteo::after { content: none; }
+
+    .hero-conteo .hero-dato-valor { font-size: min(3rem, 12.5vw); }
+
+    /* La etiqueta, un escalón más oscura que las de arriba (#8a8a8a). */
+    .hero-conteo .hero-dato-etiqueta {
+        font-size: 0.6rem;
+        color: #707070;
+    }
+
+    /* 🌫️ "11 Cuentas" relleno del mismo humo que la marca (21 de septiembre
+       de 2026, solo celular): los mismos tres fondos, el mismo recorte con
+       background-clip: text y la misma deriva de las nieblas. Va en el span
+       de fuera, así que cubre el número y la palabra que escribe
+       pintarConteoHero(). El relleno lateral, devuelto con margen negativo,
+       es para que el recorte no se coma la curva de la "s" final. */
+    @supports ((-webkit-background-clip: text) or (background-clip: text)) {
+        .hero-conteo .hero-dato-valor {
+            padding: 0 0.08em;
+            margin: 0 -0.08em;
+            color: transparent;
+            background-image: url('assets/humo-niebla-a.webp'), url('assets/humo-niebla-b.webp'), url('assets/marca-humo.webp');
+            background-size: 3.2em auto, 4.4em auto, cover;
+            background-repeat: repeat, repeat, no-repeat;
+            background-position: 0 -0.6em, 1.5em -1.2em, center;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: marca-niebla 24s ease-in-out 0.9s infinite alternate;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .hero-conteo .hero-dato-valor { animation: none; }
+    }
+
+    /* El botón, a su ancho natural (como en PC) y centrado. El selector lleva
+       .hero-pie para ganarle al bloque de 640px, que va después y estira
+       .hero-botones. */
+    .hero-pie .hero-botones {
+        width: auto;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .hero-pie .btn-hero { justify-content: center; }
 
     /* Aquí el botón se estira a todo el ancho (.hero-botones lo hace), así que
        el texto se va a la izquierda y el círculo al filo derecho: centrados
