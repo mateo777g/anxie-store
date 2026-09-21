@@ -2194,7 +2194,10 @@ body {
 
     /* El canto: una banda metálica detrás de la foto, en su mismo plano y
        asomando por la orilla de afuera. Brilla arriba y se apaga hacia
-       abajo, como en la maqueta. */
+       abajo, como en la maqueta. También baja un poco (0.013 anchos): con
+       la misma altura que la foto, su orilla de arriba asomaba por encima
+       de la esquina redondeada, y en la maqueta el canto arranca debajo de
+       ella. El radio es el mismo de la foto para que las esquinas casen. */
     .cuenta-card::before {
         content: '';
         position: absolute;
@@ -2203,9 +2206,35 @@ body {
         z-index: 0;
         width: 100%;
         aspect-ratio: 16 / 9;
-        border-radius: 18px;
+        border-radius: 16px;
         background: linear-gradient(to bottom, #d4d4d4 0%, #8a8a8a 12%, #4a4a4a 45%, #1c1c1c 85%, #111111 100%);
-        translate: calc(var(--cuenta-w) * -0.016 * var(--cuenta-lado)) 0;
+        translate: calc(var(--cuenta-w) * -0.016 * var(--cuenta-lado)) calc(var(--cuenta-w) * 0.013);
+    }
+
+    /* Al bajar la banda, entre su esquina de arriba y la de la foto quedaba
+       un escalón, como si fuera otra tarjeta detrás. Este relleno va debajo
+       de la banda, en su mismo sitio, y sus sombras sin desenfoque son
+       copias en pasos de vuelta hacia la foto: tapan ese hueco para que el
+       canto salga de la esquina misma. Cubre solo la mitad de arriba; entera,
+       sus copias asomaban claras por la esquina de abajo y adentro. */
+    .cuenta-card::after {
+        --cx: calc(var(--cuenta-w) * 0.016 * var(--cuenta-lado));
+        --cy: calc(var(--cuenta-w) * -0.013);
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1;
+        width: 100%;
+        height: calc(var(--cuenta-w) * 0.28);
+        border-radius: 16px 16px 0 0;
+        translate: calc(var(--cuenta-w) * -0.016 * var(--cuenta-lado)) calc(var(--cuenta-w) * 0.013);
+        box-shadow:
+            calc(var(--cx) * 0.17) calc(var(--cy) * 0.17) 0 #cfcfcf,
+            calc(var(--cx) * 0.33) calc(var(--cy) * 0.33) 0 #cfcfcf,
+            calc(var(--cx) * 0.5) calc(var(--cy) * 0.5) 0 #cfcfcf,
+            calc(var(--cx) * 0.67) calc(var(--cy) * 0.67) 0 #cfcfcf,
+            calc(var(--cx) * 0.83) calc(var(--cy) * 0.83) 0 #cfcfcf;
     }
 
     /* La foto va encima del canto; debajo, la sombra que la despega del
