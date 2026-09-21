@@ -1364,6 +1364,78 @@ body {
     pointer-events: none;
 }
 
+/* 🌅 EL HORIZONTE — el fondo del reposo (21 de septiembre de 2026)
+   El fondo del componente hero-1 (React/Tailwind/shadcn) que mandó el cliente,
+   pasado a CSS plano y en su variante oscura: solo el fondo, sin su texto ni
+   su botón. Tres piezas:
+     · .corona-horizonte-rejilla — la cuadrícula tenue de arriba, que se
+       desvanece en elipse hacia abajo.
+     · .corona-horizonte-degradado  — el degradado de negro a gris a blanco.
+     · .corona-horizonte-arco    — el arco enorme: una elipse negra con el
+       borde encendido (radial-gradient de negro al 82% a blanco), que asoma
+       por abajo.
+   Cuelga DENTRO de .corona-mask, después del velo: se pinta sobre el negro del
+   humo apagado y nunca fuera de la corona. Su opacidad la escribe
+   pintarCorona() en su PROPIO tramo, separado del velo: primero se va el
+   humo, queda negro liso, y ya casi cerrando la corona entra esto. El arco
+   además sube desde abajo con ese mismo progreso (--horizonte); el degradado
+   y la rejilla no se mueven. (Hacer subir el fondo ENTERO se probó y se veía
+   raro.) Sin transition, por lo mismo que el velo: el bucle de
+   rAF ya suaviza. La primera parada del degradado es --corona-negro y no el
+   #000 del componente, para que arriba no se note un
+   negro distinto al del velo. */
+.corona-horizonte {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.corona-horizonte-rejilla {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 600px;
+    background-image:
+        linear-gradient(to right, #333 1px, transparent 1px),
+        linear-gradient(to bottom, #333 1px, transparent 1px);
+    background-size: 6rem 5rem;
+    -webkit-mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, #000 70%, transparent 110%);
+            mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, #000 70%, transparent 110%);
+    opacity: 0.8;
+}
+
+.corona-horizonte-degradado {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, var(--corona-negro), transparent 30%, #898e8e 78%, #ffffff 99%);
+}
+
+.corona-horizonte-arco {
+    position: absolute;
+    left: 50%;
+    top: calc(100% - 150px);
+    width: 140%;
+    height: 750px;
+    /* Sube desde abajo: con --horizonte en 0 está --arco-bajada por debajo de
+       su sitio (fuera de pantalla, porque de él solo asoman 150px) y en 1 llega.
+       Es la ÚNICA pieza del horizonte que se mueve; el degradado y la rejilla
+       solo se encienden. */
+    --arco-bajada: 260px;
+    transform: translateX(-50%) translateY(calc((1 - var(--horizonte, 1)) * var(--arco-bajada)));
+    border-radius: 100%;
+    background: radial-gradient(closest-side, #000000 82%, #ffffff);
+}
+
+/* Los mismos escalones del componente: md (768–1023) y el base de celular. */
+@media (max-width: 1023px) {
+    .corona-horizonte-arco { top: calc(100% - 90px); width: 1100px; height: 500px; --arco-bajada: 170px; }
+}
+
+@media (max-width: 767px) {
+    .corona-horizonte-arco { width: 700px; }
+}
+
 /* Cierre en verde plano: rellena lo que la silueta deje suelto en el último
    tramo (alguna esquina, según la proporción de la pantalla). En el acto 2 el
    JS le cambia el color a --corona-negro, porque a esas alturas una esquina

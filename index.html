@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260921h">
+    <link rel="stylesheet" href="style.css?v=20260921l">
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -330,6 +330,25 @@
                      negro y no hacia uno ajeno. La opacidad la escribe
                      pintarCorona(). -->
                 <div class="corona-apagado" id="coronaApagado" aria-hidden="true"></div>
+
+                <!-- 🌅 EL HORIZONTE (fondo del reposo)
+                     El fondo que pidió el cliente, sacado de un componente de
+                     React/shadcn (hero-1): un degradado de negro a gris, una
+                     rejilla tenue arriba y un arco enorme con el borde
+                     encendido que asoma por abajo. Solo el fondo; el texto y el
+                     botón de aquel componente no vienen.
+                     Va después del velo, así que se pinta sobre el negro del
+                     humo apagado, y dentro de la máscara, así que nunca asoma
+                     fuera de la corona. Aparece DESPUÉS del apagado, ya casi
+                     cerrando la corona: primero se va el humo, queda negro, y
+                     entonces entra esto. La opacidad la escribe pintarCorona()
+                     (HORIZONTE_INICIO/FIN). -->
+                <div class="corona-horizonte" id="coronaHorizonte" aria-hidden="true">
+                    <div class="corona-horizonte-rejilla"></div>
+                    <div class="corona-horizonte-degradado">
+                        <div class="corona-horizonte-arco"></div>
+                    </div>
+                </div>
 
                 <!-- Marcas de encuadre, mitad de arriba: van DENTRO de la
                      máscara, así que cada esquina pasa de negra a blanca justo
@@ -917,11 +936,14 @@
         // 🌑 CUÁNDO SE APAGA EL HUMO
         // Estos dos números NO son scroll: son fracciones del tamaño que la
         // corona necesita para tapar la pantalla (tamanioCoberturaCorona). El
-        // humo empieza a apagarse cuando la silueta va por el 45% de ese tamaño
-        // —todavía se lee como corona— y ya está del todo negro al 85%, o sea
-        // justo cuando está cerrando. Así el portal se cierra sobre una pantalla
-        // que YA está negra, en vez de enseñarte el círculo entero y pedirte más
-        // scroll para apagarlo.
+        // humo empieza a apagarse cuando la silueta va por el 18% de ese tamaño
+        // —todavía se lee de sobra como corona— y ya se fue del todo al 38%,
+        // con la corona todavía a media pantalla. Queda negro liso y, ya casi
+        // cerrando la corona, entra el horizonte (HORIZONTE_INICIO/FIN).
+        // Historia (21 sep 2026): estaba en 0.45 → 0.85 y el horizonte iba
+        // amarrado al mismo velo, así que humo, arco y bordes blancos de la
+        // corona salían a la vez y se amontonaban. El cliente pidió los tres
+        // tiempos separados: humo fuera → negro → fondo nuevo.
         //
         // Va contra el TAMAÑO y no contra un porcentaje del recorrido porque el
         // punto en que la corona termina de cubrir cae en sitios muy distintos
@@ -929,8 +951,16 @@
         // justo al final. Atado a un porcentaje de scroll, el desvanecido caería
         // antes o después del cierre según la pantalla; atado al tamaño, pasa
         // siempre en el mismo momento VISUAL.
-        const APAGADO_INICIO = 0.45;
-        const APAGADO_FIN = 0.85;
+        const APAGADO_INICIO = 0.18;
+        const APAGADO_FIN = 0.38;
+
+        // 🌅 CUÁNDO ENTRA EL HORIZONTE (el fondo del reposo)
+        // En la misma escala que el apagado, pero SEPARADO de él: arranca con
+        // el humo ya apagado del todo y la corona casi cerrando, y está entero
+        // justo cuando la corona tapa la pantalla (1), que es cuando entra la
+        // ola de la cuenta destacada.
+        const HORIZONTE_INICIO = 0.72;
+        const HORIZONTE_FIN = 1.0;
 
         // 🎬 LOS DOS ACTOS DEL PORTAL
         // El recorrido pineado se reparte en dos tramos, medidos en PANTALLAS DE
@@ -1001,6 +1031,7 @@
             const cierre = document.getElementById('coronaCierre');
             const pista = document.getElementById('coronaPista');
             const apagado = document.getElementById('coronaApagado');
+            const horizonte = document.getElementById('coronaHorizonte');
             const contenido = document.getElementById('cases');
 
             const anchoVentana = window.innerWidth;
@@ -1041,6 +1072,11 @@
             // sale despacio. Lineal se siente a bajar un fader.
             const velo = pApagado * pApagado * (3 - 2 * pApagado);
 
+            // El horizonte, con su propio tramo y el mismo suavizado en S.
+            const pHorizonte = Math.min(1, Math.max(0,
+                (tam / cobertura - HORIZONTE_INICIO) / (HORIZONTE_FIN - HORIZONTE_INICIO)));
+            const amanecer = pHorizonte * pHorizonte * (3 - 2 * pHorizonte);
+
             // Lee rects del menú/secciones -- va aquí, ANTES de escribir nada.
             actualizarMenu(tam);
 
@@ -1058,6 +1094,14 @@
 
             // 🌑 El velo que apaga el humo, por dentro de la corona.
             if (apagado) apagado.style.opacity = velo.toFixed(3);
+
+            // 🌅 El horizonte aparece encima del negro, en su propio tramo.
+            // El degradado y la rejilla solo se encienden; el arco además SUBE
+            // desde abajo con el mismo progreso (lo lee el CSS de --horizonte).
+            if (horizonte) {
+                horizonte.style.opacity = amanecer.toFixed(3);
+                horizonte.style.setProperty('--horizonte', amanecer.toFixed(4));
+            }
 
             if (cierre) {
                 cierre.style.opacity = cerrando.toFixed(3);
