@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260922f">
+    <link rel="stylesheet" href="style.css?v=20260922n">
     <script type="module" src="https://cdn.spline.design/@splinetool/viewer@2.0.55/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -428,12 +428,15 @@
 
                 <!-- Pie: el botón al catálogo (el mismo relevo de cristal que
                      "Ver catálogo" del hero, en su versión para fondo oscuro)
-                     y el conteo. Es la última pieza de la ola. -->
+                     y el conteo. Es la última pieza de la ola. En celular el
+                     conteo se esconde y en su lugar va la frase de arriba del
+                     botón (.destacada-pie-lema, que en PC no se ve). -->
                 <div class="destacada-pie" data-reveal style="--n: 3;">
+                    <p class="destacada-pie-lema">Revisa nuestro catálogo completo de cuentas.</p>
                     <a href="catalogo.html#cases" class="btn-hero destacada-pie-btn">
                         <span class="btn-hero-rodillo">
-                            <span class="btn-hero-copia">Catálogo completo</span>
-                            <span class="btn-hero-copia" aria-hidden="true">Catálogo completo</span>
+                            <span class="btn-hero-copia">Catálogo<span class="btn-hero-sobra"> completo</span></span>
+                            <span class="btn-hero-copia" aria-hidden="true">Catálogo<span class="btn-hero-sobra"> completo</span></span>
                         </span>
                         <span class="btn-hero-circulo" aria-hidden="true">
                             <svg class="btn-hero-flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
@@ -485,8 +488,8 @@
                              segunda copia del texto aria-hidden. -->
                         <a href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener" class="btn-hero">
                             <span class="btn-hero-rodillo">
-                                <span class="btn-hero-copia">Unirse a Discord</span>
-                                <span class="btn-hero-copia" aria-hidden="true">Unirse a Discord</span>
+                                <span class="btn-hero-copia"><span class="btn-hero-sobra">Unirse a </span>Discord</span>
+                                <span class="btn-hero-copia" aria-hidden="true"><span class="btn-hero-sobra">Unirse a </span>Discord</span>
                             </span>
                             <span class="btn-hero-circulo" aria-hidden="true">
                                 <svg class="btn-hero-flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">

@@ -2202,7 +2202,13 @@ body {
         transform: var(--cuenta-giro);
         translate: none;
     }
+}
 
+/* El canto, el brillo y la sombra de la pantalla 3D van SIN media query:
+   los comparte la cuenta única del celular, que también va girada (ver el
+   bloque responsive). Leen --cuenta-w y --cuenta-lado de cada lado; el
+   `@media all` solo conserva la sangría de cuando vivían en el de PC. */
+@media all {
     /* El canto: una banda metálica detrás de la foto, en su mismo plano y
        asomando por la orilla de afuera. Brilla arriba y se apaga hacia
        abajo, como en la maqueta. También baja un poco (0.013 anchos): con
@@ -2267,7 +2273,9 @@ body {
             inset 0 0 0 1px rgba(255, 255, 255, 0.08);
         pointer-events: none;
     }
+}
 
+@media (min-width: 901px) {
     .cuenta-titulo {
         max-width: 100%;
         font-size: calc(var(--cuenta-w) * 0.045);
@@ -2364,6 +2372,10 @@ body {
 
 .destacada-pie-texto .acento-verde-claro { font-weight: 800; }
 
+/* La frase de encima del botón es solo de celular (ver el bloque
+   responsive); en PC el pie sigue siendo botón + conteo. */
+.destacada-pie-lema { display: none; }
+
 /* ==========================================
    📱 RESPONSIVE - CUENTA DESTACADA (CELULAR Y TABLET)
    ==========================================
@@ -2381,22 +2393,79 @@ body {
         padding: clamp(4.25rem, 10vh, 4.75rem) 1.25rem 1.5rem;
     }
 
-    .destacada-titulo { font-size: clamp(1.9rem, 11vw, 2.9rem); }
+    /* Sin titular también en celular (21 septiembre 2026, a pedido del
+       dueño), como en PC: la cuenta en 3D ya se presenta sola. */
+    .destacada-titulo { display: none; }
 
-    /* Singular, porque abajo solo hay una cuenta. */
-    .destacada-titulo-plural { display: none; }
-
-    .destacada-cuerpo { justify-content: center; }
-
-    /* 👈 LA REGLA QUE DEJA UNA SOLA CUENTA EN CELULAR. */
+    /* 👈 LA REGLA QUE DEJA UNA SOLA CUENTA EN CELULAR (la más cara). */
     .cuenta-card-segunda { display: none; }
 
-    .cuenta-card { width: min(100%, 560px); }
-    .cuenta-img-box { aspect-ratio: 16 / 9; border-radius: 14px; }
-    .cuenta-titulo { font-size: clamp(1rem, 4.6vw, 1.5rem); letter-spacing: 0.06em; }
-    .cuenta-mxn { font-size: clamp(1.25rem, 5.5vw, 1.7rem); }
+    /* 🪟 La cuenta única va en 3D, acomodada como la cuenta DERECHA de PC:
+       mismo giro (el espejo del de la izquierda), texto a la derecha y el USD
+       antes del MXN. Solo cambia el tamaño: girada ~50° la foto se ve a ~2/3
+       de su ancho, así que --cuenta-w pasa del ancho de la pantalla para que
+       la pantalla girada la llene. */
+    .destacada-cuerpo {
+        --cuenta-w: min(118vw, 700px);
+        justify-content: center;
+        margin-block: auto;
+        perspective: calc(var(--cuenta-w) * 9.4);
+        perspective-origin: 50% 45%;
+    }
 
-    .destacada-pie-texto { font-size: 0.66rem; letter-spacing: 2.2px; }
+    .cuenta-card {
+        --cuenta-lado: -1;
+        --cuenta-giro:
+            translateX(calc(var(--cuenta-w) * -0.23))
+            rotateX(16.8deg) rotateY(-49.4deg) rotateZ(10.1deg);
+        flex-shrink: 0;
+        width: var(--cuenta-w);
+        transform-origin: 100% calc(var(--cuenta-w) * 0.5625);
+        align-items: flex-end;
+        text-align: right;
+    }
+
+    .cuenta-card .cuenta-usd { order: -1; }
+
+    .destacada .cuenta-card[data-reveal] {
+        transform: var(--cuenta-giro);
+        translate: 0 -20px;
+        transition-property: opacity, filter, translate;
+    }
+
+    .destacada.is-revealed .cuenta-card[data-reveal] {
+        transform: var(--cuenta-giro);
+        translate: none;
+    }
+
+    .cuenta-titulo { font-size: calc(var(--cuenta-w) * 0.06); letter-spacing: 0.01em; }
+    .cuenta-mxn { font-size: calc(var(--cuenta-w) * 0.07); }
+    .cuenta-usd { font-size: calc(var(--cuenta-w) * 0.032); }
+
+    /* En celular el conteo de debajo del botón se va y ENCIMA del botón
+       entra una frase (maqueta del dueño, 21 septiembre 2026): el botón
+       queda sobre el negro del arco y la frase sobre el gris, arriba. */
+    .destacada-pie-texto { display: none; }
+
+    /* El margin fija el hueco que ocupa en el flujo, y con él dónde quedan
+       la cuenta y sus precios (el dueño los quiere ahí, no más arriba). Lo
+       que sube la frase por encima del arco es el `top` relativo, que la
+       mueve sin empujar nada; crece con el alto de la pantalla. */
+    .destacada-pie-lema {
+        display: block;
+        position: relative;
+        top: clamp(-5rem, 85px - 19vh, -1rem);
+        /* +8px: lo que el botón perdió de alto (62 → 54), para que nada suba. */
+        margin: 0 0 calc(3.6rem + 8px);
+        max-width: 22em;
+        text-align: center;
+        font-weight: 700;
+        font-size: clamp(0.8rem, 3.9vw, 1rem);
+        line-height: 1.45;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: #ffffff;
+    }
 
     /* El pie baja hasta el arco del horizonte, como en escritorio: el hueco
        que sobra se reparte a partes iguales encima del titular y encima del
@@ -2408,6 +2477,26 @@ body {
     /* El .btn-hero de celular se estira y separa texto y círculo; aquí va a
        su ancho, centrado. */
     .destacada .btn-hero { justify-content: center; }
+
+    /* Botón más chico en celular (21 septiembre 2026, a pedido del dueño):
+       dice solo "Catálogo" (.btn-hero-sobra esconde " completo") y el
+       círculo llega casi al filo, así queda una píldora corta y gordita. */
+    .destacada .btn-hero {
+        height: 54px;
+        gap: 12px;
+        padding: 0 7px 0 1.5rem;
+        /* Sube hasta quedar justo debajo del borde gris del arco (que en
+           celular asoma 175px fijos, así que el ajuste también es fijo).
+           Con `top` relativo sube solo él: la cuenta y la frase no se mueven. */
+        position: relative;
+        top: -48px;
+    }
+}
+
+/* Las palabras que sobran en los botones de celular ("completo", "Unirse
+   a"): en PC se ven, en celular se van y el botón queda más corto. */
+@media (max-width: 900px) {
+    .btn-hero-sobra { display: none; }
 }
 
 /* Teléfonos de verdad pequeños (360x640 y parecidos). */
@@ -2421,11 +2510,13 @@ body {
    ahorra sin tocar ningún texto. */
 @media (max-width: 900px) and (max-height: 700px) {
     .destacada { gap: 1rem; }
-    .destacada-titulo { font-size: clamp(1.6rem, 8.5vw, 2.2rem); }
     .destacada-pie-texto { display: none; }
-    /* Ya no se recorta a 2.2:1 (la foto va entera): se angosta la cuenta
-       para ahorrar el mismo alto. */
-    .cuenta-card { width: min(80.8%, 452px); }
+    /* Aquí no hay alto para subir la frase entera: se pegaba al precio. */
+    .destacada-pie-lema { top: -0.9rem; }
+}
+
+@media (max-width: 900px) and (prefers-reduced-motion: reduce) {
+    .destacada .cuenta-card[data-reveal] { translate: none; }
 }
 
 
@@ -2729,7 +2820,15 @@ body {
         transform-origin: 0 0;
     }
 
-    .s3-texto { gap: 1rem; }
+    /* Todo centrado en celular (21 septiembre 2026, a pedido del dueño):
+       titular, párrafo y botón, bajo la mascota que ya va al centro. */
+    .s3-texto {
+        gap: 1rem;
+        align-items: center;
+        text-align: center;
+    }
+
+    .s3-botones { justify-content: center; }
 
     .s3-titulo {
         font-size: clamp(2.2rem, 11vw, 3.2rem);
@@ -2742,6 +2841,25 @@ body {
     }
 
     .s3-botones { margin-top: 0.2rem; gap: 0.8rem 1.3rem; }
+
+    /* El mismo botón corto y gordito que el de la sección 2: solo
+       "Discord" (.btn-hero-sobra esconde "Unirse a") y más chico. */
+    .s3-botones .btn-hero {
+        height: 54px;
+        gap: 12px;
+        padding: 0 7px 0 1.5rem;
+        font-size: 1rem;
+    }
+
+    .s3-botones .btn-hero-circulo {
+        width: 40px;
+        height: 40px;
+    }
+
+    .s3-botones .btn-hero-flecha {
+        width: 17px;
+        height: 17px;
+    }
 
 }
 
@@ -2789,6 +2907,16 @@ body {
     --footer-jalon: calc(var(--s3-arco-asoma) * 0.5);
     margin-top: calc(var(--footer-jalon) * -1);
     background: linear-gradient(to bottom, transparent var(--footer-jalon), #000000 var(--footer-jalon));
+}
+
+/* En celular el corte entre la sección 3 y el footer cae en medio píxel
+   (el arco asoma 120px y el footer sube la mitad) y en el teléfono se veía
+   una rayita gris de lado a lado. El negro del footer arranca 2px antes y
+   la tapa; ahí el arco ya es negro, así que no se nota la diferencia. */
+@media (max-width: 900px) {
+    .seccion-tres-scroll-wrapper + .footer-social {
+        background: linear-gradient(to bottom, transparent calc(var(--footer-jalon) - 2px), #000000 calc(var(--footer-jalon) - 2px));
+    }
 }
 
 .footer-top {
