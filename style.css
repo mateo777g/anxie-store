@@ -2115,11 +2115,148 @@ body {
     flex-wrap: wrap;
 }
 
-/* En la cuenta de la izquierda el USD va primero (21 septiembre 2026, a
-   pedido del dueño): así los precios quedan en espejo con los de la derecha,
-   que van alineados a la derecha. Solo cuando se ven las dos cuentas. */
+/* El MXN va siempre hacia la orilla de afuera (maqueta del 21 septiembre
+   2026): a la izquierda MXN y luego USD, a la derecha USD y luego MXN.
+   Solo cuando se ven las dos cuentas. */
 @media (min-width: 901px) {
-    .cuenta-card:not(.cuenta-card-segunda) .cuenta-usd { order: -1; }
+    .cuenta-card-segunda .cuenta-usd { order: -1; }
+}
+
+/* Sin titular en PC (21 septiembre 2026, a pedido del cliente): la mitad
+   blanca de la sección 2 ya dice "Cuentas destacadas". Con el alto que deja
+   libre, las cuentas se centran en el alto (su tamaño y su giro 3D van en
+   LAS CUENTAS EN 3D, más abajo). En celular el titular se queda. */
+@media (min-width: 901px) {
+    .destacada-titulo { display: none; }
+    /* Sin titular, las cuentas se quedaban pegadas al menú con un hueco
+       enorme abajo: se centran en el alto que queda sobre el pie. */
+    .destacada-cuerpo { margin-block: auto; }
+}
+
+/* 🪟 LAS CUENTAS EN 3D (maqueta del 21 septiembre 2026,
+   assets/maqueta 3d seccion 2.png) — cada foto es una pantalla girada hacia
+   el centro: la orilla de afuera cerca, la de adentro lejos, y además echada
+   hacia atrás por arriba, así que el hueco entre las dos forma una "V"
+   (ancho arriba, angosto abajo).
+
+   Los números no son a ojo: salen de ajustar una proyección 3D a las cuatro
+   esquinas de la foto izquierda de la maqueta (1920x1080). Con el punto de
+   fuga al centro de la pantalla cae a menos de 12px en cada esquina:
+     rotateX 21.6deg · rotateY 48deg · rotateZ -14deg,
+     perspectiva 5.75 anchos de cuenta, girando sobre la esquina de abajo y
+     afuera de la foto, que se corre 0.236 anchos hacia el centro.
+   Todo va en múltiplos de --cuenta-w, así que la escena escala entera y en
+   cualquier 16:9 es la maqueta tal cual. La derecha es el espejo.
+
+   Solo giran la foto y su canto. En la maqueta el título y el precio no
+   están en el plano de la foto (ahí se verían apretados y en cursiva): van
+   derechos, a su ancho, colgando de la esquina de abajo de la foto y apenas
+   subiendo hacia el centro.
+
+   La perspectiva va en cada tarjeta y no en el contenedor porque la
+   tarjeta tiene su propio transform y filter (la ola de entrada), que
+   aplanarían el 3D de sus hijos. perspective-origin lleva el punto de fuga
+   al centro del contenedor: 47.3vw es la mitad de su ancho (100vw menos
+   2 × 2.7vw de padding). */
+@media (min-width: 901px) {
+    .destacada-cuerpo {
+        --cuenta-w: min(46.7vw, 84vh);
+        gap: 0;
+    }
+
+    .cuenta-card {
+        --cuenta-lado: 1;
+        --cuenta-giro:
+            translateX(calc(var(--cuenta-w) * 0.236))
+            rotateX(21.6deg) rotateY(48deg) rotateZ(-14deg);
+        flex-shrink: 0;
+        width: var(--cuenta-w);
+        perspective: calc(var(--cuenta-w) * 5.75);
+        perspective-origin: 47.3vw 45%;
+    }
+
+    .cuenta-card-segunda {
+        --cuenta-lado: -1;
+        --cuenta-giro:
+            translateX(calc(var(--cuenta-w) * -0.236))
+            rotateX(21.6deg) rotateY(-48deg) rotateZ(14deg);
+        perspective-origin: calc(var(--cuenta-w) - 47.3vw) 45%;
+    }
+
+    .cuenta-img-box,
+    .cuenta-card::before {
+        transform: var(--cuenta-giro);
+        transform-origin: 0 100%;
+    }
+
+    .cuenta-card-segunda .cuenta-img-box,
+    .cuenta-card-segunda::before {
+        transform-origin: 100% 100%;
+    }
+
+    /* El canto: una banda metálica detrás de la foto, en su mismo plano y
+       asomando por la orilla de afuera. Brilla arriba y se apaga hacia
+       abajo, como en la maqueta. */
+    .cuenta-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 0;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        border-radius: 18px;
+        background: linear-gradient(to bottom, #d4d4d4 0%, #8a8a8a 12%, #4a4a4a 45%, #1c1c1c 85%, #111111 100%);
+        translate: calc(var(--cuenta-w) * -0.016 * var(--cuenta-lado)) 0;
+    }
+
+    /* La foto va encima del canto; debajo, la sombra que la despega del
+       fondo. */
+    .cuenta-img-box {
+        z-index: 1;
+        box-shadow: 0 34px 60px -14px rgba(0, 0, 0, 0.95);
+    }
+
+    /* El brillo del borde de arriba. Va en un ::after porque una sombra
+       inset en la caja quedaría debajo de la imagen. */
+    .cuenta-img-box::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        box-shadow:
+            inset 0 1.5px 0 rgba(255, 255, 255, 0.55),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+        pointer-events: none;
+    }
+
+    /* Título y precio: derechos, bajo la esquina de la foto (que se corrió
+       0.236 anchos) y subiendo apenas hacia el centro. Como en la maqueta, el
+       título se corta con puntos suspensivos al ancho de la foto girada. */
+    .cuenta-titulo,
+    .cuenta-precios {
+        translate: calc(var(--cuenta-w) * 0.236 * var(--cuenta-lado)) calc(var(--cuenta-w) * 0.03);
+        rotate: calc(-1deg * var(--cuenta-lado));
+        transform-origin: left center;
+    }
+
+    .cuenta-card-segunda .cuenta-titulo,
+    .cuenta-card-segunda .cuenta-precios {
+        transform-origin: right center;
+    }
+
+    /* Medido en la maqueta: letra de 0.04 anchos, sin el espaciado ancho
+       de la versión plana. */
+    .cuenta-titulo {
+        max-width: calc(var(--cuenta-w) * 0.6);
+        font-size: calc(var(--cuenta-w) * 0.04);
+        letter-spacing: 0.01em;
+    }
+}
+
+/* Tablet apaisada: ahí el arco asoma 175px fijos y el precio lo pisaba. */
+@media (min-width: 901px) and (max-width: 1023px) {
+    .destacada-cuerpo { --cuenta-w: min(46.7vw, 60vh); }
 }
 
 .cuenta-mxn {
