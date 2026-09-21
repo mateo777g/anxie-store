@@ -92,7 +92,7 @@ body.no-scroll {
 }
 
 .filter-menu-title {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 0.68rem;
     font-weight: 800;
     letter-spacing: 1px;
@@ -106,7 +106,7 @@ body.no-scroll {
     border: none;
     text-align: left;
     padding: 10px 16px;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 0.8rem;
     font-weight: 600;
     color: #333333;
@@ -183,19 +183,6 @@ body.no-scroll {
     padding-left: 30px;
 }
 
-/* 🔤 LA LETRA DEL CATÁLOGO (22 septiembre 2026, a pedido del dueño): la
-   Arial de los atajos del header y del menú, en vez de la Montserrat del
-   resto del sitio. Cada regla de este archivo ya la declara; esto cubre lo
-   que la hereda del <body> (textos sueltos del catálogo, las ventanas de
-   búsqueda, compra y zoom, y el menú lateral). El footer se queda con la
-   suya, que es la misma en las tres páginas. */
-.catalog-main,
-.search-modal-overlay,
-.buy-modal-overlay,
-.image-zoom-overlay {
-    font-family: Arial, Helvetica, sans-serif;
-}
-
 /* ÁREA DE PRODUCTOS */
 .catalog-main {
     background-color: #ffffff;
@@ -209,7 +196,7 @@ body.no-scroll {
 }
 
 .shop-all-title {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 800;
     font-size: 1.8rem;
     text-transform: uppercase;
@@ -241,7 +228,7 @@ body.no-scroll {
     color: #ffffff;
     padding: 6px 14px;
     border-radius: 50px;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -281,7 +268,7 @@ body.no-scroll {
 }
 
 .product-title {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 500;
     font-size: 0.95rem;
     color: #000000;
@@ -289,7 +276,7 @@ body.no-scroll {
 }
 
 .product-price {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 700;
     font-size: 0.9rem;
     color: #000000;
@@ -312,7 +299,7 @@ body.no-scroll {
     color: #ffffff;
     text-align: center;
     text-decoration: none;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 700;
     font-size: 0.85rem;
     transition: background 0.3s;
@@ -327,7 +314,7 @@ body.no-scroll {
 
 #loading-msg {
     text-align: left;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 600;
     grid-column: 1 / -1;
     padding: 20px 0;
@@ -385,7 +372,7 @@ body.no-scroll {
     flex: 1;
     border: none;
     outline: none;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 1rem;
     color: #000000;
     font-weight: 500;
@@ -413,7 +400,7 @@ body.no-scroll {
 }
 
 .search-section-title {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 0.75rem;
     font-weight: 800;
     letter-spacing: 0.5px;
@@ -457,7 +444,7 @@ body.no-scroll {
 }
 
 .search-result-title {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 0.75rem;
     font-weight: 600;
     color: #222222;
@@ -471,7 +458,7 @@ body.no-scroll {
 }
 
 .search-result-price {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 0.75rem;
     font-weight: 700;
     color: #000000;
@@ -575,7 +562,7 @@ body.no-scroll {
 }
 
 .buy-col-title {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 0.85rem;
     font-weight: 600;
     color: #222222;
@@ -587,7 +574,7 @@ body.no-scroll {
 /* 👇 TÍTULO NUEVO: OCULTO EN PC 👇 */
 .buy-modal-mobile-title {
     display: none; 
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 0.85rem;
     font-weight: 600;
     color: #222222;
@@ -613,7 +600,7 @@ body.no-scroll {
 .btn-buy-option {
     width: 100%;
     padding: 11px 16px;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 700;
     font-size: 0.8rem;
     text-decoration: none;
@@ -661,7 +648,7 @@ body.no-scroll {
     /* Título superior para móviles */
     .buy-modal-mobile-title {
         display: block !important;
-        font-family: Arial, Helvetica, sans-serif;
+        font-family: 'Montserrat', sans-serif;
         font-size: 0.82rem;
         font-weight: 600;
         color: #222222;
