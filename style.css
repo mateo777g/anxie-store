@@ -2827,7 +2827,11 @@ body {
     .s3-mascota spline-viewer {
         width: 560px;
         height: 560px;
-        transform: scale(calc(var(--mascota-n) / 560));
+        /* La caja va centrada, pero la escena de Spline dibuja la mascota
+           un 3% de su ancho a la izquierda (medido: 8px en 280). El
+           translate la devuelve al centro; va antes del scale, así que se
+           mide en píxeles de la pantalla. */
+        transform: translateX(calc(var(--mascota) * 0.03)) scale(calc(var(--mascota-n) / 560));
         transform-origin: 0 0;
     }
 

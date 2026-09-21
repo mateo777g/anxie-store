@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260922q">
+    <link rel="stylesheet" href="style.css?v=20260922r">
     <script type="module" src="https://cdn.spline.design/@splinetool/viewer@2.0.55/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -770,9 +770,10 @@
             });
         });
 
-        // 🎯 SCROLL SUAVE DE LOS ANCLAS DEL MENÚ
+        // 🎯 SCROLL SUAVE DE LOS ANCLAS DEL MENÚ Y DEL FOOTER
+        // (los atajos del footer iban con el salto seco del navegador)
         window.addEventListener('DOMContentLoaded', () => {
-            const navLinks = document.querySelectorAll('.menu__item[href^="#"]');
+            const navLinks = document.querySelectorAll('.menu__item[href^="#"], .footer-nav-link[href^="#"]');
 
             navLinks.forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
