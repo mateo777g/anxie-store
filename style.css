@@ -1431,7 +1431,10 @@ body {
     transform: translateX(-50%) translateY(calc((1 - var(--arco, 0)) * var(--arco-bajada)));
     opacity: var(--arco, 0);
     border-radius: 100%;
-    background: radial-gradient(closest-side, #000000 82%, #ffffff);
+    /* El borde remata en gris claro y no en blanco puro (21 septiembre 2026,
+       maqueta del cliente): es el blanco al ~60% de opacidad sobre el negro,
+       pero en color sólido para que el interior del arco siga negro opaco. */
+    background: radial-gradient(closest-side, #000000 82%, #999999);
 }
 
 /* Los mismos escalones del componente: md (768–1023) y el base de celular. */
@@ -2021,10 +2024,12 @@ body {
    necesitan las fotos. */
 .destacada-titulo {
     font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
-    font-weight: 800;
-    font-size: min(8.6vw, 15vh);
+    /* Más delgado y un poco más chico que antes (800, 8.6vw), como en la
+       maqueta del cliente del 21 septiembre 2026. */
+    font-weight: 600;
+    font-size: min(7.4vw, 13vh);
     line-height: 0.9;
-    letter-spacing: -0.05em;
+    letter-spacing: -0.04em;
     text-align: center;
     text-transform: uppercase;
 }
@@ -2110,6 +2115,13 @@ body {
     flex-wrap: wrap;
 }
 
+/* En la cuenta de la izquierda el USD va primero (21 septiembre 2026, a
+   pedido del dueño): así los precios quedan en espejo con los de la derecha,
+   que van alineados a la derecha. Solo cuando se ven las dos cuentas. */
+@media (min-width: 901px) {
+    .cuenta-card:not(.cuenta-card-segunda) .cuenta-usd { order: -1; }
+}
+
 .cuenta-mxn {
     font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
     font-weight: 800;
@@ -2138,11 +2150,17 @@ body {
 .destacada .btn-hero {
     /* Más chico que el del hero (66px): aquí comparte el negro del arco con
        el conteo y no debe competir con las cuentas. */
-    height: 54px;
+    /* Más alto y con más aire a los dos lados (21 septiembre 2026, a pedido
+       del dueño): +16px por lado, así texto y círculo no se mueven entre sí. */
+    height: 62px;
     gap: 16px;
-    padding: 0 7px 0 28px;
+    padding: 0 23px 0 44px;
     font-size: 1rem;
     color: #ffffff;
+    /* Fondo negro sólido: desde que el botón subió al brillo gris del arco,
+       el cristal transparente dejaba ver el gris detrás. Queda solo el borde
+       de cristal; el fondo negro tapa el ondulado del backdrop-filter. */
+    background: #000000;
     box-shadow: var(--cristal-borde-claro);
 }
 
@@ -2161,11 +2179,15 @@ body {
 /* En escritorio SOLO el botón se sube hacia el borde del arco, que asoma un
    25% del alto (ver .corona-horizonte-arco); el conteo se queda abajo, donde
    siempre (lo pidió así el cliente). El margen abre hueco entre los dos para
-   que el botón quede ~60px debajo de la cima del arco, justo al terminar su
-   brillo gris y todavía sobre el NEGRO. 21.5vh = 25vh del arco − 3.5vh del
-   padding de abajo; 9rem = esos 60px + botón, hueco y conteo. */
+   que el botón quede ~35px debajo de la cima del arco (antes ~60px; el
+   dueño lo pidió más arriba el 21 septiembre 2026, aunque roce el brillo
+   gris). 21.5vh = 25vh del arco − 3.5vh del padding de abajo; 9rem − 24px
+   = esos ~35px + botón, hueco y conteo. */
 @media (min-width: 1024px) {
-    .destacada .btn-hero { margin-bottom: max(0px, calc(21.5vh - 9rem)); }
+    .destacada .btn-hero { margin-bottom: max(0px, calc(21.5vh - 9rem + 24px - 40px)); }
+    /* El conteo sube 40px (21 septiembre 2026, a pedido del dueño); el
+       botón le descuenta esos mismos 40px a su margen y no se mueve. */
+    .destacada .destacada-pie-texto { margin-bottom: 40px; }
 }
 
 .destacada-pie-texto {
