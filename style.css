@@ -2400,32 +2400,30 @@ body {
     /* 👈 LA REGLA QUE DEJA UNA SOLA CUENTA EN CELULAR (la más cara). */
     .cuenta-card-segunda { display: none; }
 
-    /* 🪟 La cuenta única va en 3D, acomodada como la cuenta DERECHA de PC:
-       mismo giro (el espejo del de la izquierda), texto a la derecha y el USD
-       antes del MXN. Solo cambia el tamaño: girada ~50° la foto se ve a ~2/3
-       de su ancho, así que --cuenta-w pasa del ancho de la pantalla para que
-       la pantalla girada la llene. */
+    /* 🪟 La cuenta única va en 3D, pero DE FRENTE (21 septiembre 2026, a
+       pedido del cliente): el giro de lado de PC solo tiene sentido con la
+       otra cuenta enfrente formando la "V"; sola se veía coja. Aquí la misma
+       pantalla con canto se echa hacia atrás por arriba, sin girar a ningún
+       lado, así que sus orillas suben juntándose como un "/\". Gira sobre
+       su borde de abajo; el texto va en el mismo plano, centrado. Con
+       --cuenta-lado 0 el canto asoma solo por abajo, parejo. */
     .destacada-cuerpo {
-        --cuenta-w: min(118vw, 700px);
+        --cuenta-w: min(calc(100vw - 2.5rem), 560px);
         justify-content: center;
         margin-block: auto;
-        perspective: calc(var(--cuenta-w) * 9.4);
-        perspective-origin: 50% 45%;
+        perspective: calc(var(--cuenta-w) * 1.1);
+        perspective-origin: 50% 40%;
     }
 
     .cuenta-card {
-        --cuenta-lado: -1;
-        --cuenta-giro:
-            translateX(calc(var(--cuenta-w) * -0.23))
-            rotateX(16.8deg) rotateY(-49.4deg) rotateZ(10.1deg);
+        --cuenta-lado: 0;
+        --cuenta-giro: rotateX(22deg);
         flex-shrink: 0;
         width: var(--cuenta-w);
-        transform-origin: 100% calc(var(--cuenta-w) * 0.5625);
-        align-items: flex-end;
-        text-align: right;
+        transform-origin: 50% 100%;
+        align-items: center;
+        text-align: center;
     }
-
-    .cuenta-card .cuenta-usd { order: -1; }
 
     .destacada .cuenta-card[data-reveal] {
         transform: var(--cuenta-giro);
@@ -2438,9 +2436,21 @@ body {
         translate: none;
     }
 
-    .cuenta-titulo { font-size: calc(var(--cuenta-w) * 0.06); letter-spacing: 0.01em; }
-    .cuenta-mxn { font-size: calc(var(--cuenta-w) * 0.07); }
-    .cuenta-usd { font-size: calc(var(--cuenta-w) * 0.032); }
+    .cuenta-titulo { font-size: calc(var(--cuenta-w) * 0.056); letter-spacing: 0.01em; }
+    .cuenta-mxn { font-size: calc(var(--cuenta-w) * 0.085); }
+    .cuenta-usd { font-size: calc(var(--cuenta-w) * 0.038); }
+
+    /* El canto de frente asoma solo por abajo, más grueso que en PC. El
+       degradado de PC se apaga hacia abajo (allá brilla por el costado), así
+       que aquí va al revés: el brillo metálico en la franja de abajo, que es
+       lo único que se ve. El relleno de la esquina (::after) no hace falta:
+       sin corrimiento de lado no queda escalón arriba. */
+    .cuenta-card::before {
+        translate: 0 calc(var(--cuenta-w) * 0.03);
+        background: linear-gradient(to top, #6a6a6a 0%, #d4d4d4 2.5%, #8a8a8a 5.5%, #1c1c1c 10%);
+    }
+
+    .cuenta-card::after { display: none; }
 
     /* En celular el conteo de debajo del botón se va y ENCIMA del botón
        entra una frase (maqueta del dueño, 21 septiembre 2026): el botón
