@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rock+Salt&display=swap" rel="stylesheet">
 
     <!-- CSS y visor de Spline -->
-    <link rel="stylesheet" href="style.css?v=20260922r">
+    <link rel="stylesheet" href="style.css?v=20260922t">
     <script type="module" src="https://cdn.spline.design/@splinetool/viewer@2.0.55/build/spline-viewer.js"></script>
     
     <!-- CDN de Supabase -->
@@ -116,6 +116,42 @@
         de "click afuera" que ya cierra el menú, sin código nuevo.
     -->
     <div class="menu-scrim" aria-hidden="true"></div>
+
+    <!--
+        🟢 VENTANA DE BIENVENIDA (solo en esta página).
+        Sale en CADA visita: no se guarda en ningún lado que ya se cerró, así
+        lo pidió el dueño. Es un <dialog> nativo abierto con showModal(), así
+        que va en la capa superior (por encima de la píldora, sin pelear
+        z-index) y el resto de la página queda inerte mientras está abierta.
+        Estilos en el bloque VENTANA DE BIENVENIDA de style.css; el JS, al
+        final de esta página.
+
+        Invita al servidor de Discord. El hueco negro de la izquierda (donde
+        la maqueta tenía una foto) lleva el logo de Discord en blanco (assets/logo-discord-blanco.webp, sacado de
+        logodiscordv.png: recortado y pasado de azul a blanco), y el botón
+        lleva al Discord y además cierra la ventana, para que no siga ahí al
+        volver a la pestaña.
+        Al abrir, el JS pone el foco en el propio <dialog> (por eso el
+        tabindex="-1") y no en el botón: así no aparece un anillo de foco a
+        quien usa el ratón, y con Tab se llega al botón.
+    -->
+    <dialog class="bienvenida" id="bienvenida" aria-labelledby="bienvenida-titulo" tabindex="-1">
+        <div class="bienvenida__foto">
+            <img class="bienvenida__logo" src="assets/logo-discord-blanco.webp" alt="" width="640" height="496" decoding="async">
+        </div>
+
+        <div class="bienvenida__cuerpo">
+            <h2 class="bienvenida__titulo" id="bienvenida-titulo">Únete a nuestro servidor de Discord</h2>
+            <p class="bienvenida__texto">Resuelve dudas, adquiere tu cuenta y encuentra productos exclusivos.</p>
+            <a class="bienvenida__btn" href="https://discord.gg/YuTzCPu3tS" target="_blank" rel="noopener noreferrer" data-cerrar>Entrar</a>
+        </div>
+
+        <button type="button" class="bienvenida__cerrar" aria-label="Cerrar" data-cerrar>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+                <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+        </button>
+    </dialog>
 
     <!-- ==========================================================
          SECCIÓN 1: HERO CLARO
@@ -1849,6 +1885,96 @@ void main() {
     })();
     </script>
 
+    <!-- ==========================================================
+         🟢 VENTANA DE BIENVENIDA
+         Se abre en cada visita, un momento después de cargar para que la
+         ola de entrada del hero se alcance a ver. Cierra con la X, con el
+         botón de Discord (que abre el Discord en otra pestaña), con Esc o
+         con un click fuera de la tarjeta. El HTML va arriba, justo después
+         del menú.
+         ========================================================== -->
+    <script>
+    (function () {
+        const ventana = document.getElementById('bienvenida');
+        // Sin <dialog> (navegadores de antes de 2022) no se abre y ya.
+        if (!ventana || typeof ventana.showModal !== 'function') return;
+
+        const raiz = document.documentElement;
+        const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)');
+        let pulsadoEnFondo = false;
+
+        let temporizador = 0;
+
+        function abrir() {
+            if (ventana.open) return;
+            // La clase va antes que showModal() para que la barra de scroll
+            // desaparezca y el velo aparezca en el mismo pintado.
+            raiz.classList.add('bienvenida-abierta');
+            ventana.showModal();
+            // El foco a la ventana y no a su primer botón (ver el comentario
+            // del HTML). Chrome no hace caso del autofocus en el propio <dialog>.
+            ventana.focus();
+        }
+
+        // 🎬 Cierra con su animación de salida; con movimiento reducido, en seco.
+        function cerrar() {
+            if (!ventana.open || ventana.classList.contains('is-cerrando')) return;
+            if (sinMovimiento.matches) {
+                terminar();
+                return;
+            }
+            ventana.classList.add('is-cerrando');
+            ventana.addEventListener('animationend', terminar);
+            // Por si la animación no llega a correr (una página que no está
+            // pintando no avanza sus animaciones ni lanza animationend).
+            temporizador = setTimeout(terminar, 400);
+        }
+
+        // Cierra de verdad y devuelve el scroll a la página. Lo hace aquí mismo
+        // y no esperando al evento close: Chrome lo lanza con el siguiente
+        // pintado, no al momento. Se puede llamar de más; la segunda vez no
+        // hace nada.
+        function terminar() {
+            clearTimeout(temporizador);
+            ventana.removeEventListener('animationend', terminar);
+            if (ventana.open) ventana.close();
+            limpiar();
+        }
+
+        function limpiar() {
+            ventana.classList.remove('is-cerrando');
+            raiz.classList.remove('bienvenida-abierta');
+        }
+
+        // Si el navegador la cierra por su cuenta (un segundo Esc seguido ya
+        // no se puede cancelar), se recoge igual. Solo limpia, nunca cierra: el
+        // close llega tarde y, si la ventana se hubiera vuelto a abrir entre
+        // tanto, la cerraría.
+        ventana.addEventListener('close', () => {
+            if (!ventana.open) limpiar();
+        });
+
+        // Esc: se cancela el cierre en seco del navegador para animarlo.
+        ventana.addEventListener('cancel', (e) => {
+            e.preventDefault();
+            cerrar();
+        });
+
+        // Click fuera de la tarjeta: el velo (::backdrop) le pasa el click al
+        // propio <dialog>. Se exige que el botón también se haya pulsado ahí;
+        // si no, arrastrar para seleccionar texto y soltar fuera la cerraría.
+        ventana.addEventListener('pointerdown', (e) => {
+            pulsadoEnFondo = e.target === ventana;
+        });
+        ventana.addEventListener('click', (e) => {
+            if ((e.target === ventana && pulsadoEnFondo) || e.target.closest('[data-cerrar]')) {
+                cerrar();
+            }
+        });
+
+        setTimeout(abrir, 700);
+    })();
+    </script>
 
 </body>
 </html>

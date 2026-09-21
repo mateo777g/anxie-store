@@ -3144,3 +3144,260 @@ body {
         font-size: 0.74rem;
     }
 }
+
+/* =========================================================================
+   🟢 VENTANA DE BIENVENIDA (solo index.html)
+   =========================================================================
+   Calcada de una maqueta que mandó el dueño: tarjeta blanca de esquinas
+   redondas, la foto a la izquierda, el texto a la derecha y la X arriba a la
+   derecha. En el sitio de la foto va, por ahora, el logo de Discord en
+   blanco sobre negro, y un solo botón que lleva al Discord. La letra no
+   es la de la maqueta sino la de la portada, a petición del dueño: el título
+   como la marca "ANXIE STORE" (Plus Jakarta Sans 800, mayúsculas, apretada) y
+   el resto en Montserrat, como los datos y el botón del hero.
+
+   Es un <dialog> abierto con showModal(): va en la capa superior del
+   navegador, por encima de la píldora, sin z-index. Dos trampas del <dialog>:
+   - el reset de arriba (* { margin: 0 }) le quita el margin: auto que lo
+     centra en pantalla; aquí se le devuelve;
+   - el display va solo en [open]: puesto en la regla base, le ganaría a su
+     display: none y la ventana se vería también cerrada. */
+.bienvenida {
+    margin: auto;
+    padding: 0;
+    border: 0;
+    width: min(800px, 100% - 48px);
+    max-width: none;
+    max-height: calc(100% - 48px);
+    overflow: hidden auto;
+    border-radius: 24px;
+    background: #ffffff;
+    color: var(--tinta);
+    font-family: 'Montserrat', sans-serif;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+    /* El JS le pone el foco a la propia ventana al abrir; no lleva anillo. */
+    outline: none;
+}
+
+.bienvenida[open] {
+    display: grid;
+    grid-template-columns: 45% 1fr;
+    animation: bienvenida-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* El velo: negro al 40%, como en la maqueta. Colores literales y no
+   variables: hay navegadores en los que ::backdrop no hereda las de :root. */
+.bienvenida::backdrop {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.bienvenida[open]::backdrop {
+    animation: bienvenida-velo-in 420ms ease both;
+}
+
+/* La salida. El JS pone .is-cerrando, espera a que acabe y llama a close(). */
+.bienvenida.is-cerrando {
+    animation: bienvenida-out 240ms ease both;
+}
+
+.bienvenida.is-cerrando::backdrop {
+    animation: bienvenida-velo-out 240ms ease both;
+}
+
+@keyframes bienvenida-in {
+    from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.97);
+    }
+}
+
+@keyframes bienvenida-out {
+    to {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+}
+
+@keyframes bienvenida-velo-in {
+    from { opacity: 0; }
+}
+
+@keyframes bienvenida-velo-out {
+    to { opacity: 0; }
+}
+
+/* Mientras está abierta la página de atrás no se mueve: el mismo overflow:
+   hidden en el body que usa el panel del menú en celular. El scrollbar-gutter
+   guarda el hueco de la barra de scroll, que si no desaparece al abrir y
+   vuelve al cerrar, y la página de atrás salta de lado las dos veces.
+   Ese hueco el velo no lo tapa (el navegador no deja pintar ahí) y enseña el
+   fondo del lienzo, que es el negro del body: quedaba una franja negra a la
+   derecha. #999 es el blanco del hero bajo el velo al 40%, que es lo que hay
+   en ese borde cuando la ventana sale, al cargar. Solo se ve en PC con barra
+   de scroll clásica (Windows); en Mac y en celular la barra flota y no hay
+   hueco. */
+html.bienvenida-abierta {
+    scrollbar-gutter: stable;
+    background: #999999;
+}
+
+html.bienvenida-abierta body {
+    overflow: hidden;
+}
+
+/* --- El hueco de la foto: negro, con el logo de Discord al centro --- */
+.bienvenida__foto {
+    display: grid;
+    place-items: center;
+    background: var(--negro);
+    /* 544px es el alto de la tarjeta de la maqueta a 800 de ancho. En una
+       pantalla más baja manda el alto de la pantalla. */
+    min-height: min(544px, 100vh - 48px);
+    min-height: min(544px, 100dvh - 48px);
+}
+
+/* El logo ya viene blanco y recortado a su silueta (ver el HTML). En PC se
+   mide por el ancho de la columna; en celular, por el alto de la franja. */
+.bienvenida__logo {
+    display: block;
+    width: 46%;
+    height: auto;
+}
+
+/* --- El texto --- */
+.bienvenida__cuerpo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 48px;
+}
+
+.bienvenida__titulo {
+    font-family: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 50px;
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+    text-transform: uppercase;
+    color: var(--tinta);
+    margin-bottom: 18px;
+}
+
+.bienvenida__texto {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--tinta);
+    margin-bottom: 24px;
+}
+
+/* --- El botón de Discord: píldora negra. Es un enlace; el align-self evita
+   que la columna flex lo estire a todo el ancho. --- */
+.bienvenida__btn {
+    align-self: flex-start;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 1;
+    padding: 12px 20px;
+    border-radius: 999px;
+    background: var(--tinta);
+    color: #ffffff;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.bienvenida__btn:hover {
+    background: #3a3a3a;
+}
+
+/* --- La X --- */
+.bienvenida__cerrar {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: #ffffff;
+    color: var(--tinta);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.bienvenida__cerrar:hover {
+    background: #e5e5e5;
+}
+
+.bienvenida__cerrar svg {
+    width: 22px;
+    height: 22px;
+}
+
+.bienvenida__btn:focus-visible,
+.bienvenida__cerrar:focus-visible {
+    outline: 2px solid var(--tinta);
+    outline-offset: 2px;
+}
+
+/* 📱 En celular (y tablet vertical) se apila: la foto arriba, el texto
+   abajo, y la X queda sobre el negro de la foto. */
+@media (max-width: 900px) {
+    .bienvenida {
+        width: min(480px, 100% - 32px);
+        max-height: calc(100% - 32px);
+        border-radius: 20px;
+    }
+
+    .bienvenida[open] {
+        grid-template-columns: 1fr;
+    }
+
+    .bienvenida__foto {
+        --bienvenida-franja: clamp(150px, 30svh, 280px);
+        min-height: 0;
+        height: var(--bienvenida-franja);
+    }
+
+    /* El alto del logo sale de la misma medida de la franja y no de un
+       height: 44%: en WebKit un % de alto en un hijo de grid con la fila en
+       auto no se resuelve, y el logo salía a su tamaño natural (496px),
+       tapando el título. */
+    .bienvenida__logo {
+        width: auto;
+        height: calc(var(--bienvenida-franja) * 0.44);
+    }
+
+    .bienvenida__cuerpo {
+        padding: 28px 24px;
+    }
+
+    .bienvenida__titulo {
+        font-size: clamp(32px, 9.5vw, 44px);
+        margin-bottom: 14px;
+    }
+
+    .bienvenida__texto {
+        font-size: 15px;
+        margin-bottom: 20px;
+    }
+
+    .bienvenida__cerrar {
+        top: 12px;
+        right: 12px;
+    }
+}
+
+/* Con el movimiento reducido entra y sale sin animación (el JS tampoco
+   espera a la salida). Va al final para ganarle a las reglas de arriba. */
+@media (prefers-reduced-motion: reduce) {
+    .bienvenida[open],
+    .bienvenida[open]::backdrop,
+    .bienvenida.is-cerrando,
+    .bienvenida.is-cerrando::backdrop {
+        animation: none;
+    }
+}
