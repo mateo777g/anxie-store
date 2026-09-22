@@ -20,8 +20,8 @@
     <link rel="stylesheet" href="style.css?v=20260922t">
     <link rel="stylesheet" href="catalogo.css?v=20260922m">
     
-    <!-- Visor de Spline -->
-    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
+    <!-- El visor de Spline ya no va aquí: lo pide un script al final de la
+         página, solo en PC y cuando la página terminó de cargar -->
     <!-- CDN de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -429,7 +429,9 @@
             }
         }
 
-        ocultarLogosSpline();
+        // El visor llega tarde (ver VISOR DE SPLINE BAJO DEMANDA, abajo): se
+        // limpia en cuanto el navegador conoce <spline-viewer>, antes de pintarlo.
+        customElements.whenDefined('spline-viewer').then(ocultarLogosSpline);
 
         let globalCuentas = [];
 
@@ -792,6 +794,50 @@
             });
         });
 
+    </script>
+
+    <!-- 🧊 VISOR DE SPLINE BAJO DEMANDA. El visor (spline-viewer.js, ~1 MB
+         comprimido) solo lo usan los dos logos 3D del modal "¿Cómo adquirir?",
+         y solo en PC: a 650px o menos el modal enseña fotos (catalogo.css).
+         Hasta el 22/09/2026 se bajaba en el <head> siempre, también en celular.
+         Ahora se pide solo en PC, con la página ya cargada (fotos incluidas),
+         o antes si alguien abre el modal.
+         Es la misma versión y la misma URL que usa index.html (jsdelivr, que
+         lo deja en caché un año), así que se baja una sola vez para las dos
+         páginas: si cambias la versión aquí, cámbiala también allá. -->
+    <script>
+        (function () {
+            const VISOR_SPLINE = 'https://cdn.jsdelivr.net/npm/@splinetool/viewer@2.0.55/build/spline-viewer.js';
+            const conSpline = window.matchMedia('(min-width: 651px)');
+            let pedido = false;
+
+            function cargarVisor() {
+                if (pedido || !conSpline.matches) return;
+                pedido = true;
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.src = VISOR_SPLINE;
+                document.head.appendChild(script);
+            }
+
+            // Con la página ya cargada y el navegador desocupado.
+            window.addEventListener('load', () => {
+                const enReposo = window.requestIdleCallback || ((fn) => setTimeout(fn, 200));
+                enReposo(cargarVisor, { timeout: 3000 });
+            });
+
+            // Si abren el modal antes, se pide en ese momento.
+            document.addEventListener('click', (e) => {
+                if (e.target.closest && e.target.closest('.open-buy-modal-btn')) cargarVisor();
+            });
+
+            // Si la ventana pasa de celular a PC (girar la tablet, agrandar la ventana).
+            if (conSpline.addEventListener) {
+                conSpline.addEventListener('change', () => {
+                    if (document.readyState === 'complete') cargarVisor();
+                });
+            }
+        })();
     </script>
 </body>
 </html>
