@@ -3,8 +3,9 @@
 # internos ya salieron de git, pero los despliegues viejos pueden haberlos
 # dejado ahí: estas reglas los esconden aunque sigan en el servidor.
 
-# 🚫 Archivos internos por extensión (documentación, config, textos, scripts)
-<FilesMatch "\.(md|toml|txt|log|bak|py|sh|ps1|env)$">
+# 🚫 Archivos ocultos (.gitignore, etc.) e internos por extensión
+#    (documentación, config, textos, scripts)
+<FilesMatch "(^\.|\.(md|toml|txt|log|bak|py|sh|ps1|env)$)">
   <IfModule mod_authz_core.c>
     Require all denied
   </IfModule>
