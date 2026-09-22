@@ -7,3 +7,21 @@ _scripts/
 worker/.wrangler/
 worker/.env
 nul
+
+# Credenciales privadas (tokens de Supabase y Cloudflare). NO NEGOCIABLE.
+.env
+.env.*
+*.env
+
+# Planes de trabajo: hablan de huecos de seguridad y todo lo rastreado
+# termina publicado en anxiestore.com, así que se quedan fuera de git.
+plan *.txt
+
+# Todo lo que está en git se publica en anxiestore.com (Hostinger despliega
+# el repo entero en public_html). Lo interno se queda solo en la PC:
+CLAUDE.md
+worker/
+.vscode/
+.claude/
+# Maquetas, ejemplos, textos de referencia y assets que ya no usa ninguna página.
+_privado/

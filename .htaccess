@@ -1,0 +1,23 @@
+# ====== ANXIE STORE — HOSTINGER ======
+# Hostinger publica en public_html todo lo que hay en el repo. Los archivos
+# internos ya salieron de git, pero los despliegues viejos pueden haberlos
+# dejado ahí: estas reglas los esconden aunque sigan en el servidor.
+
+# 🚫 Archivos internos por extensión (documentación, config, textos, scripts)
+<FilesMatch "\.(md|toml|txt|log|bak|py|sh|ps1|env)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+</FilesMatch>
+
+# 🚫 Carpetas internas: responden 404, como si no existieran
+<IfModule mod_alias.c>
+  RedirectMatch 404 ^/(worker|EJEMPLOS|maquetas-s2|_privado|_respaldo[^/]*|_scripts|venv|\.vscode|\.claude|\.wrangler|\.git)(/|$)
+</IfModule>
+
+# 🛡️ Cabeceras de seguridad
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+</IfModule>
