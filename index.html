@@ -16,10 +16,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- CSS y visor de Spline -->
+    <!-- CSS (el visor de Spline ya no va aquí: lo pide un script al final
+         de la página cuando la mascota de la sección 3 se acerca) -->
     <link rel="stylesheet" href="style.css?v=20260922t">
-    <script type="module" src="https://cdn.spline.design/@splinetool/viewer@2.0.55/build/spline-viewer.js"></script>
-    
+
     <!-- CDN de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -119,8 +119,9 @@
 
     <!--
         🟢 VENTANA DE BIENVENIDA (solo en esta página).
-        Sale en CADA visita: no se guarda en ningún lado que ya se cerró, así
-        lo pidió el dueño. Es un <dialog> nativo abierto con showModal(), así
+        Sale UNA sola vez por navegador: al abrirse se anota en localStorage
+        (anxie_bienvenida_v1) y ya no vuelve (el dueño lo pidió así el
+        22/09/2026; antes salía en cada visita). Es un <dialog> nativo abierto con showModal(), así
         que va en la capa superior (por encima de la píldora, sin pelear
         z-index) y el resto de la página queda inerte mientras está abierta.
         Estilos en el bloque VENTANA DE BIENVENIDA de style.css; el JS, al
@@ -1321,11 +1322,51 @@
             }
         }
 
-        ocultarLogosSpline();
-        if (document.readyState === 'loading') {
-            window.addEventListener('DOMContentLoaded', ocultarLogosSpline);
+        // El visor llega tarde (ver VISOR DE SPLINE BAJO DEMANDA, abajo): se
+        // limpia en cuanto el navegador conoce <spline-viewer>, antes de pintarlo.
+        customElements.whenDefined('spline-viewer').then(ocultarLogosSpline);
+
+    </script>
+
+    <!-- ==========================================================
+         🧊 VISOR DE SPLINE BAJO DEMANDA
+         El visor (spline-viewer.js, ~1 MB comprimido) solo lo usa la mascota
+         de la sección 3, que está a 5-6 pantallas del inicio. Hasta el
+         22/09/2026 se bajaba en el <head> y competía con el hero; ahora se
+         pide cuando a la mascota le faltan 3 pantallas para aparecer, lo que
+         en PC y en celular deja unas 3 pantallas de portal para que llegue.
+
+         Viene de jsdelivr: es el mismo archivo que cdn.spline.design (byte a
+         byte), pero jsdelivr lo deja en caché un año y Spline no. Es la misma
+         URL que usa catalogo.html, así que se baja una sola vez para las dos
+         páginas: si cambias la versión aquí, cámbiala también allá.
+         ========================================================== -->
+    <script>
+    (function () {
+        const VISOR_SPLINE = 'https://cdn.jsdelivr.net/npm/@splinetool/viewer@2.0.55/build/spline-viewer.js';
+        const mascota = document.querySelector('.s3-mascota');
+        if (!mascota) return;
+
+        function cargarVisor() {
+            const script = document.createElement('script');
+            script.type = 'module';
+            script.src = VISOR_SPLINE;
+            document.head.appendChild(script);
         }
 
+        // Sin IntersectionObserver (navegadores muy viejos) se pide de una vez.
+        if (!('IntersectionObserver' in window)) {
+            cargarVisor();
+            return;
+        }
+
+        const vigia = new IntersectionObserver((entradas) => {
+            if (!entradas.some((e) => e.isIntersecting)) return;
+            vigia.disconnect();
+            cargarVisor();
+        }, { rootMargin: '0px 0px 300% 0px' });
+        vigia.observe(mascota);
+    })();
     </script>
 
     <!-- 🟢 Comportamiento del menú píldora (abrir/cerrar, roll del hover).
@@ -1887,17 +1928,27 @@ void main() {
 
     <!-- ==========================================================
          🟢 VENTANA DE BIENVENIDA
-         Se abre en cada visita, un momento después de cargar para que la
-         ola de entrada del hero se alcance a ver. Cierra con la X, con el
-         botón de Discord (que abre el Discord en otra pestaña), con Esc o
-         con un click fuera de la tarjeta. El HTML va arriba, justo después
-         del menú.
+         Se abre en la primera visita, un momento después de cargar para que
+         la ola de entrada del hero se alcance a ver, y ya no vuelve en ese
+         navegador. Cierra con la X, con el botón de Discord (que abre el
+         Discord en otra pestaña), con Esc o con un click fuera de la
+         tarjeta. El HTML va arriba, justo después del menú.
+
+         Lo de "ya se vio" vive en localStorage. Para que vuelva a salir a
+         todo el mundo (otra promo, otro texto), sube el número de la llave:
+         anxie_bienvenida_v1 → _v2. Si el navegador bloquea localStorage
+         (algunos modos privados), sale en cada visita, como antes.
          ========================================================== -->
     <script>
     (function () {
         const ventana = document.getElementById('bienvenida');
         // Sin <dialog> (navegadores de antes de 2022) no se abre y ya.
         if (!ventana || typeof ventana.showModal !== 'function') return;
+
+        const LLAVE_VISTA = 'anxie_bienvenida_v1';
+        try {
+            if (localStorage.getItem(LLAVE_VISTA)) return;
+        } catch (e) {}
 
         const raiz = document.documentElement;
         const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -1914,6 +1965,8 @@ void main() {
             // El foco a la ventana y no a su primer botón (ver el comentario
             // del HTML). Chrome no hace caso del autofocus en el propio <dialog>.
             ventana.focus();
+            // Ya se vio: en la próxima visita no sale.
+            try { localStorage.setItem(LLAVE_VISTA, '1'); } catch (e) {}
         }
 
         // 🎬 Cierra con su animación de salida; con movimiento reducido, en seco.
