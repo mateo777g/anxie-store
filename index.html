@@ -753,7 +753,8 @@
         // En escritorio se pintan las dos; en celular el CSS esconde la segunda
         // (.cuenta-card-segunda) porque dentro del pin del portal no hay alto
         // para ambas. Aquí siempre se piden las dos: es la misma petición, el
-        // límite sube de 1 a 2 y no cuesta una query extra.
+        // límite sube de 1 a 2 y no cuesta una query extra. Lo que en celular
+        // NO se pide es la foto de la segunda (ver unaSolaCuenta, abajo).
         //
         // forceRefresh=true salta el caché -- lo usa la suscripción Realtime para
         // que un cambio en Supabase se refleje al instante en vez de esperar a que
@@ -814,6 +815,21 @@
             if (palabra) palabra.textContent = total === 1 ? 'Cuenta' : 'Cuentas';
         }
 
+        // 📱 En celular la segunda tarjeta no se ve (el CSS la esconde hasta
+        // 900px), pero un <img> escondido con display: none se descarga igual:
+        // ~300 KB por visita que nadie veía. Ahí su foto se guarda en
+        // data-src y solo se pide si la ventana crece a PC. Mismo corte que el
+        // @media que la esconde.
+        const unaSolaCuenta = window.matchMedia('(max-width: 900px)');
+
+        unaSolaCuenta.addEventListener('change', () => {
+            const img = document.getElementById('dest2Img');
+            if (!unaSolaCuenta.matches && img && img.dataset.src) {
+                img.src = img.dataset.src;
+                delete img.dataset.src;
+            }
+        });
+
         // Rellena UNA tarjeta. Los ids de la segunda llevan el prefijo "dest2".
         function pintarTarjetaDestacada(prefijo, cuenta) {
             const titulo = document.getElementById(prefijo + 'Titulo');
@@ -832,8 +848,13 @@
             if (plataformas) plataformas.innerHTML = renderPlataformasHTML(cuenta.disponibilidad);
 
             if (img && cuenta.image_url) {
-                img.src = cuenta.image_url;
                 img.alt = cuenta.titulo || 'Cuenta destacada de Anxie Store';
+                if (prefijo === 'dest2' && unaSolaCuenta.matches) {
+                    img.dataset.src = cuenta.image_url;
+                } else {
+                    img.src = cuenta.image_url;
+                    delete img.dataset.src;
+                }
             }
         }
 
