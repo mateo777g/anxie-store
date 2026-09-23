@@ -18,7 +18,7 @@
 
     <!-- CSS (el visor de Spline ya no va aquí: lo pide un script al final
          de la página cuando la mascota de la sección 3 se acerca) -->
-    <link rel="stylesheet" href="style.css?v=20260922t">
+    <link rel="stylesheet" href="style.css?v=20260923a">
 
     <!-- CDN de Supabase (versión fija: no cambia sola y jsdelivr la guarda un año) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0"></script>
@@ -1232,6 +1232,67 @@
             });
         }
 
+        // 🌫️ LA NIEBLA DE LA MARCA SOLO SE MUEVE CON EL HERO A LA VISTA
+        // Pone .hero--fuera cuando el hero sale de la pantalla (el CSS pausa
+        // ahí la animación; ver .hero--fuera en style.css).
+        (function () {
+            const hero = document.querySelector('.hero');
+            if (!hero || !('IntersectionObserver' in window)) return;
+            new IntersectionObserver((entradas) => {
+                hero.classList.toggle('hero--fuera', !entradas[0].isIntersecting);
+            }).observe(hero);
+        })();
+
+        // 🌾 EL GRANO DE LAS LETRAS, PINTADO UNA SOLA VEZ
+        // --humo-grano (style.css) es un SVG con un filtro de ruido. Como va en
+        // el mismo fondo que la niebla que se mueve, el navegador volvía a
+        // calcular ese ruido en cada fotograma, y era lo más caro de la
+        // animación (medido el 23 de septiembre de 2026). Aquí se dibuja el
+        // mismo SVG una vez en un canvas, a la densidad de la pantalla, y la
+        // variable pasa a apuntar a esa imagen: se ve igual (1 nivel de 255 de
+        // diferencia como mucho) y ya no se recalcula nada. El 160 es el
+        // tamaño del mosaico en el CSS (background-size: 160px 160px).
+        // Si algo falla, se queda el SVG de siempre. Se rehace si cambia la
+        // densidad (zoom del navegador, otra pantalla).
+        (function () {
+            const raiz = document.documentElement;
+            const fuente = getComputedStyle(raiz).getPropertyValue('--humo-grano').trim()
+                .match(/^url\(\s*(["']?)(.*)\1\s*\)$/);
+            if (!fuente || !window.URL || !URL.createObjectURL) return;
+
+            let dprHecho = 0;
+            let urlGrano = '';
+
+            function pintarGrano() {
+                const dpr = window.devicePixelRatio || 1;
+                if (dpr === dprHecho) return;
+                dprHecho = dpr;
+
+                const img = new Image();
+                img.onload = () => {
+                    try {
+                        const lado = Math.round(160 * dpr);
+                        const lienzo = document.createElement('canvas');
+                        lienzo.width = lado;
+                        lienzo.height = lado;
+                        lienzo.getContext('2d').drawImage(img, 0, 0, lado, lado);
+                        lienzo.toBlob((blob) => {
+                            // Si la densidad cambió mientras tanto, ya viene otro.
+                            if (!blob || dpr !== dprHecho) return;
+                            const anterior = urlGrano;
+                            urlGrano = URL.createObjectURL(blob);
+                            raiz.style.setProperty('--humo-grano', `url(${urlGrano})`);
+                            if (anterior) URL.revokeObjectURL(anterior);
+                        }, 'image/png');
+                    } catch (e) {}
+                };
+                img.src = fuente[2];
+            }
+
+            pintarGrano();
+            window.addEventListener('resize', pintarGrano, { passive: true });
+        })();
+
         // 🎮 LÓGICA DE ANIMACIONES Y SCROLL
         window.addEventListener('scroll', () => {
             actualizarCorona();
@@ -1709,65 +1770,95 @@ void main() {
             }
             if (!gl) { esconder(); return null; }
 
-            function compilar(tipo, fuente) {
+            // ⏳ COMPILAR SIN CONGELAR LA PÁGINA (23 de septiembre de 2026)
+            // Compilar este shader es caro: en Windows el navegador lo traduce a
+            // Direct3D y desenrolla sus bucles, y en una PC con RTX 4060 tardaba
+            // 1.1 s. Antes se preguntaba COMPILE_STATUS y LINK_STATUS justo
+            // después de compilar, y esa pregunta obliga a esperar: la página
+            // entera (la ola de entrada, la píldora, el scroll) se quedaba
+            // congelada ese rato, en PC y en celular, porque hasta el proceso de
+            // la GPU se quedaba parado.
+            // Con KHR_parallel_shader_compile el navegador compila en otro hilo
+            // y aquí se pregunta de vez en cuando por COMPLETION_STATUS_KHR, que
+            // no espera (ver arrancar(), más abajo). Cuando dice que ya está, se
+            // sigue igual que siempre. El portal queda varias pantallas más
+            // abajo, así que para cuando el visitante llega el humo ya está
+            // listo. Chrome y el motor de Safari la tienen (comprobado en Chrome
+            // 153 y WebKit 26 el 23/09/2026). Sin la extensión se hace como
+            // antes (esperando), que es lo único que se puede.
+            // Los estados de compilación de cada shader solo se leen si el
+            // enlace falla: leerlos antes también obliga a esperar.
+            function crearShader(tipo, fuente) {
                 const s = gl.createShader(tipo);
                 gl.shaderSource(s, fuente);
                 gl.compileShader(s);
-                if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-                    console.warn(nombre + ':', gl.getShaderInfoLog(s));
-                    return null;
-                }
                 return s;
             }
 
-            const vs = compilar(gl.VERTEX_SHADER, VERT);
-            const fs = compilar(gl.FRAGMENT_SHADER, FRAG);
-            if (!vs || !fs) { esconder(); return null; }
-
+            const vs = crearShader(gl.VERTEX_SHADER, VERT);
+            const fs = crearShader(gl.FRAGMENT_SHADER, FRAG);
             const programa = gl.createProgram();
             gl.attachShader(programa, vs);
             gl.attachShader(programa, fs);
             gl.linkProgram(programa);
-            gl.deleteShader(vs);
-            gl.deleteShader(fs);
-            if (!gl.getProgramParameter(programa, gl.LINK_STATUS)) {
-                console.warn(nombre + ':', gl.getProgramInfoLog(programa));
-                esconder();
-                return null;
+
+            const paralelo = gl.getExtension('KHR_parallel_shader_compile');
+
+            // Los uniforms se llenan en armarPrograma(), con el programa ya
+            // enlazado; hasta entonces listo vale false y nadie dibuja.
+            let uni = null;
+            let listo = false;
+
+            // Lo que antes corría justo después de linkProgram. Devuelve false
+            // si el shader no compiló (y entonces ya escondió el canvas).
+            function armarPrograma() {
+                if (!gl.getProgramParameter(programa, gl.LINK_STATUS)) {
+                    [vs, fs].forEach(function (s) {
+                        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+                            console.warn(nombre + ':', gl.getShaderInfoLog(s));
+                        }
+                    });
+                    console.warn(nombre + ':', gl.getProgramInfoLog(programa));
+                    esconder();
+                    return false;
+                }
+                gl.deleteShader(vs);
+                gl.deleteShader(fs);
+                gl.useProgram(programa);
+
+                // Un solo triángulo que se sale de la pantalla: cubre todo el viewport
+                // con 3 vértices en vez de los 6 que costarían dos triángulos.
+                const buffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+                const posicion = gl.getAttribLocation(programa, 'a_position');
+                gl.enableVertexAttribArray(posicion);
+                gl.vertexAttribPointer(posicion, 2, gl.FLOAT, false, 0, 0);
+
+                uni = {
+                    colors:    gl.getUniformLocation(programa, 'u_colors'),
+                    scene:     gl.getUniformLocation(programa, 'u_scene'),
+                    shape:     gl.getUniformLocation(programa, 'u_shape'),
+                    surface:   gl.getUniformLocation(programa, 'u_surface'),
+                    finish:    gl.getUniformLocation(programa, 'u_finish'),
+                    transform: gl.getUniformLocation(programa, 'u_transform'),
+                    space:     gl.getUniformLocation(programa, 'u_space'),
+                    marco:     gl.getUniformLocation(programa, 'u_marco')
+                };
+
+                // Nada de esto cambia nunca: se sube una sola vez, no cada fotograma.
+                const planos = [];
+                for (let i = 0; i < COLORES.length; i++) {
+                    planos.push(COLORES[i][0], COLORES[i][1], COLORES[i][2]);
+                }
+                gl.uniform3fv(uni.colors, new Float32Array(planos));
+                gl.uniform4f(uni.shape, U.scale, U.intensity, U.paramA, U.warp);
+                gl.uniform4f(uni.surface, U.detail, U.contrast, U.brightness, U.saturation);
+                gl.uniform4f(uni.finish, U.hue, U.vignette, U.blur, U.grain);
+                gl.uniform4f(uni.transform, U.seed, U.rotate, U.drift, U.oklab);
+                gl.uniform4f(uni.space, U.offsetX, U.offsetY, 0, 0);
+                return true;
             }
-            gl.useProgram(programa);
-
-            // Un solo triángulo que se sale de la pantalla: cubre todo el viewport
-            // con 3 vértices en vez de los 6 que costarían dos triángulos.
-            const buffer = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-            const posicion = gl.getAttribLocation(programa, 'a_position');
-            gl.enableVertexAttribArray(posicion);
-            gl.vertexAttribPointer(posicion, 2, gl.FLOAT, false, 0, 0);
-
-            const uni = {
-                colors:    gl.getUniformLocation(programa, 'u_colors'),
-                scene:     gl.getUniformLocation(programa, 'u_scene'),
-                shape:     gl.getUniformLocation(programa, 'u_shape'),
-                surface:   gl.getUniformLocation(programa, 'u_surface'),
-                finish:    gl.getUniformLocation(programa, 'u_finish'),
-                transform: gl.getUniformLocation(programa, 'u_transform'),
-                space:     gl.getUniformLocation(programa, 'u_space'),
-                marco:     gl.getUniformLocation(programa, 'u_marco')
-            };
-
-            // Nada de esto cambia nunca: se sube una sola vez, no cada fotograma.
-            const planos = [];
-            for (let i = 0; i < COLORES.length; i++) {
-                planos.push(COLORES[i][0], COLORES[i][1], COLORES[i][2]);
-            }
-            gl.uniform3fv(uni.colors, new Float32Array(planos));
-            gl.uniform4f(uni.shape, U.scale, U.intensity, U.paramA, U.warp);
-            gl.uniform4f(uni.surface, U.detail, U.contrast, U.brightness, U.saturation);
-            gl.uniform4f(uni.finish, U.hue, U.vignette, U.blur, U.grain);
-            gl.uniform4f(uni.transform, U.seed, U.rotate, U.drift, U.oklab);
-            gl.uniform4f(uni.space, U.offsetX, U.offsetY, 0, 0);
 
             let raf = 0;
             let vivo = true;
@@ -1832,7 +1923,7 @@ void main() {
             }
 
             function pedirFotograma() {
-                if (vivo && enPantalla && pestaniaVisible && !tapado && raf === 0) {
+                if (listo && vivo && enPantalla && pestaniaVisible && !tapado && raf === 0) {
                     raf = requestAnimationFrame(dibujar);
                 }
             }
@@ -1841,32 +1932,43 @@ void main() {
                 if (raf !== 0) { cancelAnimationFrame(raf); raf = 0; }
             }
 
-            function dibujar(ahora) {
-                raf = 0;
-                if (!vivo || !enPantalla || !pestaniaVisible || tapado) return;
+            function pintar(ahora) {
                 ajustarTamanio();
                 gl.uniform4f(uni.scene, canvas.width, canvas.height,
                              ((ahora - arranque) / 1000) * U.timeScale, U.colorCount);
                 gl.drawArrays(gl.TRIANGLES, 0, 3);
+            }
+
+            function dibujar(ahora) {
+                raf = 0;
+                if (!vivo || !enPantalla || !pestaniaVisible || tapado) return;
+                pintar(ahora);
                 pedirFotograma();
             }
 
             function remedir() {
                 if (!vivo) return;
                 marcoSucio = true;
+                if (!listo) return;
                 ajustarTamanio();
                 pedirFotograma();
             }
 
             // Fuera de pantalla no se dibuja. El portal mide varias pantallas de
             // alto, así que la mayor parte de la visita el shader no se ve y no
-            // tiene por qué estar quemando GPU. Lo mismo la marca del hero en
-            // cuanto bajas.
+            // tiene por qué estar quemando GPU.
+            // El rootMargin de -1px abajo no es decorativo (23 de septiembre de
+            // 2026): el hero mide justo una pantalla, así que en el inicio el
+            // canvas queda pegado al borde de abajo, y para IntersectionObserver
+            // tocar el borde ya cuenta como estar en pantalla. El humo se estaba
+            // dibujando a pantalla completa, sin que nadie lo viera, todo el rato
+            // que el visitante pasaba en el hero. Con el margen, empieza en
+            // cuanto asoma el primer píxel del portal.
             if (window.IntersectionObserver) {
                 new IntersectionObserver(function (entradas) {
                     enPantalla = entradas[0] ? entradas[0].isIntersecting : true;
                     if (enPantalla) pedirFotograma(); else pararFotograma();
-                }).observe(canvas);
+                }, { rootMargin: '0px 0px -1px 0px' }).observe(canvas);
             }
 
             document.addEventListener('visibilitychange', function () {
@@ -1894,8 +1996,33 @@ void main() {
                 esconder();
             });
 
-            ajustarTamanio();
-            pedirFotograma();
+            // Con el programa listo se pinta UN fotograma aunque el portal no
+            // esté a la vista, como se hizo siempre al cargar: así el driver
+            // termina de preparar el shader ahora y no en el primer fotograma
+            // del portal, que es cuando se notaría. Después, el bucle de siempre.
+            function arrancar() {
+                if (!vivo) return;
+                if (!armarPrograma()) { vivo = false; return; }
+                listo = true;
+                if (pestaniaVisible) pintar(performance.now());
+                pedirFotograma();
+            }
+
+            // Se pregunta cada 250 ms y no en cada fotograma: la pregunta viaja
+            // al proceso de la GPU y espera turno detrás de lo que esté
+            // pintando, y durante la ola de entrada eso llegaba a 150 ms por
+            // pregunta (medido con la CPU 4× más lenta). La primera va al
+            // segundo, con la ola ya terminada.
+            if (paralelo) {
+                const esperarCompilacion = function () {
+                    if (!vivo) return;
+                    if (gl.getProgramParameter(programa, paralelo.COMPLETION_STATUS_KHR)) arrancar();
+                    else setTimeout(esperarCompilacion, 250);
+                };
+                setTimeout(esperarCompilacion, 1000);
+            } else {
+                arrancar();
+            }
 
             return {
                 remedir: remedir,

@@ -902,7 +902,14 @@ body {
    shader (grain: 0.063 en crearHumo()), y sin él las letras se veían
    planas al lado. Es un mosaico de 160px de ruido fractal en SVG, gris que
    se aclara y oscurece alrededor del medio, al 10% de opacidad. Va quieto:
-   el primer valor de cada paso de marca-niebla es el suyo y no cambia. */
+   el primer valor de cada paso de marca-niebla es el suyo y no cambia.
+   En index.html un script lo dibuja UNA vez en un canvas, a la densidad de
+   la pantalla, y cambia esta variable por esa imagen (23 de septiembre de
+   2026): como SVG con filtro, el navegador recalculaba el ruido en cada
+   fotograma de la niebla, y eso era lo más caro de toda la animación. La
+   imagen sale igual (máximo 1 nivel de 255 de diferencia, medido en Chrome y
+   WebKit a 1x, 2x, 2.625x y 3x). Este SVG sigue siendo el original: si lo
+   cambias, el script copia el nuevo solo. */
 :root {
     --humo-grano: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.3' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix values='2.5 0 0 0 -0.75 2.5 0 0 0 -0.75 2.5 0 0 0 -0.75 0 0 0 0 0.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
 }
@@ -929,6 +936,19 @@ body {
     0%   { background-position: 0 0, 0 -0.6em, 1.5em -1.2em, center; }
     50%  { background-position: 0 0, 1.4em -0.9em, 0.2em -0.7em, center; }
     100% { background-position: 0 0, 2.6em -0.4em, -1.3em -1.1em, center; }
+}
+
+/* Con el hero fuera de la vista la niebla se para (23 de septiembre de 2026).
+   Mover el fondo obliga a repintar las letras en cada fotograma, y Chrome lo
+   seguía haciendo con el hero ya arriba, fuera de pantalla, mientras el
+   visitante bajaba por el portal: trabajo que no ve nadie, peleándole el
+   fotograma a la corona y al humo. La clase la pone el JS de index.html
+   (un IntersectionObserver sobre el .hero). Al volver sigue desde donde se
+   quedó, que es lo mismo que no haberse parado. Vale también para el
+   "11 Cuentas" de celular, que lleva la misma niebla. */
+.hero.hero--fuera .hero-wordmark span,
+.hero.hero--fuera .hero-conteo .hero-dato-valor {
+    animation-play-state: paused;
 }
 
 @media (prefers-reduced-motion: reduce) {
