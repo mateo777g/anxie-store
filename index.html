@@ -18,7 +18,7 @@
 
     <!-- CSS (el visor de Spline ya no va aquí: lo pide un script al final
          de la página cuando la mascota de la sección 3 se acerca) -->
-    <link rel="stylesheet" href="style.css?v=20260923d">
+    <link rel="stylesheet" href="style.css?v=20260923e">
 
     <!-- CDN de Supabase (versión fija: no cambia sola y jsdelivr la guarda un año) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0"></script>
@@ -47,9 +47,9 @@
         🟢 MENÚ PÍLDORA (reemplazó a la navbar vieja).
         Píldora fija arriba al centro, a 20px, igual en toda la página: el
         hero ya no la baja a un hueco dentro de la tarjeta. Cerrada muestra
-        "Menú" + hamburguesa; al abrirse se estira y un círculo baja desde
-        arriba pintando el panel. En celular se convierte en un panel lateral
-        de alto completo, anclado a la derecha.
+        "Menú" + hamburguesa; en PC, al abrirse se estira y un círculo baja
+        desde arriba pintando el panel. Hasta 900px abre en cambio el panel
+        lateral de abajo (el mismo del catálogo).
 
         El color lo cambia el JS según la sección que tenga debajo
         (data-theme = claro | verde). Arranca en "claro" porque el hero es
@@ -110,12 +110,47 @@
     </nav>
 
     <!--
-        Velo del panel lateral. SOLO existe en celular (en escritorio el CSS lo
-        deja en display: none y no pinta nada).
-        Va a propósito FUERA de .menu: así el click sobre él cae en el listener
-        de "click afuera" que ya cierra el menú, sin código nuevo.
+        🚪 PANEL LATERAL (hasta 900px): el MISMO del catálogo, saliendo por la
+        derecha. La píldora de arriba es su botón (menu.js lo abre en vez de
+        estirarla) y le pasa su color al abrir (data-theme: negro sobre
+        fondos claros, blanco sobre el negro). Estilos en el bloque PANEL
+        LATERAL de style.css, compartidos con catalogo.html. En PC no se abre.
     -->
-    <div class="menu-scrim" aria-hidden="true"></div>
+    <div class="sidebar-overlay" aria-hidden="true"></div>
+    <aside class="sidebar-catalog sidebar-catalog--derecha" id="menu-panel" data-theme="claro" aria-label="Menú" inert>
+        <div class="sidebar-bar">
+            <span class="sidebar-etiqueta">Menú</span>
+            <button type="button" class="sidebar-close-btn" aria-label="Cerrar menú">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+                    <path d="M6 6 18 18" />
+                    <path d="M18 6 6 18" />
+                </svg>
+            </button>
+        </div>
+
+        <ul class="sidebar-links">
+            <li style="--i: 0;"><a href="#home">
+                <svg class="sidebar-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 10a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <path d="M15 21v-8H9v8" />
+                </svg>
+                <span>Inicio</span>
+            </a></li>
+            <li style="--i: 1;"><a href="catalogo.html#cases">
+                <svg class="sidebar-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M4 8h16l-1.2 11a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8z" />
+                    <path d="M9 11V7a3 3 0 0 1 6 0v4" />
+                </svg>
+                <span>Catálogo</span>
+            </a></li>
+            <li style="--i: 2;"><a href="#features">
+                <svg class="sidebar-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z" />
+                </svg>
+                <span>Contacto</span>
+            </a></li>
+        </ul>
+    </aside>
 
     <!--
         🟢 VENTANA DE BIENVENIDA (solo en esta página).
@@ -1530,7 +1565,7 @@
 
     <!-- 🟢 Comportamiento del menú píldora (abrir/cerrar, roll del hover).
          Va al final para que el marcado ya exista cuando corre. -->
-    <script src="menu.js?v=20260922a"></script>
+    <script src="menu.js?v=20260923a"></script>
 
     <!-- ==========================================================
          🌫️ FONDO DEL PORTAL: SHADER DE HUMO ("Smoke Ring")

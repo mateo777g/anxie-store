@@ -1,16 +1,18 @@
 /* =========================================================================
    🟢 MENÚ PÍLDORA — comportamiento
    =========================================================================
-   Tres cosas: abrir/cerrar la píldora, el roll de letras del hover, y dejar
-   que la página le diga de qué color va (data-theme).
+   Cuatro cosas: abrir/cerrar la píldora (PC), abrir/cerrar el panel lateral
+   (hasta 900px), el roll de letras del hover, y dejar que la página le diga
+   de qué color va (data-theme).
 
    Va en archivo aparte y no inline como el resto de los scripts del proyecto
    porque el menú es chrome compartido: index.html y legal.html montan el mismo
    marcado, y tener la lógica duplicada en los dos archivos es justo el
    problema que ya arrastran limpiarSplineViewer() y ocultarLogosSpline().
 
-   Los estilos viven en el bloque MENÚ PÍLDORA de style.css. Este archivo solo
-   pone/quita .is-open, el alto abierto, y el data-theme que le pidan.
+   Los estilos viven en los bloques MENÚ PÍLDORA y PANEL LATERAL de style.css.
+   Este archivo solo pone/quita .is-open, el alto abierto, el .active del panel
+   y su velo, y el data-theme que le pidan.
    ========================================================================= */
 (() => {
     const menuRoot = document.querySelector('.menu');
@@ -85,24 +87,47 @@
         caja.appendChild(rollo);
     }
 
-    // 📱 En celular el menú no es la píldora que se estira, sino un panel lateral
-    // de alto completo: ahí el alto lo pone el CSS y medirlo a mano lo rompería.
-    // Mismo breakpoint que el @media del CSS.
-    const esPanel = window.matchMedia('(max-width: 640px)');
+    // 📱 Hasta 900px la píldora no se estira: abre el panel lateral, el mismo
+    // del catálogo (<aside class="sidebar-catalog--derecha">, hermano de .menu).
+    // Mismo corte que el del catálogo y que el resto del sitio.
+    const esPanel = window.matchMedia('(max-width: 900px)');
+    const panel = document.querySelector('.sidebar-catalog--derecha');
+    const velo = document.querySelector('.sidebar-overlay');
+    const panelCerrar = panel?.querySelector('.sidebar-close-btn');
 
+    // 🖥️ PC: la píldora se estira en su sitio.
     function abrirMenu(abierto) {
         menuRoot.classList.toggle('is-open', abierto);
         menuBar.setAttribute('aria-expanded', String(abierto));
         // Cerrado, los links no deben ser enfocables con Tab.
         menuList.inert = !abierto;
         // Alto medido en vez de fijo: si algún día se agrega o quita un link, la
-        // animación sigue cerrando justo. En el panel lateral, no: se deja vacío
-        // para que mande el height: 100% del CSS.
-        menuShell.style.height = abierto && !esPanel.matches
+        // animación sigue cerrando justo.
+        menuShell.style.height = abierto
             ? `${menuBar.offsetHeight + menuList.offsetHeight}px`
             : '';
-        // Enciende el velo y frena el scroll de la página detrás del panel.
-        document.body.classList.toggle('menu-abierto', abierto && esPanel.matches);
+    }
+
+    const panelAbierto = () => Boolean(panel?.classList.contains('active'));
+
+    // 🚪 Celular y tablet: el panel lateral. Toma el color de la píldora en el
+    // momento de abrir; mientras está abierto la página no scrollea, así que la
+    // sección de atrás (y con ella el tema) no cambia. Solo se copia al abrir y
+    // no en cada setTema() para que no cambie de color mientras sale.
+    function abrirPanel(abierto) {
+        if (!panel) return;
+        if (abierto) panel.dataset.theme = menuRoot.dataset.theme || 'claro';
+        // Si el foco estaba dentro (la X, un link, Escape), vuelve a la píldora.
+        const focoDentro = panel.contains(document.activeElement);
+
+        panel.classList.toggle('active', abierto);
+        velo?.classList.toggle('active', abierto);
+        panel.inert = !abierto;
+        menuBar.setAttribute('aria-expanded', String(abierto));
+        document.body.classList.toggle('menu-abierto', abierto);
+
+        if (abierto) panelCerrar?.focus({ preventScroll: true });
+        else if (focoDentro) menuBar.focus({ preventScroll: true });
     }
 
     menuItems.forEach((link, i) => {
@@ -139,9 +164,20 @@
     });
 
     menuBar.addEventListener('click', () => {
-        abrirMenu(!menuRoot.classList.contains('is-open'));
+        if (esPanel.matches && panel) abrirPanel(!panelAbierto());
+        else abrirMenu(!menuRoot.classList.contains('is-open'));
     });
 
+    // Se cierra con la X, tocando el velo o tocando un link (como el catálogo).
+    panelCerrar?.addEventListener('click', () => abrirPanel(false));
+    velo?.addEventListener('click', () => abrirPanel(false));
+    panel?.querySelectorAll('.sidebar-links a').forEach((link) => {
+        link.addEventListener('click', () => abrirPanel(false));
+    });
+
+    // "Click afuera" de la píldora estirada (solo PC). El panel lateral vive
+    // FUERA de .menu, pero nunca llega aquí abierto: en modo panel .menu no
+    // lleva .is-open, y su propio cierre va por la X, el velo y los links.
     document.addEventListener('mousedown', (e) => {
         if (menuRoot.classList.contains('is-open') && !menuRoot.contains(e.target)) {
             abrirMenu(false);
@@ -149,18 +185,32 @@
     });
 
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && menuRoot.classList.contains('is-open')) {
+        if (e.key !== 'Escape') return;
+        if (panelAbierto()) {
+            abrirPanel(false);
+            menuBar.focus({ preventScroll: true });
+        } else if (menuRoot.classList.contains('is-open')) {
             abrirMenu(false);
             menuBar.focus();
         }
     });
 
-    // Al cruzar el breakpoint el menú cambia de forma (píldora <-> panel):
-    // abierto quedaría a medio camino, con el alto inline de la otra versión.
-    // Se cierra y listo.
-    esPanel.addEventListener('change', () => abrirMenu(false));
+    // La píldora controla la lista de links en PC y el panel en celular.
+    function sincronizarModo() {
+        if (panel) menuBar.setAttribute('aria-controls', esPanel.matches ? panel.id : menuList.id);
+    }
+
+    // Al cruzar los 900px el menú cambia de forma (píldora <-> panel): abierto
+    // quedaría a medio camino. Se cierra y listo.
+    esPanel.addEventListener('change', () => {
+        abrirMenu(false);
+        abrirPanel(false);
+        sincronizarModo();
+    });
 
     abrirMenu(false);
+    abrirPanel(false);
+    sincronizarModo();
 
     // 🎨 Puerta para que la página diga de qué color va la píldora. index.html la
     // llama desde su bucle de scroll; legal.html, desde el script de su footer

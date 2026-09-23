@@ -20,7 +20,7 @@
          así que carga solo lo indispensable (instantáneo). catalogo.css
          tampoco hace falta: el chrome de aquí es el menú píldora de
          index.html, que style.css ya resuelve por completo. -->
-    <link rel="stylesheet" href="style.css?v=20260923d">
+    <link rel="stylesheet" href="style.css?v=20260923e">
     <link rel="stylesheet" href="legal.css?v=20260922c">
 </head>
 <body>
@@ -95,9 +95,48 @@
         </div>
     </nav>
 
-    <!-- Velo del panel lateral. SOLO existe en celular. Va FUERA de .menu para
-         que el click sobre él lo recoja el listener de "click afuera". -->
-    <div class="menu-scrim" aria-hidden="true"></div>
+    <!--
+        🚪 PANEL LATERAL (hasta 900px): el MISMO del catálogo, saliendo por la
+        derecha. La píldora de arriba es su botón (menu.js lo abre en vez de
+        estirarla) y le pasa su color al abrir (data-theme: negro sobre
+        fondos claros, blanco sobre el negro). Estilos en el bloque PANEL
+        LATERAL de style.css, compartidos con catalogo.html. En PC no se abre.
+    -->
+    <div class="sidebar-overlay" aria-hidden="true"></div>
+    <aside class="sidebar-catalog sidebar-catalog--derecha" id="menu-panel" data-theme="claro" aria-label="Menú" inert>
+        <div class="sidebar-bar">
+            <span class="sidebar-etiqueta">Menú</span>
+            <button type="button" class="sidebar-close-btn" aria-label="Cerrar menú">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+                    <path d="M6 6 18 18" />
+                    <path d="M18 6 6 18" />
+                </svg>
+            </button>
+        </div>
+
+        <ul class="sidebar-links">
+            <li style="--i: 0;"><a href="index.html#home">
+                <svg class="sidebar-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 10a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <path d="M15 21v-8H9v8" />
+                </svg>
+                <span>Inicio</span>
+            </a></li>
+            <li style="--i: 1;"><a href="catalogo.html#cases">
+                <svg class="sidebar-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M4 8h16l-1.2 11a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8z" />
+                    <path d="M9 11V7a3 3 0 0 1 6 0v4" />
+                </svg>
+                <span>Catálogo</span>
+            </a></li>
+            <li style="--i: 2;"><a href="index.html#features">
+                <svg class="sidebar-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z" />
+                </svg>
+                <span>Contacto</span>
+            </a></li>
+        </ul>
+    </aside>
 
     <!-- 📄 CONTENIDO LEGAL 📄
          Texto calcado del documento legal final del dueño (21 sep 2026).
@@ -780,7 +819,7 @@
 
     <!-- 🟢 Comportamiento del menú píldora (abrir/cerrar, roll del hover).
          El mismo archivo que usa index.html. -->
-    <script src="menu.js?v=20260922a"></script>
+    <script src="menu.js?v=20260923a"></script>
 
 </body>
 </html>
