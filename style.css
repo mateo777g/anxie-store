@@ -1503,7 +1503,7 @@ body.menu-abierto {
     height: 100%;
     pointer-events: none;
     /* Negro mientras el shader no ha dibujado: el humo se enciende al terminar
-       la ola de entrada (24 septiembre 2026), y antes de tener contexto WebGL
+       la ola de entrada (23 septiembre 2026), y antes de tener contexto WebGL
        el canvas es transparente y asomaría el verde de .corona-lienzo. Negro
        es lo que se veía siempre mientras el shader compilaba. Sin WebGL el
        canvas se esconde y queda el verde, como antes. */

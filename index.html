@@ -18,9 +18,9 @@
 
     <!-- CSS (el visor de Spline ya no va aquí: lo pide un script al final
          de la página cuando la mascota de la sección 3 se acerca) -->
-    <link rel="stylesheet" href="style.css?v=20260923f">
+    <link rel="stylesheet" href="style.css?v=20260923g">
 
-    <!-- 🔤 LA OLA DE ENTRADA ESPERA A LAS FUENTES (24 de septiembre de 2026)
+    <!-- 🔤 LA OLA DE ENTRADA ESPERA A LAS FUENTES (23 de septiembre de 2026)
          La ola (hero-in / menu-in) lleva blur(), y Chrome no puede animar un
          blur fuera del hilo principal: cada fotograma de la ola depende de
          que ese hilo esté libre. Las fuentes de Google llegaban A MITAD de la
@@ -2227,7 +2227,7 @@ void main() {
             // Se pregunta cada 250 ms y no en cada fotograma: la pregunta viaja
             // al proceso de la GPU y espera turno detrás de lo que esté
             // pintando, y durante la ola de entrada eso llegaba a 150 ms por
-            // pregunta (medido con la CPU 4× más lenta). Desde el 24/09 el humo
+            // pregunta (medido con la CPU 4× más lenta). Desde el 23/09 (tarde) el humo
             // ya se enciende con la ola terminada (ver encenderHumo(), abajo).
             if (paralelo) {
                 const esperarCompilacion = function () {
@@ -2254,7 +2254,7 @@ void main() {
         // 👑 EL PORTAL: el marco es el propio canvas, y solo se dibuja lo que
         // deja ver la corona (zonaVisibleHumo, en el JS del portal).
         //
-        // ⏳ SE ENCIENDE CUANDO TERMINA LA OLA DE ENTRADA (24 de septiembre de
+        // ⏳ SE ENCIENDE CUANDO TERMINA LA OLA DE ENTRADA (23 de septiembre de
         // 2026). Crear el contexto y compilar el shader, aunque la compilación
         // vaya en otro hilo, ocupa el proceso de la GPU, y hacerlo al cargar
         // caía justo encima de la ola: en la traza con la CPU 4× más lenta,
