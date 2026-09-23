@@ -127,6 +127,20 @@ body {
     animation-delay: calc(var(--n, 0) * 110ms);
 }
 
+/* En index.html la ola arranca pausada hasta que llegan las fuentes (ver el
+   script "LA OLA DE ENTRADA ESPERA A LAS FUENTES" en su <head>): el blur de
+   hero-in no puede ir en el compositor, así que si las fuentes llegan a mitad
+   de la ola, la página se remide entera en plena entrada y la ola da saltos.
+   Pausada, cada pieza se queda en su primer fotograma (invisible: `both`).
+   La niebla de las letras también espera, para seguir arrancando después de
+   la ola. En legal.html la clase nunca se pone. */
+html.ola-en-espera .menu,
+html.ola-en-espera .hero [data-reveal],
+html.ola-en-espera .hero-wordmark span,
+html.ola-en-espera .hero-conteo .hero-dato-valor {
+    animation-play-state: paused;
+}
+
 /* Con el movimiento reducido no hay ola: todo aparece ya puesto. (El relevo
    del botón se apaga en su propio bloque, al lado de sus reglas: este de aquí
    solo puede pisar lo declarado más arriba. La cinta que tuvo el hero estuvo
@@ -1488,6 +1502,12 @@ body.menu-abierto {
     width: 100%;
     height: 100%;
     pointer-events: none;
+    /* Negro mientras el shader no ha dibujado: el humo se enciende al terminar
+       la ola de entrada (24 septiembre 2026), y antes de tener contexto WebGL
+       el canvas es transparente y asomaría el verde de .corona-lienzo. Negro
+       es lo que se veía siempre mientras el shader compilaba. Sin WebGL el
+       canvas se esconde y queda el verde, como antes. */
+    background-color: #000;
 }
 
 /* 🌑 EL VELO QUE APAGA EL HUMO

@@ -18,7 +18,53 @@
 
     <!-- CSS (el visor de Spline ya no va aquí: lo pide un script al final
          de la página cuando la mascota de la sección 3 se acerca) -->
-    <link rel="stylesheet" href="style.css?v=20260923e">
+    <link rel="stylesheet" href="style.css?v=20260923f">
+
+    <!-- 🔤 LA OLA DE ENTRADA ESPERA A LAS FUENTES (24 de septiembre de 2026)
+         La ola (hero-in / menu-in) lleva blur(), y Chrome no puede animar un
+         blur fuera del hilo principal: cada fotograma de la ola depende de
+         que ese hilo esté libre. Las fuentes de Google llegaban A MITAD de la
+         ola, y al llegar el navegador vuelve a medir la página entera (~80 ms
+         con la CPU 4× más lenta) y cambia la letra de "ANXIE STORE" en plena
+         entrada: la ola se veía a saltos. Así que la ola (y la niebla de las
+         letras, que va detrás de ella) arranca pausada y se suelta cuando las
+         dos fuentes ya están, o al segundo si tardan más. Pedirlas aquí
+         además adelanta su descarga: sin esto esperaban a la primera
+         maquetación. En una visita repetida vienen del caché y no se nota.
+         Este script corre después de los CSS de arriba (los espera), así que
+         las @font-face de Google ya existen cuando se piden. La clase la
+         apaga el CSS del bloque "Entrada escalonada" de style.css, y
+         window.anxieOla avisa cuándo empezó la ola (el humo del portal la
+         espera para compilar). -->
+    <script>
+    (function () {
+        'use strict';
+        const raiz = document.documentElement;
+        let soltarOla;
+        window.anxieOla = new Promise(function (resolver) { soltarOla = resolver; });
+        if (!document.fonts || !document.fonts.load) { soltarOla(); return; }
+
+        raiz.classList.add('ola-en-espera');
+        let suelta = false;
+        const soltar = function () {
+            if (suelta) return;
+            suelta = true;
+            raiz.classList.remove('ola-en-espera');
+            soltarOla();
+        };
+        // Dos fotogramas: en el primero el navegador remide la página con las
+        // fuentes nuevas; la ola arranca en el siguiente, ya sin ese trabajo.
+        const soltarTrasMedir = function () {
+            requestAnimationFrame(function () { requestAnimationFrame(soltar); });
+        };
+        const texto = 'ANXIE STORE Cuentas catálogo años';
+        Promise.all([
+            document.fonts.load('800 1em "Plus Jakarta Sans"', texto),
+            document.fonts.load('600 1em Montserrat', texto)
+        ]).then(soltarTrasMedir, soltarTrasMedir);
+        setTimeout(soltar, 1000);
+    })();
+    </script>
 
     <!-- CDN de Supabase (versión fija: no cambia sola y jsdelivr la guarda un año) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0"></script>
@@ -2181,15 +2227,15 @@ void main() {
             // Se pregunta cada 250 ms y no en cada fotograma: la pregunta viaja
             // al proceso de la GPU y espera turno detrás de lo que esté
             // pintando, y durante la ola de entrada eso llegaba a 150 ms por
-            // pregunta (medido con la CPU 4× más lenta). La primera va al
-            // segundo, con la ola ya terminada.
+            // pregunta (medido con la CPU 4× más lenta). Desde el 24/09 el humo
+            // ya se enciende con la ola terminada (ver encenderHumo(), abajo).
             if (paralelo) {
                 const esperarCompilacion = function () {
                     if (!vivo) return;
                     if (gl.getProgramParameter(programa, paralelo.COMPLETION_STATUS_KHR)) arrancar();
                     else setTimeout(esperarCompilacion, 250);
                 };
-                setTimeout(esperarCompilacion, 1000);
+                setTimeout(esperarCompilacion, 250);
             } else {
                 arrancar();
             }
@@ -2207,9 +2253,41 @@ void main() {
 
         // 👑 EL PORTAL: el marco es el propio canvas, y solo se dibuja lo que
         // deja ver la corona (zonaVisibleHumo, en el JS del portal).
-        const humoCorona = crearHumo(canvasCorona, {
-            nombre: 'Shader de la corona',
-            zonaVisible: typeof zonaVisibleHumo === 'function' ? zonaVisibleHumo : null
+        //
+        // ⏳ SE ENCIENDE CUANDO TERMINA LA OLA DE ENTRADA (24 de septiembre de
+        // 2026). Crear el contexto y compilar el shader, aunque la compilación
+        // vaya en otro hilo, ocupa el proceso de la GPU, y hacerlo al cargar
+        // caía justo encima de la ola: en la traza con la CPU 4× más lenta,
+        // ~200 ms sin un solo fotograma en plena entrada (el video del dueño
+        // lo mostraba: las letras entraban a saltos). La ola dura 4 × 110 ms
+        // + 520 ms, así que se espera un segundo desde que arranca
+        // (window.anxieOla, en el <head>) y después un rato libre del
+        // navegador. Si antes de eso el visitante hace scroll (o la página abre
+        // ya bajada), se enciende en el acto: va camino del portal. Mientras
+        // tanto el canvas se ve negro (su fondo en style.css), igual que se veía
+        // antes de que el shader estuviera listo.
+        let humoCorona = null;
+        let tapadoPendiente = false;
+        let encendido = false;
+
+        function encenderHumo() {
+            if (encendido) return;
+            encendido = true;
+            window.removeEventListener('scroll', encenderHumo);
+            humoCorona = crearHumo(canvasCorona, {
+                nombre: 'Shader de la corona',
+                zonaVisible: typeof zonaVisibleHumo === 'function' ? zonaVisibleHumo : null
+            });
+            if (humoCorona && tapadoPendiente) humoCorona.setTapado(true);
+        }
+
+        window.addEventListener('scroll', encenderHumo, { passive: true });
+        if (window.scrollY > 0) encenderHumo();
+        Promise.resolve(window.anxieOla).then(function () {
+            setTimeout(function () {
+                if (window.requestIdleCallback) requestIdleCallback(encenderHumo, { timeout: 1000 });
+                else encenderHumo();
+            }, 1000);
         });
 
         // 🔌 LO ÚNICO QUE ESTE BLOQUE EXPONE
@@ -2217,9 +2295,10 @@ void main() {
         // en cuanto el velo del apagado queda opaco, y a setTapado(false) si
         // vuelves a subir y el humo tiene que reaparecer. Sin esto el shader
         // seguiría quemando GPU detrás de un negro liso durante dos pantallas
-        // de scroll.
+        // de scroll. Si llega antes de encenderlo, se guarda para entonces.
         window.anxieHumo = {
             setTapado: function (valor) {
+                tapadoPendiente = !!valor;
                 if (humoCorona) humoCorona.setTapado(valor);
             }
         };
