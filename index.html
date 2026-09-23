@@ -18,7 +18,7 @@
 
     <!-- CSS (el visor de Spline ya no va aquí: lo pide un script al final
          de la página cuando la mascota de la sección 3 se acerca) -->
-    <link rel="stylesheet" href="style.css?v=20260923a">
+    <link rel="stylesheet" href="style.css?v=20260923b">
 
     <!-- CDN de Supabase (versión fija: no cambia sola y jsdelivr la guarda un año) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0"></script>
@@ -999,6 +999,61 @@
             return Math.min(1, Math.max(0, -rect.top / recorrido));
         }
 
+        // Progreso DENTRO del destapado. Es exactamente el que la curva de la
+        // corona ha usado siempre: al repartir el recorrido el acto 1 conserva
+        // sus 2.6 pantallas, así que la animación de la corona se siente
+        // idéntica a antes.
+        function pDestapadoDe(progreso) {
+            const fin = finDestapado();
+            return fin > 0 ? Math.min(1, progreso / fin) : 1;
+        }
+
+        // El ancho de la corona para ese progreso: la curva de la maqueta, tal
+        // cual (arranque + progreso^2.3 * 4500). El exponente es lo que hace que
+        // casi no se mueva al principio (da tiempo a leerla como corona) y se
+        // dispare al final. Lo usan pintarCorona() y zonaVisibleHumo().
+        // Redondeado a píxel entero. Con decimales el navegador re-rasteriza la
+        // máscara SVG a un tamaño distinto en CADA fotograma y los bordes de las
+        // puntas hierven; a píxel entero se queda quieta.
+        function tamCoronaDe(pDestapado) {
+            const reposo = tamanioReposoCorona();
+            const cobertura = tamanioCoberturaCorona();
+            const crecimiento = Math.max(CORONA_CRECIMIENTO, cobertura - reposo);
+            return Math.round(reposo + Math.pow(pDestapado, 2.3) * crecimiento);
+        }
+
+        // Alto de la silueta entre su ancho (el viewBox de la máscara mide
+        // 1000 x 874.44).
+        const CORONA_PROPORCION = 874.44 / 1000;
+
+        // ✂️ HASTA DÓNDE SE VE EL HUMO (23 de septiembre de 2026)
+        // El humo solo se ve por dentro de la corona, pero el shader pintaba la
+        // pantalla entera: con la corona en reposo en un celular, casi 5 veces
+        // más píxeles de los que se ven, y es el trabajo más pesado de la
+        // tarjeta gráfica en toda la página. Esto le dice al shader (crearHumo,
+        // más abajo) el rectángulo de la corona, y fuera de él no dibuja nada:
+        // fuera no se ve nada, porque la máscara lo tapa.
+        // Devuelve la mitad del ancho y del alto de ese rectángulo, en px CSS
+        // del canvas y medidos desde su centro. El lienzo hace zoom desde el
+        // centro, así que el zoom se deshace dividiendo.
+        // Va a lo grande a propósito: el humo se dibuja en su propio
+        // requestAnimationFrame, que puede correr antes o después del de la
+        // corona en el mismo fotograma. Por eso se toma la corona MÁS GRANDE y
+        // el zoom MÁS CHICO entre la que está pintada y la que pide el scroll,
+        // y la que pinte el bucle cae siempre entre esas dos.
+        // null = sin recorte (todavía no se pudo medir el portal).
+        function zonaVisibleHumo() {
+            if (!_portalRecorrido) return null;
+            const pPintado = pDestapadoDe(_coronaActual);
+            const pObjetivo = pDestapadoDe(_coronaObjetivo);
+            const tam = Math.max(tamCoronaDe(pPintado), tamCoronaDe(pObjetivo));
+            const zoom = 1 + Math.min(pPintado, pObjetivo) * CORONA_ZOOM;
+            return {
+                mitadAncho: tam / 2 / zoom,
+                mitadAlto: tam * CORONA_PROPORCION / 2 / zoom
+            };
+        }
+
         // Este cuerpo está partido a propósito en dos mitades: PRIMERO todo lo
         // que MIDE (getBoundingClientRect, innerWidth...) y DESPUÉS todo lo que
         // ESCRIBE estilos. Antes iba mezclado -- se escribía mask-size y acto
@@ -1008,6 +1063,7 @@
         // que no llegaban a tiempo.
         function pintarCorona(progreso) {
             // ---- 1. MEDIR ----
+            const portal = document.getElementById('coronaPortal');
             const mask = document.getElementById('coronaMask');
             const lienzo = document.querySelector('.corona-lienzo');
             const cierre = document.getElementById('coronaCierre');
@@ -1019,23 +1075,9 @@
             const anchoVentana = window.innerWidth;
             const altoVentana = altoViewport();
 
-            // Progreso DENTRO del destapado. Es exactamente el que la curva de
-            // la corona ha usado siempre: al repartir el recorrido el acto 1
-            // conserva sus 2.6 pantallas, así que la animación de la corona se
-            // siente idéntica a antes.
-            const fin = finDestapado();
-            const pDestapado = fin > 0 ? Math.min(1, progreso / fin) : 1;
-
-            // La curva de la maqueta, tal cual: arranque + progreso^2.3 * 4500.
-            // El exponente es lo que hace que casi no se mueva al principio (da
-            // tiempo a leerla como corona) y se dispare al final.
-            const reposo = tamanioReposoCorona();
+            const pDestapado = pDestapadoDe(progreso);
             const cobertura = tamanioCoberturaCorona();
-            const crecimiento = Math.max(CORONA_CRECIMIENTO, cobertura - reposo);
-            // Redondeado a píxel entero. Con decimales el navegador re-rasteriza
-            // la máscara SVG a un tamaño distinto en CADA fotograma y los bordes
-            // de las puntas hierven; a píxel entero se queda quieta.
-            const tam = Math.round(reposo + Math.pow(pDestapado, 2.3) * crecimiento);
+            const tam = tamCoronaDe(pDestapado);
 
             const pantalla = Math.max(anchoVentana, altoVentana);
             // Red de seguridad, no parte de la animación: en la maqueta no existe
@@ -1096,6 +1138,14 @@
                 // Va detrás de la máscara, así que el cambio seco no se ve.
                 cierre.style.backgroundColor = pApagado > 0 ? 'var(--corona-negro)' : '';
             }
+
+            // 📱 La franja que asoma DEBAJO del pin en celular mientras la barra
+            // del navegador se esconde (el pin mide 100dvh, y el navegador lo
+            // estira cuando la barra termina de irse, no antes). Esa franja es
+            // el fondo del portal: blanco mientras el borde de abajo del pin es
+            // blanco y negro desde que el cierre lo tapa, así no se nota. En PC
+            // la franja no existe y esto no cambia nada de lo que se ve.
+            if (portal) portal.classList.toggle('corona-portal--negro', cerrando > 0.5);
 
             // Con el velo del todo opaco el shader está dibujando humo que no ve
             // nadie, y al portal todavía le queda más de una pantalla en el
@@ -1302,8 +1352,19 @@
         window.addEventListener('resize', actualizarRevelados, { passive: true });
         actualizarRevelados();
 
-        function refrescarCorona() {
-            actualizarCorona(true);
+        // En celular, un resize que deja el ancho igual es la barra del
+        // navegador que terminó de esconderse o de salir. Ahí el objetivo no
+        // cambia (altoViewport() usa el alto guardado), así que la corona sigue
+        // con su arrastre de siempre: con el pintado inmediato pegaba un brinco
+        // hasta el objetivo cada vez que la barra acababa de moverse.
+        let _coronaAnchoVisto = window.innerWidth;
+
+        function refrescarCorona(evento) {
+            const ancho = window.innerWidth;
+            const soloBarra = !!evento && evento.type === 'resize'
+                && ancho <= 900 && ancho === _coronaAnchoVisto;
+            _coronaAnchoVisto = ancho;
+            actualizarCorona(!soloBarra);
         }
 
         window.addEventListener('DOMContentLoaded', refrescarCorona);
@@ -1755,9 +1816,15 @@ void main() {
         //                              es el propio canvas.
         //   opciones.observarTambien — opcional. Otro elemento cuyo cambio de
         //                              tamaño obliga a remedir (el del marco).
+        //   opciones.zonaVisible     — opcional. Se llama en cada fotograma y
+        //                              devuelve { mitadAncho, mitadAlto } en px
+        //                              CSS desde el centro del canvas: lo único
+        //                              que se ve. Fuera de ahí no se dibuja.
+        //                              null = el canvas entero.
         function crearHumo(canvas, opciones) {
             const nombre = opciones.nombre;
             const medirMarco = opciones.medirMarco || null;
+            const zonaVisible = opciones.zonaVisible || null;
             const esconder = function () { canvas.style.display = 'none'; };
 
             let gl = null;
@@ -1873,6 +1940,10 @@ void main() {
             // terminó de moverse, no en cada fotograma.
             let marcoSucio = true;
             let marcoCss = null;
+            // El tamaño CSS del canvas en el último ajustarTamanio(), para el
+            // recorte de zonaVisible sin volver a medir.
+            let cssAnchoVisto = 1;
+            let cssAltoVisto = 1;
             const arranque = performance.now();
 
             // clientWidth/clientHeight y NO getBoundingClientRect: el canvas del
@@ -1882,6 +1953,8 @@ void main() {
             function ajustarTamanio() {
                 const cssAncho = Math.max(1, canvas.clientWidth);
                 const cssAlto = Math.max(1, canvas.clientHeight);
+                cssAnchoVisto = cssAncho;
+                cssAltoVisto = cssAlto;
                 if (medirMarco && marcoSucio) {
                     marcoCss = medirMarco();
                 }
@@ -1932,8 +2005,33 @@ void main() {
                 if (raf !== 0) { cancelAnimationFrame(raf); raf = 0; }
             }
 
+            // ✂️ Limita el dibujo (scissor) a lo que dice zonaVisible, más un
+            // margen de 4px CSS: el navegador estira el canvas con filtrado y
+            // cada píxel de pantalla lee también a sus vecinos, así que el borde
+            // tiene que estar dibujado aunque no se vea. Lo de fuera queda en el
+            // negro con el que WebGL vacía el canvas en cada fotograma, y ahí no
+            // mira nadie: lo tapa la máscara. Lo que sí se dibuja sale idéntico,
+            // porque cada píxel del shader solo depende de su propia posición.
+            function aplicarZonaVisible() {
+                const zona = zonaVisible ? zonaVisible() : null;
+                const sx = canvas.width / cssAnchoVisto;
+                const sy = canvas.height / cssAltoVisto;
+                const x0 = zona ? Math.max(0, Math.floor((cssAnchoVisto / 2 - zona.mitadAncho - 4) * sx)) : 0;
+                const x1 = zona ? Math.min(canvas.width, Math.ceil((cssAnchoVisto / 2 + zona.mitadAncho + 4) * sx)) : canvas.width;
+                const y0 = zona ? Math.max(0, Math.floor((cssAltoVisto / 2 - zona.mitadAlto - 4) * sy)) : 0;
+                const y1 = zona ? Math.min(canvas.height, Math.ceil((cssAltoVisto / 2 + zona.mitadAlto + 4) * sy)) : canvas.height;
+                if (x0 <= 0 && y0 <= 0 && x1 >= canvas.width && y1 >= canvas.height) {
+                    gl.disable(gl.SCISSOR_TEST);
+                    return;
+                }
+                gl.enable(gl.SCISSOR_TEST);
+                // El scissor cuenta desde ABAJO, igual que gl_FragCoord.
+                gl.scissor(x0, canvas.height - y1, Math.max(0, x1 - x0), Math.max(0, y1 - y0));
+            }
+
             function pintar(ahora) {
                 ajustarTamanio();
+                aplicarZonaVisible();
                 gl.uniform4f(uni.scene, canvas.width, canvas.height,
                              ((ahora - arranque) / 1000) * U.timeScale, U.colorCount);
                 gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -2035,8 +2133,12 @@ void main() {
             };
         }
 
-        // 👑 EL PORTAL: el marco es el propio canvas.
-        const humoCorona = crearHumo(canvasCorona, { nombre: 'Shader de la corona' });
+        // 👑 EL PORTAL: el marco es el propio canvas, y solo se dibuja lo que
+        // deja ver la corona (zonaVisibleHumo, en el JS del portal).
+        const humoCorona = crearHumo(canvasCorona, {
+            nombre: 'Shader de la corona',
+            zonaVisible: typeof zonaVisibleHumo === 'function' ? zonaVisibleHumo : null
+        });
 
         // 🔌 LO ÚNICO QUE ESTE BLOQUE EXPONE
         // pintarCorona() (el JS del portal, más arriba) llama a setTapado(true)

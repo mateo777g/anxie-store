@@ -1266,6 +1266,9 @@ body {
        sube con margin-top: -100vh y se come justo esa pantalla. Si tocas este
        número, toca el margen negativo igual. */
     height: 610vh;
+    /* Este fondo solo se ve en la franja que asoma DEBAJO del pin mientras la
+       barra del navegador se esconde (ver .corona-pin). Por eso cambia a negro
+       con .corona-portal--negro cuando la corona ya tapó la pantalla. */
     background-color: #ffffff;
 
     /* El negro al que se apaga el humo. Es el --negro de la paleta, que sale del
@@ -1276,12 +1279,30 @@ body {
     z-index: 11;
 }
 
+/* La franja de debajo del pin, del color del borde de abajo del pin: el negro
+   del arco del horizonte (#000) desde que la corona tapa la pantalla. La
+   clase la pone pintarCorona() en index.html. */
+.corona-portal--negro {
+    background-color: #000000;
+}
+
 .corona-pin {
     position: sticky;
     top: 0;
     width: 100%;
+    /* dvh y NO svh (23 de septiembre de 2026): el pin tiene que medir lo que
+       mide la pantalla EN CADA MOMENTO. En celular la barra de direcciones se
+       esconde al bajar y la pantalla crece (~56px en Chrome de Android, más en
+       Safari); con 100svh el pin se quedaba con el alto de la barra visible y
+       debajo asomaba el blanco del portal: las esquinas y la pista "scroll"
+       subían y en el negro del reposo salía una raya blanca abajo. 100dvh
+       sigue a la barra, y con ella visible mide lo mismo que 100svh, así que
+       ese estado no cambia. En PC no hay barra que se esconda: dvh = svh = vh.
+       El navegador ajusta dvh cuando la barra TERMINA de moverse; mientras se
+       mueve asoma una franja del portal, y por eso el portal la pinta del
+       color que toca (.corona-portal--negro). */
     height: 100vh;
-    height: 100svh;
+    height: 100dvh;
     overflow: hidden;
     background-color: #ffffff;
     display: flex;
