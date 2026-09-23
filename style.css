@@ -1266,9 +1266,10 @@ body {
        sube con margin-top: -100vh y se come justo esa pantalla. Si tocas este
        número, toca el margen negativo igual. */
     height: 610vh;
-    /* Este fondo solo se ve en la franja que asoma DEBAJO del pin mientras la
-       barra del navegador se esconde (ver .corona-pin). Por eso cambia a negro
-       con .corona-portal--negro cuando la corona ya tapó la pantalla. */
+    /* Este fondo no se ve nunca: el pin mide 100lvh, que siempre es al menos
+       lo que mide la pantalla, así que lo tapa entero en todo momento (ver
+       .corona-pin). Hasta el 23/09/2026 asomaba en celular una franja de él
+       debajo del pin, y se pintaba de negro para disimularla; ya no hace falta. */
     background-color: #ffffff;
 
     /* El negro al que se apaga el humo. Es el --negro de la paleta, que sale del
@@ -1279,30 +1280,31 @@ body {
     z-index: 11;
 }
 
-/* La franja de debajo del pin, del color del borde de abajo del pin: el negro
-   del arco del horizonte (#000) desde que la corona tapa la pantalla. La
-   clase la pone pintarCorona() en index.html. */
-.corona-portal--negro {
-    background-color: #000000;
-}
-
 .corona-pin {
     position: sticky;
     top: 0;
     width: 100%;
-    /* dvh y NO svh (23 de septiembre de 2026): el pin tiene que medir lo que
-       mide la pantalla EN CADA MOMENTO. En celular la barra de direcciones se
-       esconde al bajar y la pantalla crece (~56px en Chrome de Android, más en
-       Safari); con 100svh el pin se quedaba con el alto de la barra visible y
-       debajo asomaba el blanco del portal: las esquinas y la pista "scroll"
-       subían y en el negro del reposo salía una raya blanca abajo. 100dvh
-       sigue a la barra, y con ella visible mide lo mismo que 100svh, así que
-       ese estado no cambia. En PC no hay barra que se esconda: dvh = svh = vh.
-       El navegador ajusta dvh cuando la barra TERMINA de moverse; mientras se
-       mueve asoma una franja del portal, y por eso el portal la pinta del
-       color que toca (.corona-portal--negro). */
+    /* lvh (23 de septiembre de 2026): el alto de la pantalla GRANDE, la que
+       queda con la barra del navegador escondida. En celular la barra se
+       esconde al bajar y la pantalla crece (~56px en Chrome de Android; ~85px
+       en Chrome 135+ con la franja de gestos, más en Safari). lvh NO cambia
+       cuando la barra se mueve y nunca es menor que la pantalla, así que
+       debajo del pin no puede asomar nada y nada se recoloca. Con la barra
+       puesta, los ~85px de abajo quedan bajo el borde, como en cualquier
+       página: lo pegado abajo (esquinas, "scroll", el botón del reposo) se
+       mide contra el pin entero, igual que en PC. El JS mide lo mismo:
+       altoViewport() en index.html lee una sonda de 100lvh.
+       Historia: primero 100svh (el alto CON barra): al irse la barra el pin
+       se quedaba corto y asomaba el blanco del portal. Luego 100dvh (commit
+       672bdc1), que sigue a la barra, pero TARDE: Chrome lo actualiza con
+       retraso y espera a que acabe el gesto, así que mientras tanto seguía el
+       hueco (tapado de negro con un parche) y al enterarse todo brincaba
+       ~85px. En PC no hay barra: lvh = vh, y el pin no cambia.
+       Fuentes: MDN <length> (vh equivale a lvh; dvh redimensiona mientras se
+       hace scroll), web.dev/blog/viewport-units, developer.chrome.com/blog/
+       url-bar-resizing y developer.chrome.com/docs/css-ui/edge-to-edge. */
     height: 100vh;
-    height: 100dvh;
+    height: 100lvh;
     overflow: hidden;
     background-color: #ffffff;
     display: flex;

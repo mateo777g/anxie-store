@@ -18,7 +18,7 @@
 
     <!-- CSS (el visor de Spline ya no va aquí: lo pide un script al final
          de la página cuando la mascota de la sección 3 se acerca) -->
-    <link rel="stylesheet" href="style.css?v=20260923b">
+    <link rel="stylesheet" href="style.css?v=20260923c">
 
     <!-- CDN de Supabase (versión fija: no cambia sola y jsdelivr la guarda un año) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0"></script>
@@ -826,25 +826,43 @@
             });
         });
 
-        // 📐 ALTO DE VIEWPORT ESTABLE (fix del scroll raro en iPhone)
-        // En iOS, window.innerHeight NO es constante: crece ~130px solo cuando
-        // Safari colapsa su barra al scrollear. Como las animaciones de abajo
-        // dividen entre ese valor, el progreso brincaba hacia atrás a media
-        // scroll. Lo cacheamos y solo lo recalculamos cuando cambia el ANCHO,
+        // 📐 ALTO DE VIEWPORT ESTABLE: el mismo 100lvh que mide el pin
+        // En celular window.innerHeight NO es constante: crece cuando la barra
+        // del navegador se esconde al bajar (~85px en Chrome de Android con la
+        // franja de gestos, ~130px en Safari). Como las animaciones de abajo
+        // dividen entre ese valor, el progreso brincaba a media scroll. Por eso
+        // en celular se usa el alto de 100lvh, la pantalla GRANDE: no cambia
+        // con la barra y es EXACTAMENTE lo que mide .corona-pin en style.css,
+        // así que el CSS y el JS cuentan con la misma pantalla y progreso,
+        // cobertura de la corona, apagado, ola y umbrales caen siempre en el
+        // mismo scroll. Hasta el 23/09/2026 se guardaba innerHeight al cargar,
+        // que es el alto CON barra: ~85px menos que el pin.
+        // lvh no se puede leer desde JS, así que se mide con una sonda: un div
+        // invisible de 100lvh. Se vuelve a medir solo cuando cambia el ANCHO,
         // que es lo único que significa un cambio real de viewport (girar el
-        // celular).
-        let _vpAlto = window.innerHeight;
+        // celular). En emuladores y en PC no hay barra: lvh = innerHeight.
+        const _vpSonda = document.createElement('div');
+        _vpSonda.setAttribute('aria-hidden', 'true');
+        _vpSonda.style.cssText = 'position:absolute;top:0;left:0;width:1px;'
+            + 'height:100vh;height:100lvh;visibility:hidden;pointer-events:none;';
+        document.body.appendChild(_vpSonda);
+
+        function medirAltoGrande() {
+            return _vpSonda.getBoundingClientRect().height || window.innerHeight;
+        }
+
+        let _vpAlto = medirAltoGrande();
         let _vpAncho = window.innerWidth;
         window.addEventListener('resize', () => {
             if (window.innerWidth !== _vpAncho) {
                 _vpAncho = window.innerWidth;
-                _vpAlto = window.innerHeight;
+                _vpAlto = medirAltoGrande();
             }
         }, { passive: true });
 
         // En PC no existe barra que se colapse, así que ahí usamos el valor
         // vivo (permite redimensionar la ventana sin recargar). En celular
-        // usamos el cacheado para que la animación no salte.
+        // usamos el medido para que la animación no salte.
         function altoViewport() {
             return window.innerWidth > 900 ? window.innerHeight : _vpAlto;
         }
@@ -1063,7 +1081,6 @@
         // que no llegaban a tiempo.
         function pintarCorona(progreso) {
             // ---- 1. MEDIR ----
-            const portal = document.getElementById('coronaPortal');
             const mask = document.getElementById('coronaMask');
             const lienzo = document.querySelector('.corona-lienzo');
             const cierre = document.getElementById('coronaCierre');
@@ -1138,14 +1155,6 @@
                 // Va detrás de la máscara, así que el cambio seco no se ve.
                 cierre.style.backgroundColor = pApagado > 0 ? 'var(--corona-negro)' : '';
             }
-
-            // 📱 La franja que asoma DEBAJO del pin en celular mientras la barra
-            // del navegador se esconde (el pin mide 100dvh, y el navegador lo
-            // estira cuando la barra termina de irse, no antes). Esa franja es
-            // el fondo del portal: blanco mientras el borde de abajo del pin es
-            // blanco y negro desde que el cierre lo tapa, así no se nota. En PC
-            // la franja no existe y esto no cambia nada de lo que se ve.
-            if (portal) portal.classList.toggle('corona-portal--negro', cerrando > 0.5);
 
             // Con el velo del todo opaco el shader está dibujando humo que no ve
             // nadie, y al portal todavía le queda más de una pantalla en el
@@ -1354,7 +1363,8 @@
 
         // En celular, un resize que deja el ancho igual es la barra del
         // navegador que terminó de esconderse o de salir. Ahí el objetivo no
-        // cambia (altoViewport() usa el alto guardado), así que la corona sigue
+        // cambia (altoViewport() usa el alto de 100lvh, como el pin, y ninguno
+        // de los dos se entera de la barra), así que la corona sigue
         // con su arrastre de siempre: con el pintado inmediato pegaba un brinco
         // hasta el objetivo cada vez que la barra acababa de moverse.
         let _coronaAnchoVisto = window.innerWidth;
