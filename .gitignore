@@ -25,3 +25,5 @@ worker/
 .claude/
 # Maquetas, ejemplos, textos de referencia y assets que ya no usa ninguna página.
 _privado/
+
+planes/
