@@ -18,7 +18,7 @@
 
     <!-- CSS (el visor de Spline ya no va aquí: lo pide un script al final
          de la página cuando la mascota de la sección 3 se acerca) -->
-    <link rel="stylesheet" href="style.css?v=20260923c">
+    <link rel="stylesheet" href="style.css?v=20260923d">
 
     <!-- CDN de Supabase (versión fija: no cambia sola y jsdelivr la guarda un año) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0"></script>
@@ -544,9 +544,16 @@
 
                 <!-- 👉 DERECHA: la mascota del Discord en 3D (Spline). Va FUERA de
                      la ola a propósito: el blur de la entrada sobre un canvas
-                     WebGL vivo la trababa. -->
+                     WebGL vivo la trababa.
+                     En celular (≤ 900px) NO hay 3D: sale el logo de Discord en su
+                     azul, una imagen quieta (decisión del dueño, 23/09/2026: con la
+                     mascota viva la página iba a la mitad de fluidez en su
+                     teléfono). Ahí el visor ni se baja; ver VISOR DE SPLINE BAJO
+                     DEMANDA. En PC el logo va con display: none y, al ser lazy, el
+                     navegador no lo pide. -->
                 <div class="s3-mascota" aria-hidden="true">
                     <spline-viewer url="https://prod.spline.design/HFQiKc5wRilijMuJ/scene.splinecode"></spline-viewer>
+                    <img class="s3-mascota-logo" src="assets/logo-discord-azul.webp" alt="" width="640" height="496" loading="lazy" decoding="async">
                 </div>
 
             </div>
@@ -1472,12 +1479,23 @@
          byte), pero jsdelivr lo deja en caché un año y Spline no. Es la misma
          URL que usa catalogo.html, así que se baja una sola vez para las dos
          páginas: si cambias la versión aquí, cámbiala también allá.
+
+         SOLO EN PC (> 900px) desde el 23/09/2026: en celular la mascota es el
+         logo de Discord en imagen (ver el markup de .s3-mascota), así que ahí
+         el visor no se baja nunca y no hay una segunda escena WebGL
+         compitiendo con el humo. Si la ventana crece de celular a PC, se
+         empieza a vigilar en ese momento.
          ========================================================== -->
     <script>
     (function () {
         const VISOR_SPLINE = 'https://cdn.jsdelivr.net/npm/@splinetool/viewer@2.0.55/build/spline-viewer.js';
         const mascota = document.querySelector('.s3-mascota');
         if (!mascota) return;
+
+        // El mismo @media (max-width: 900px) que pone el logo en .s3-mascota,
+        // negado: así no queda ningún ancho en el que no valga ninguno.
+        const esCelular = window.matchMedia('(max-width: 900px)');
+        let vigilando = false;
 
         function cargarVisor() {
             const script = document.createElement('script');
@@ -1486,18 +1504,27 @@
             document.head.appendChild(script);
         }
 
-        // Sin IntersectionObserver (navegadores muy viejos) se pide de una vez.
-        if (!('IntersectionObserver' in window)) {
-            cargarVisor();
-            return;
+        function vigilar() {
+            if (vigilando || esCelular.matches) return;
+            vigilando = true;
+            esCelular.removeEventListener('change', vigilar);
+
+            // Sin IntersectionObserver (navegadores muy viejos) se pide de una vez.
+            if (!('IntersectionObserver' in window)) {
+                cargarVisor();
+                return;
+            }
+
+            const vigia = new IntersectionObserver((entradas) => {
+                if (!entradas.some((e) => e.isIntersecting)) return;
+                vigia.disconnect();
+                cargarVisor();
+            }, { rootMargin: '0px 0px 300% 0px' });
+            vigia.observe(mascota);
         }
 
-        const vigia = new IntersectionObserver((entradas) => {
-            if (!entradas.some((e) => e.isIntersecting)) return;
-            vigia.disconnect();
-            cargarVisor();
-        }, { rootMargin: '0px 0px 300% 0px' });
-        vigia.observe(mascota);
+        esCelular.addEventListener('change', vigilar);
+        vigilar();
     })();
     </script>
 
