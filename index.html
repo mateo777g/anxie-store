@@ -134,7 +134,7 @@
                     </span>
                     <span class="menu__text">Inicio</span>
                 </a></li>
-                <li><a class="menu__item" href="catalogo.html#cases">
+                <li><a class="menu__item" href="/catalogo">
                     <span class="menu__ico" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M4 8h16l-1.2 11a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8z" />
@@ -143,7 +143,7 @@
                     </span>
                     <span class="menu__text">Catalogo</span>
                 </a></li>
-                <li><a class="menu__item" href="#features">
+                <li><a class="menu__item" href="#contacto">
                     <span class="menu__ico" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z" />
@@ -182,14 +182,14 @@
                 </svg>
                 <span>Inicio</span>
             </a></li>
-            <li style="--i: 1;"><a href="catalogo.html#cases">
+            <li style="--i: 1;"><a href="/catalogo">
                 <svg class="sidebar-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M4 8h16l-1.2 11a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8z" />
                     <path d="M9 11V7a3 3 0 0 1 6 0v4" />
                 </svg>
                 <span>Catálogo</span>
             </a></li>
-            <li style="--i: 2;"><a href="#features">
+            <li style="--i: 2;"><a href="#contacto">
                 <svg class="sidebar-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z" />
                 </svg>
@@ -318,7 +318,7 @@
                              segunda copia del texto es aria-hidden para que el
                              lector de pantalla no lea "Ver catálogo" dos
                              veces. -->
-                        <a href="catalogo.html#cases" class="btn-hero">
+                        <a href="/catalogo" class="btn-hero">
                             <span class="btn-hero-rodillo">
                                 <span class="btn-hero-copia">Ver catálogo</span>
                                 <span class="btn-hero-copia" aria-hidden="true">Ver catálogo</span>
@@ -551,7 +551,7 @@
                      botón (.destacada-pie-lema, que en PC no se ve). -->
                 <div class="destacada-pie" data-reveal style="--n: 3;">
                     <p class="destacada-pie-lema">Revisa nuestro catálogo completo de cuentas.</p>
-                    <a href="catalogo.html#cases" class="btn-hero destacada-pie-btn">
+                    <a href="/catalogo" class="btn-hero destacada-pie-btn">
                         <span class="btn-hero-rodillo">
                             <span class="btn-hero-copia">Catálogo<span class="btn-hero-sobra"> completo</span></span>
                             <span class="btn-hero-copia" aria-hidden="true">Catálogo<span class="btn-hero-sobra"> completo</span></span>
@@ -581,7 +581,7 @@
     </div>
 
     <!-- SECCIÓN 4: POR QUÉ ANXIE STORE -->
-    <div class="seccion-tres-scroll-wrapper" id="features">
+    <div class="seccion-tres-scroll-wrapper" id="contacto">
         <section class="seccion-tres">
             <div class="seccion-tres-container">
 
@@ -652,8 +652,8 @@
             <!-- Atajos. El aviso legal va abajo, junto al copyright. -->
             <nav class="footer-nav" aria-label="Enlaces del pie" data-reveal style="--n: 0;">
                 <a href="#home" class="footer-nav-link"><span>Inicio</span></a>
-                <a href="catalogo.html#cases" class="footer-nav-link"><span>Catalogo</span></a>
-                <a href="#features" class="footer-nav-link"><span>Contacto</span></a>
+                <a href="/catalogo" class="footer-nav-link"><span>Catalogo</span></a>
+                <a href="#contacto" class="footer-nav-link"><span>Contacto</span></a>
             </nav>
 
             <div class="footer-redes" data-reveal style="--n: 1;">
@@ -685,7 +685,7 @@
         <p class="footer-marca" aria-hidden="true" data-reveal style="--n: 2;">Anxie<em>Store</em></p>
 
         <div class="footer-bottom" data-reveal style="--n: 3;">
-            <a href="legal.html" class="footer-legal">Aviso Legal</a>
+            <a href="/legal" class="footer-legal">Aviso Legal</a>
             <p class="footer-copy">&copy; 2026 AnxieStore. Todos los derechos reservados.</p>
         </div>
     </footer>
@@ -918,8 +918,12 @@
 
         // 🎯 SCROLL SUAVE DE LOS ANCLAS DEL MENÚ Y DEL FOOTER
         // (los atajos del footer iban con el salto seco del navegador)
+        // El panel lateral (celular) sigue saltando en seco como el ancla normal;
+        // se intercepta solo para que la dirección no se quede con #home o
+        // #contacto (24 septiembre 2026, URLs limpias). Si ya traía uno (se
+        // llega a /#contacto desde el catálogo), se borra al moverse.
         window.addEventListener('DOMContentLoaded', () => {
-            const navLinks = document.querySelectorAll('.menu__item[href^="#"], .footer-nav-link[href^="#"]');
+            const navLinks = document.querySelectorAll('.menu__item[href^="#"], .footer-nav-link[href^="#"], .sidebar-links a[href^="#"]');
 
             navLinks.forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
@@ -929,7 +933,8 @@
                     const targetElement = document.querySelector(targetId);
                     if (targetElement) {
                         e.preventDefault();
-                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                        if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+                        targetElement.scrollIntoView(this.closest('.sidebar-links') ? undefined : { behavior: 'smooth' });
                     }
                 });
             });
@@ -1326,7 +1331,7 @@
             // La sección 4 es blanca y va POR ENCIMA del portal (z 25 vs 11).
             // Durante el solape los dos están bajo la barra a la vez, así que
             // esta comprobación va después: gana quien se ve.
-            if (bajoLaBarra(document.getElementById('features'))) tema = 'claro';
+            if (bajoLaBarra(document.getElementById('contacto'))) tema = 'claro';
 
             // El footer: ya no es verde sino negro, así que 'oscuro' (píldora
             // blanca, panel verde) es el único tema que no se pierde encima de

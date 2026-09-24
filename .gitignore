@@ -25,5 +25,7 @@ worker/
 .claude/
 # Maquetas, ejemplos, textos de referencia y assets que ya no usa ninguna página.
 _privado/
+# Servidor local que imita las URLs limpias del .htaccess.
+servidor-local.py
 
 planes/

@@ -16,6 +16,28 @@
   RedirectMatch 404 ^/(worker|EJEMPLOS|maquetas-s2|_privado|_respaldo[^/]*|_scripts|venv|\.vscode|\.claude|\.wrangler|\.git)(/|$)
 </IfModule>
 
+# 🔗 URLs limpias (24 septiembre 2026): anxiestore.com/catalogo y /legal en vez
+#    de /catalogo.html y /legal.html, y el inicio siempre en anxiestore.com/.
+#    Los archivos no se mueven: la dirección limpia sirve el .html de siempre.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Las direcciones viejas (enlaces guardados, Google, el HTML en caché)
+  # llevan a la limpia con un 301. %{THE_REQUEST} es lo que pidió el
+  # navegador, no la reescritura interna de abajo: sin esa condición el
+  # 301 y la reescritura se perseguirían en bucle.
+  RewriteCond %{THE_REQUEST} \s/+index\.html[\s?]
+  RewriteRule ^index\.html$ / [R=301,L]
+
+  RewriteCond %{THE_REQUEST} \s/+(catalogo|legal)\.html[\s?]
+  RewriteRule ^(catalogo|legal)\.html$ /$1 [R=301,L]
+
+  # Con barra final, style.css y assets/ se buscarían dentro de /catalogo/.
+  RewriteRule ^(catalogo|legal)/$ /$1 [R=301,L]
+
+  RewriteRule ^(catalogo|legal)$ $1.html [L]
+</IfModule>
+
 # 🛡️ Cabeceras de seguridad
 <IfModule mod_headers.c>
   Header always set X-Content-Type-Options "nosniff"
