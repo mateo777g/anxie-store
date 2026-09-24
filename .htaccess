@@ -43,4 +43,14 @@
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set X-Frame-Options "SAMEORIGIN"
+
+  # 🔄 El HTML se revalida en cada visita (24 septiembre 2026). Sin
+  #    Cache-Control el navegador se guardaba la página a ojo y, tras un
+  #    push, seguía mostrando la vieja: con las URLs limpias, un Edge abría
+  #    el inicio viejo y de ahí /legal.html sin preguntarle al servidor.
+  #    Si no cambió, Hostinger contesta un 304 vacío. El CSS/JS sigue con
+  #    su semana de caché: para eso está el ?v= de cada página.
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
 </IfModule>
