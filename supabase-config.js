@@ -2,7 +2,6 @@
 // supabase-config.js
 // Cliente compartido de Supabase para páginas PÚBLICAS
 // → Usar en: index.html y catalogo.html
-// → NO usar en: lilshop.html (el admin necesita auth real)
 //
 // ¿Por qué persistSession: false?
 // El console mostraba "Tracking Prevention blocked access to storage"
