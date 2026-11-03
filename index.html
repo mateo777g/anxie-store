@@ -882,6 +882,10 @@
 
         // Suscripción en Tiempo Real
         function suscribirCambiosTiempoReal() {
+            // Al cambiar el dólar (Ajustes del panel), la base recalcula el USD de muchas
+            // cuentas a la vez y llega un evento por cada una: se espera a que paren
+            // (500 ms sin eventos) y se consulta UNA vez, no una por cuenta.
+            let esperaRecarga = null;
             _supabase
                 .channel('schema-db-changes')
                 .on(
@@ -893,7 +897,8 @@
                         // también recargue de Supabase en su próxima visita, y forzar
                         // que esta página lea directo de la base ahora mismo.
                         try { sessionStorage.removeItem('anxie_catalog_v1'); } catch (e) {}
-                        cargarCuentaDestacada(true);
+                        clearTimeout(esperaRecarga);
+                        esperaRecarga = setTimeout(() => cargarCuentaDestacada(true), 500);
                     }
                 )
                 .subscribe();
